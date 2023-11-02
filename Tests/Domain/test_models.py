@@ -33,6 +33,7 @@ class test_mole(unittest.TestCase):
                 "user_id": UserID(id=1),
                 "name": "takgyun",
                 "password": Password(pw="1qaz2wsx!@"),
+                "posts": None,
             },
             user.__dict__,
         )
@@ -45,6 +46,7 @@ class test_mole(unittest.TestCase):
                 "title": "test",
                 "content": Content(content="test 입니다."),
                 "user_id": UserID(id=1),
+                "post_id": None,
             },
             post.__dict__,
         )
