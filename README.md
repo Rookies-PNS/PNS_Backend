@@ -16,6 +16,11 @@ pip install -r requirments.txt
 python Tests\Domain\test_models.py
 ```
 
+# Docs
+
+[회원기능](https://github.com/Cloud-is-best-beer/Log_Board_Tak/blob/main/Applications/README.md)
+
+
 # TimeLine
 
 [이탁균 진행상황](https://docs.google.com/spreadsheets/d/1lDSmwstYR6058RaqRJcVM6E0k69j6pXSGbfq7WrgrpE/edit#gid=386990213)
