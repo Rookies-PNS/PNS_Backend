@@ -1,16 +1,16 @@
 import dataclasses
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class ID:
     id: int
 
 
-@dataclasses.dataclass
-class UserID:
-    id: ID
+@dataclasses.dataclass(frozen=True)
+class UserID(ID):
+    ...
 
 
-@dataclasses.dataclass
-class PostID:
-    id: ID
+@dataclasses.dataclass(frozen=True)
+class PostID(ID):
+    ...
