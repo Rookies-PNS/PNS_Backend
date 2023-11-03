@@ -3,7 +3,7 @@ import unittest
 import sys
 
 from Domains.Models import User, Post
-from Commons import UserID, Password, Content
+from Commons import Uid, UserId, PostId, Password, Content
 
 
 class test_mole(unittest.TestCase):
@@ -27,10 +27,10 @@ class test_mole(unittest.TestCase):
 
     def test_User_1(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        user = User(UserID(id=1), "takgyun", Password(pw="1qaz2wsx!@"))
+        user = User(UserId(Uid(idx=1), "taks123"), "takgyun", Password(pw="1qaz2wsx!@"))
         self.assertDictEqual(
             {
-                "user_id": UserID(id=1),
+                "user_id": UserId(Uid(idx=1), id="taks123"),
                 "name": "takgyun",
                 "password": Password(pw="1qaz2wsx!@"),
                 "posts": None,
@@ -40,13 +40,13 @@ class test_mole(unittest.TestCase):
 
     def test_Post_1(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post = Post("test", Content(content="test 입니다."), UserID(id=1))
+        post = Post("test", Content(content="test 입니다."), PostId(idx=1), Uid(idx=1))
         self.assertDictEqual(
             {
                 "title": "test",
                 "content": Content(content="test 입니다."),
-                "user_id": UserID(id=1),
-                "post_id": None,
+                "post_id": PostId(idx=1),
+                "user_id": Uid(idx=1),
             },
             post.__dict__,
         )
