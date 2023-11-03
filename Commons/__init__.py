@@ -7,7 +7,7 @@ root_path = str(now_path.parent)
 if not (root_path in sys.path):
     sys.path.append(root_path)
 
-from Commons.Types.ID import ID, UserID, PostID
+from Commons.Types.ID import Id, Uid, UserId, UserIdVO, PostId
 from Commons.Types.Content import Content
 from Commons.Types.Password import Password
 

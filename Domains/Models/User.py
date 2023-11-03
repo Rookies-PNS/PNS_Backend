@@ -1,15 +1,15 @@
 from typing import List, Optional
 
-from Commons import UserID, Password, PostID
+from Commons import UserId, Password, PostId
 
 
 class User:
     def __init__(
         self,
-        user_id: UserID,
+        user_id: UserId,
         name: str,
         password: Password,
-        posts: Optional[List[PostID]] = None,
+        posts: Optional[List[PostId]] = None,
     ):
         self.user_id = user_id
         self.name = name

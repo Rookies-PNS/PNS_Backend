@@ -1,16 +1,29 @@
 import dataclasses
+from typing import Optional
 
 
 @dataclasses.dataclass(frozen=True)
-class ID:
-    id: int
+class Id:
+    idx: int
 
 
 @dataclasses.dataclass(frozen=True)
-class UserID(ID):
+class Uid(Id):
     ...
 
 
+@dataclasses.dataclass
+class UserId:
+    uid: Optional[Uid]
+    id: str
+
+
 @dataclasses.dataclass(frozen=True)
-class PostID(ID):
+class UserIdVO:
+    uid: Uid
+    id: str
+
+
+@dataclasses.dataclass(frozen=True)
+class PostId(Id):
     ...

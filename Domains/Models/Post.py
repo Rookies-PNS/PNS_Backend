@@ -1,6 +1,6 @@
-from typing import List, Optional
+from typing import Optional
 
-from Commons import UserID, Content, PostID
+from Commons import Uid, Content, PostId
 
 
 class Post:
@@ -8,8 +8,8 @@ class Post:
         self,
         title: str,
         content: Content,
-        user_id: Optional[UserID] = None,
-        post_id: Optional[PostID] = None,
+        post_id: Optional[PostId] = None,
+        user_id: Optional[Uid] = None,
     ):
         self.title = title
         self.content = content
