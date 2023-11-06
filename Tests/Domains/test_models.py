@@ -6,7 +6,7 @@ from Domains.Models import User, Post
 from Commons import Uid, UserId, PostId, Password, Content
 
 
-class test_mole(unittest.TestCase):
+class test_models(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = "test"

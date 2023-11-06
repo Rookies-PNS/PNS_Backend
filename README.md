@@ -13,7 +13,7 @@ git clone https://github.com/Cloud-is-best-beer/Log_Board_Tak.git
 cd Log_Board_Tak
 pip install -r requirments.txt
 
-python Tests\Domain\test_models.py
+python Tests\Domains\test_models.py
 ```
 
 # Docs
