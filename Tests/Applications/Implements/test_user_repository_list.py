@@ -4,7 +4,12 @@ from typing import Optional, List
 from Commons import UserId, Uid
 from Domains.Entities import UserVO, User
 from Applications.Repositories.Interfaces import IUserRepository
-from Applications.Results import Result, Fail, Fail_CreateUser_IDAlreadyExists
+from Applications.Results import (
+    Result,
+    Fail,
+    Fail_CheckUser_IDNotFound,
+    Fail_CreateUser_IDAlreadyExists,
+)
 
 
 class TestUserRepositoryList(IUserRepository):
@@ -12,16 +17,18 @@ class TestUserRepositoryList(IUserRepository):
         self.arr = arr
         self.count = 0
 
-    def check_not_exist_userid(self, userid: str) -> Result[UserId]:
+    def check_exist_userid(self, userid: str) -> Result[UserId]:
         for user in self.arr:
-            if userid == user.user_id:
-                return Fail_CreateUser_IDAlreadyExists
-        return UserId(id=userid)
+            if userid == user.user_id.id:
+                return UserId(id=userid)
+        return Fail_CheckUser_IDNotFound()
 
     def save(self, user: User) -> Result[UserVO]:
+        user_id = self.check_exist_userid(user.user_id)
         self.count += 1
         user_vo = UserVO(user.user_id, user.name, user.password, Uid(idx=self.count))
         self.arr.append(user_vo)
+        return user_vo
 
     def search_by_uid(self, uid: Uid) -> Optional[UserVO]:
         for user in self.arr:

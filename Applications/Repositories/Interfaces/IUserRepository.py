@@ -9,7 +9,7 @@ from Applications.Results import Result
 
 class IUserRepository(metaclass=ABCMeta):
     @abstractclassmethod
-    def check_not_exist_userid(self, userid: str) -> Result[UserId]:
+    def check_exist_userid(self, userid: str) -> Result[UserId]:
         pass
 
     @abstractclassmethod

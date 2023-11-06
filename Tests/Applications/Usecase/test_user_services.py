@@ -6,6 +6,11 @@ from typing import List
 from Commons import UserId, Uid, Password
 from Domains.Entities import UserVO, User
 from Applications.Usecases import CreateUser
+from Applications.Results import (
+    Fail,
+    Fail_CheckUser_IDNotFound,
+    Fail_CreateUser_IDAlreadyExists,
+)
 
 from Tests.Applications.Implements.test_user_repository_list import (
     TestUserRepositoryList,
@@ -35,6 +40,18 @@ class test_create_user(unittest.TestCase):
     def tearDown(self):
         "Hook method for deconstructing the test fixture after testing it."
         print("\t", sys._getframe(0).f_code.co_name)
+
+    def test_result(self):
+        print("\t\t", sys._getframe(0).f_code.co_name)
+        self.assertEqual({"type": "basic"}, Fail(type="basic").__dict__)
+
+        self.assertTrue(issubclass(Fail_CreateUser_IDAlreadyExists, Fail))
+        self.assertEqual(
+            {"type": "IDAlreadyExists"}, Fail_CreateUser_IDAlreadyExists().__dict__
+        )
+
+        self.assertTrue(issubclass(Fail_CheckUser_IDNotFound, Fail))
+        self.assertEqual({"type": "IDNotFound"}, Fail_CheckUser_IDNotFound().__dict__)
 
     def test_start_data(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
@@ -74,6 +91,15 @@ class test_create_user(unittest.TestCase):
             },
             user.__dict__,
         )
+
+        # 중복 아이디
+        ret = self.create_user.create("taks123", "1q2w3e4r!@#$", "takgyun Lee")
+        match ret:
+            case _ if isinstance(ret, Fail):
+                self.assertTrue(True)
+            case _:
+                print(ret.__dict__)
+                self.assertTrue(False)
 
 
 if __name__ == "__main__":

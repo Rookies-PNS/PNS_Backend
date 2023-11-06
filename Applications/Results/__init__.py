@@ -8,4 +8,7 @@ if not (root_path in sys.path):
     sys.path.append(root_path)
 
 from Applications.Results.Result import Result, Fail
-from Applications.Results.Fails import *
+from Applications.Results.Fails import (
+    Fail_CreateUser_IDAlreadyExists,
+    Fail_CheckUser_IDNotFound,
+)
