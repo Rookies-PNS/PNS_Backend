@@ -2,7 +2,7 @@ import __init__
 from typing import List, Optional
 
 from Commons import UserId, Uid, Password, PostId
-from Domains.Models import User, UserVO
+from Domains.Entities import User, UserVO
 from Applications.Repositories.Interfaces import IUserRepository
 from Applications.Results import Result, Fail
 

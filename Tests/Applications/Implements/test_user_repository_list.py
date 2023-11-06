@@ -2,7 +2,7 @@ import __init__
 from typing import Optional, List
 
 from Commons import UserId, Uid
-from Domains.Models import UserVO, User
+from Domains.Entities import UserVO, User
 from Applications.Repositories.Interfaces import IUserRepository
 from Applications.Results import Result, Fail, Fail_CreateUser_IDAlreadyExists
 

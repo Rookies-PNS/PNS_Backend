@@ -4,7 +4,7 @@ from collections.abc import Collection
 from abc import *
 
 from Commons import Uid, PostId
-from Domains.Models import Post, PostVO
+from Domains.Entities import Post, PostVO
 from Applications.Results import Result
 
 

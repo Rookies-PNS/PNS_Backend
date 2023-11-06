@@ -3,7 +3,7 @@ from typing import Optional
 from abc import *
 
 from Commons import Uid, UserId
-from Domains.Models import User, UserVO
+from Domains.Entities import User, UserVO
 from Applications.Results import Result
 
 

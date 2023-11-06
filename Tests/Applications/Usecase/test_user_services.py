@@ -4,7 +4,7 @@ import sys
 from typing import List
 
 from Commons import UserId, Uid, Password
-from Domains.Models import UserVO, User
+from Domains.Entities import UserVO, User
 from Applications.Usecases import CreateUser
 
 from Tests.Applications.Implements.test_user_repository_list import (
