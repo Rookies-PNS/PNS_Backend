@@ -104,11 +104,13 @@ class test_create_user(unittest.TestCase):
         self.assertEqual({"type": "basic"}, Fail(type="basic").__dict__)
 
         self.assertTrue(issubclass(Fail_CreateUser_IDAlreadyExists, Fail))
+        self.assertTrue(isinstance(Fail_CreateUser_IDAlreadyExists(), Fail))
         self.assertEqual(
             {"type": "IDAlreadyExists"}, Fail_CreateUser_IDAlreadyExists().__dict__
         )
 
         self.assertTrue(issubclass(Fail_CheckUser_IDNotFound, Fail))
+        self.assertTrue(isinstance(Fail_CheckUser_IDNotFound(), Fail))
         self.assertEqual({"type": "IDNotFound"}, Fail_CheckUser_IDNotFound().__dict__)
 
     def test_start_data(self):
