@@ -2,7 +2,7 @@ import __init__
 import unittest
 import sys
 
-from Domains.Models import User, Post
+from Domains.Entities import User, Post
 from Commons import Uid, UserId, PostId, Password, Content
 
 
