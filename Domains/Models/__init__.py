@@ -7,5 +7,5 @@ root_path = str(now_path.parent.parent)
 if not (root_path in sys.path):
     sys.path.append(root_path)
 
-from Domains.Models.Post import Post
-from Domains.Models.User import User
+from Domains.Models.Post import Post, PostVO
+from Domains.Models.User import User, UserVO

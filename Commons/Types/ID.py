@@ -14,13 +14,6 @@ class Uid(Id):
 
 @dataclasses.dataclass
 class UserId:
-    uid: Optional[Uid]
-    id: str
-
-
-@dataclasses.dataclass(frozen=True)
-class UserIdVO:
-    uid: Uid
     id: str
 
 

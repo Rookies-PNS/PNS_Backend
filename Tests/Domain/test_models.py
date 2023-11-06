@@ -27,13 +27,13 @@ class test_mole(unittest.TestCase):
 
     def test_User_1(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        user = User(UserId(Uid(idx=1), "taks123"), "takgyun", Password(pw="1qaz2wsx!@"))
+        user = User(UserId("taks123"), "takgyun", Password(pw="1qaz2wsx!@"), Uid(idx=1))
         self.assertDictEqual(
             {
-                "user_id": UserId(Uid(idx=1), id="taks123"),
+                "user_id": UserId(id="taks123"),
                 "name": "takgyun",
                 "password": Password(pw="1qaz2wsx!@"),
-                "posts": None,
+                "uid": Uid(idx=1),
             },
             user.__dict__,
         )

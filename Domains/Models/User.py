@@ -1,6 +1,7 @@
 from typing import List, Optional
+from dataclasses import dataclass
 
-from Commons import UserId, Password, PostId
+from Commons import UserId, Uid, Password, PostId
 
 
 class User:
@@ -9,9 +10,17 @@ class User:
         user_id: UserId,
         name: str,
         password: Password,
-        posts: Optional[List[PostId]] = None,
+        uid: Optional[Uid] = None,
     ):
         self.user_id = user_id
         self.name = name
         self.password = password
-        self.posts = posts
+        self.uid = uid
+
+
+@dataclass(frozen=True)
+class UserVO:
+    user_id: UserId
+    name: str
+    password: Password
+    uid: Uid
