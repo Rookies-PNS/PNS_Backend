@@ -12,3 +12,8 @@ class Fail_CreateUser_IDAlreadyExists(Fail):
 @dataclass(frozen=True)
 class Fail_CheckUser_IDNotFound(Fail):
     type: str = "IDNotFound"
+
+
+@dataclass(frozen=True)
+class Fail_CheckUser_PasswardNotCorrect(Fail):
+    type: str = "PasswardNotCorrect"

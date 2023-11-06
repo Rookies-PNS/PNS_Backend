@@ -9,6 +9,7 @@ from Applications.Results import (
     Fail,
     Fail_CreateUser_IDAlreadyExists,
     Fail_CheckUser_IDNotFound,
+    Fail_CheckUser_PasswardNotCorrect,
 )
 
 
@@ -18,12 +19,9 @@ class CreateUser:
 
     def create(self, id: str, pw: str, name: str) -> Result[UserVO]:
         # check user id
-        ret_uid = self.repository.check_exist_userid(id)
-        match ret_uid:
-            case _ if isinstance(ret_uid, UserId):
-                return Fail_CreateUser_IDAlreadyExists()
-            case _:
-                user_id = UserId(id=id)
+        if self.repository.check_exist_userid(id):
+            return Fail_CreateUser_IDAlreadyExists()
+        user_id = UserId(id=id)
 
         # check passward
         password = Password(pw=pw)
@@ -33,15 +31,20 @@ class CreateUser:
         return self.repository.save(user)
 
 
-# class LoginUser:
-#     def __init__(self, repository: IUserRepository):
-#         self.repository = repository
+class LoginUser:
+    def __init__(self, repository: IUserRepository):
+        self.repository = repository
 
-#     def login(self, id: str, pw: str) -> Result[UserVO]:
-#         # check user id
-#         ret_uid = self.repository.check_exist_userid(id)
-#         match ret_uid:
-#             case _ if isinstance(ret_uid, UserId):
-#                 return Fail_CheckUser_IDNotFound()
-#             case _:
-#                 pass
+    def login(self, id: str, pw: str) -> Result[UserVO]:
+        # check user id
+        if not self.repository.check_exist_userid(id):
+            return Fail_CheckUser_IDNotFound()
+
+        # get user
+        user = self.repository.search_by_userid(UserId(id=id))
+
+        # check pw
+        pw = Password(pw=pw)
+        if pw == user.password:
+            return user
+        return Fail_CheckUser_PasswardNotCorrect()

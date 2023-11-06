@@ -17,11 +17,11 @@ class TestUserRepositoryList(IUserRepository):
         self.arr = arr
         self.count = 0
 
-    def check_exist_userid(self, userid: str) -> Result[UserId]:
+    def check_exist_userid(self, userid: str) -> bool:
         for user in self.arr:
             if userid == user.user_id.id:
-                return UserId(id=userid)
-        return Fail_CheckUser_IDNotFound()
+                return True
+        return False
 
     def save(self, user: User) -> Result[UserVO]:
         user_id = self.check_exist_userid(user.user_id)
