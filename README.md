@@ -12,8 +12,11 @@ pip install -r requirements.txt
 git clone https://github.com/Cloud-is-best-beer/Log_Board_Tak.git
 cd Log_Board_Tak
 pip install -r requirments.txt
+```
 
-python Tests\Domains\test_models.py
+# How to Test
+```pwsh
+foreach ($Line in $File){iex "$Line"}
 ```
 
 # Docs

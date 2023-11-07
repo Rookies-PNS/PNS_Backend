@@ -116,7 +116,7 @@ class test_create_user(unittest.TestCase):
     def test_start_data(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
 
-        user = self.arr[0]
+        user = self.login_user.login("taks123", "1q2w3e4r!@#$")
 
         self.assertDictEqual(
             {
@@ -128,7 +128,7 @@ class test_create_user(unittest.TestCase):
             user.__dict__,
         )
 
-        user = self.arr[1]
+        user = self.login_user.login("hahahoho119", "1b2n3m4!#@")
 
         self.assertDictEqual(
             {
@@ -140,7 +140,7 @@ class test_create_user(unittest.TestCase):
             user.__dict__,
         )
 
-        user = self.arr[2]
+        user = self.login_user.login("mygun7749", "$1#awb5$")
 
         self.assertDictEqual(
             {
@@ -165,5 +165,9 @@ class test_create_user(unittest.TestCase):
                 self.assertTrue(False)
 
 
-if __name__ == "__main__":
+def main():
     unittest.main()
+
+
+if __name__ == "__main__":
+    main()

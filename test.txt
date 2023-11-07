@@ -1,0 +1,2 @@
+python -m unittest Tests\Domains\test_entities.py
+python -m unittest Tests\Applications\Usecase\test_user_services.py
