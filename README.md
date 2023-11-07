@@ -12,6 +12,8 @@ pip install -r requirements.txt
 git clone https://github.com/Cloud-is-best-beer/Log_Board_Tak.git
 cd Log_Board_Tak
 pip install -r requirments.txt
+
+python Services\Flask\board_site.py
 ```
 
 # How to Test
