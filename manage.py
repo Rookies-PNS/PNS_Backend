@@ -9,6 +9,7 @@ def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument("--run", choices=["test", "git-push", "flask"], default="flask")
     parser.add_argument("--branch", default="main")
+    parser.add_argument("--not_debug", action="store_false", default=True)
     parser.add_argument(
         "--test_file",
         nargs="*",
@@ -31,6 +32,8 @@ def test(test_list: list) -> bool:
         ret = subprocess.call(test_py, shell=True)
         if ret == 1:
             fail = True
+    if fail:
+        print("==================test가 실패했습니다=========================")
 
     return not fail
 
@@ -39,14 +42,12 @@ def git_push(test_list: list, branch="main"):
     if test(test_list):
         exe = f"git push origin {branch}"
         subprocess.call(exe, shell=True)
-    else:
-        print("test가 실패했습니다.")
 
 
-def flask():
+def flask(debug=True):
     from Services.Flask.board_site import app
 
-    app.run(debug=True)
+    app.run(debug=debug)
 
 
 def main(opt):
@@ -57,9 +58,9 @@ def main(opt):
         case "git-push":
             git_push(opt.test_file, opt.branch)
         case "flask":
-            flask()
+            flask(opt.not_debug)
         case _:
-            print("'python manage.py --help' 명령어도 인자를 확인해 주세요.")
+            print("'python manage.py -h' 명령어도 인자를 확인해 주세요.")
 
 
 if __name__ == "__main__":
