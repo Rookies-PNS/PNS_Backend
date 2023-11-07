@@ -1,0 +1,67 @@
+import __init__
+
+import argparse
+import os
+import subprocess
+
+
+def parse_opt():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--run", choices=["test", "git-push", "flask"], default="flask")
+    parser.add_argument("--branch", default="main")
+    parser.add_argument(
+        "--test_file",
+        nargs="*",
+        default=[
+            r"Tests\Domains\test_entities.py",
+            r"Tests\Applications\Usecase\test_user_services.py",
+        ],
+    )
+    opt = parser.parse_args()
+    return opt
+
+
+def test(test_list: list) -> bool:
+    fail = False
+
+    test_exe = "python -m unittest"
+
+    for test in test_list:
+        test_py = f"{test_exe} {test}"
+        ret = subprocess.call(test_py, shell=True)
+        if ret == 1:
+            fail = True
+
+    return not fail
+
+
+def git_push(test_list: list, branch="main"):
+    if test(test_list):
+        exe = f"git push origin {branch}"
+        subprocess.call(exe, shell=True)
+    else:
+        print("test가 실패했습니다.")
+
+
+def flask():
+    from Services.Flask.board_site import app
+
+    app.run(debug=True)
+
+
+def main(opt):
+    print(f"Run {opt.run}")
+    match opt.run:
+        case "test":
+            test(opt.test_file)
+        case "git-push":
+            git_push(opt.test_file, opt.branch)
+        case "flask":
+            flask()
+        case _:
+            print("'python manage.py --help' 명령어도 인자를 확인해 주세요.")
+
+
+if __name__ == "__main__":
+    opt = parse_opt()
+    main(opt)
