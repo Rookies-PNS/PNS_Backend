@@ -1,7 +1,6 @@
 import __init__
 from flask import Flask, render_template, request, redirect, url_for, session
 
-
 from Domains.Entities import UserVO
 from Applications.Usecases import LoginUser
 from Applications.Results import Fail, Result

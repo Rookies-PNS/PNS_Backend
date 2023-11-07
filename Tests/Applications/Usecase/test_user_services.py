@@ -32,8 +32,9 @@ class test_create_user(unittest.TestCase):
         "Hook method for setting up the test fixture before exercising it."
         print("\t", sys._getframe(0).f_code.co_name)
         self.arr: List[UserVO] = []
-        self.create_user = CreateUser(TestUserRepositoryList(self.arr))
-        self.login_user = LoginUser(TestUserRepositoryList(self.arr))
+        repo = TestUserRepositoryList(self.arr)
+        self.create_user = CreateUser(repo)
+        self.login_user = LoginUser(repo)
 
         self.create_user.create("taks123", "1q2w3e4r!@#$", "takgyun Lee")
         self.create_user.create("hahahoho119", "1b2n3m4!#@", "Ho Han")
