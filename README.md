@@ -15,6 +15,8 @@ pip install -r requirments.txt
 ```
 
 # How to Test
+
+### in Powershell
 ```pwsh
 foreach ($Line in $File){iex "$Line"}
 ```
