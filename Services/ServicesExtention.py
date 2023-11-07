@@ -11,6 +11,7 @@ def get_secrets_file() -> str:
         if os.path.isfile(join_path):
             return os.path.abspath(join_path)
 
+    print("Check File", "[Log_Board_Tak/secrets.json]")
     raise FileNotFoundError()
 
 
@@ -18,7 +19,6 @@ def get_secrets_key() -> str:
     try:
         secret_file = get_secrets_file()  # secrets.json 파일 위치
     except FileNotFoundError as ex:
-        print("Check File", "[Log_Board_Tak/secrets.json]")
         exit()
     except Exception as ex:
         raise ex
