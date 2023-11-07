@@ -20,7 +20,7 @@ python Services\Flask\board_site.py
 
 ### in Powershell
 ```pwsh
-foreach ($Line in $File){iex "$Line"}
+foreach ($Line in (Get-Content "test.txt")){iex "$Line"}
 ```
 
 # Docs
