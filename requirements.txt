@@ -1,4 +1,7 @@
 python=3.11
 flask=2.2.2
 dependency=4.41.0
+pymysql=1.0.2
+
+# ========= yoyo ========== yoyo-migrations=7.3.2 text-unidecode = 1.3
 # pip=23.3
