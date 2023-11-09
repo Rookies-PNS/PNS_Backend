@@ -50,6 +50,27 @@ def flask(debug=True):
     app.run(debug=debug)
 
 
+# def create_table():
+#     from get_db_data import get_mysql_url
+#     from pathlib import Path
+#     import os
+
+#     origin_path = os.getcwd()
+#     root_path = Path(__file__).resolve().parent
+#     yoyo_dir = r"Infrastructures\Yoyo"
+#     yoyo_dir = str(root_path / yoyo_dir)
+#     os.chdir(yoyo_dir)
+
+#     try:
+#         exe = f"yoyo apply --database {get_mysql_url()} {yoyo_dir}"
+#         print(exe)
+#         subprocess.call(exe, shell=True)
+#     except Exception as ex:
+#         print(ex)
+#     finally:
+#         os.chdir(origin_path)
+
+
 def main(opt):
     print(f"Run {opt.run}")
     match opt.run:
@@ -59,6 +80,8 @@ def main(opt):
             git_push(opt.test_file, opt.branch)
         case "flask":
             flask(opt.not_debug)
+        # case "create-table":
+        #     create_table()
         case _:
             print("'python manage.py -h' 명령어도 인자를 확인해 주세요.")
 
