@@ -7,9 +7,12 @@ import subprocess
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--run", choices=["test", "git-push", "flask"], default="flask")
+    parser.add_argument(
+        "--run", choices=["test", "git-push", "flask", "migrate"], default="flask"
+    )
     parser.add_argument("--branch", default="main")
     parser.add_argument("--not_debug", action="store_false", default=True)
+    parser.add_argument("--storage_type", default="mysql")
     parser.add_argument(
         "--test_file",
         nargs="*",
@@ -71,8 +74,29 @@ def flask(debug=True):
 #         os.chdir(origin_path)
 
 
+def migrate():
+    from Infrastructures.IOC import get_strage_factory
+    from Infrastructures import IStorageFactory, IMigrations
+
+    factory: IStorageFactory = get_strage_factory()
+
+    m: IMigrations = factory.get_migrations()
+
+    m.create_user()
+    # m.init_user()
+    # m.create_post()
+    # m.init_post
+
+
+def set_storage(storage_type: str):
+    from Infrastructures.IOC import select_strage
+
+    select_strage(storage_type)
+
+
 def main(opt):
     print(f"Run {opt.run}")
+    set_storage(opt.storage_type)
     match opt.run:
         case "test":
             test(opt.test_file)
@@ -80,6 +104,8 @@ def main(opt):
             git_push(opt.test_file, opt.branch)
         case "flask":
             flask(opt.not_debug)
+        case "migrate":
+            migrate()
         # case "create-table":
         #     create_table()
         case _:

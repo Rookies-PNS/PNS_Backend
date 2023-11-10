@@ -7,4 +7,6 @@ root_path = str(now_path.parent)
 if not (root_path in sys.path):
     sys.path.append(root_path)
 
-from Services.ServicesExtention import get_secrets_key
+from Services.ServicesExtention import (
+    get_secrets_key,
+)

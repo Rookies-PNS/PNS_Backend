@@ -5,7 +5,7 @@ from Domains.Entities import UserVO
 from Applications.Usecases import LoginUser
 from Applications.Results import Fail, Result
 
-from Services.Flask.IOC import get_user_storage
+from Infrastructures.IOC import get_user_storage
 from Services import get_secrets_key
 
 # APP init
