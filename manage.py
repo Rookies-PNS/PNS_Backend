@@ -8,7 +8,9 @@ import subprocess
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--run", choices=["test", "git-push", "flask", "migrate"], default="flask"
+        "--run",
+        choices=["test", "git-push", "flask", "migrate", "delete-storage"],
+        default="flask",
     )
     parser.add_argument("--branch", default="main")
     parser.add_argument("--not_debug", action="store_false", default=True)
@@ -18,7 +20,9 @@ def parse_opt():
         nargs="*",
         default=[
             r"Tests\Domains\test_entities.py",
-            r"Tests\Applications\Usecase\test_user_services.py",
+            r"Tests\Applications\Usecases\test_user_services.py",
+            r"Tests\Infrastructures\Storage\test_.py",
+            r"Tests\Infrastructures\Storage\test_migrate.py",
         ],
     )
     opt = parser.parse_args()
@@ -29,14 +33,20 @@ def test(test_list: list) -> bool:
     fail = False
 
     test_exe = "python -m unittest"
+    fail_list = []
 
     for test in test_list:
         test_py = f"{test_exe} {test}"
+        print("Test", test)
         ret = subprocess.call(test_py, shell=True)
         if ret == 1:
+            fail_list.append(test)
             fail = True
     if fail:
-        print("==================test가 실패했습니다=========================")
+        print("=======================Fail Test=============================")
+        for test in fail_list:
+            print(f"\t> {test}")
+        print("=======================+++++++++=============================")
 
     return not fail
 
@@ -53,39 +63,50 @@ def flask(debug=True):
     app.run(debug=debug)
 
 
-# def create_table():
-#     from get_db_data import get_mysql_url
-#     from pathlib import Path
-#     import os
+def init_user():
+    from Applications.Usecases import CreateUser
+    from Infrastructures.IOC import get_strage_factory
+    from Infrastructures.Interfaces import IStorageFactory
+    from Applications.Repositories.Interfaces import IUserRepository
 
-#     origin_path = os.getcwd()
-#     root_path = Path(__file__).resolve().parent
-#     yoyo_dir = r"Infrastructures\Yoyo"
-#     yoyo_dir = str(root_path / yoyo_dir)
-#     os.chdir(yoyo_dir)
+    admin = {
+        "id": "admin",
+        "pw": "admin123",
+        "name": "관리자",
+    }
+    users = [
+        admin,
+    ]
+    create = CreateUser(get_strage_factory().get_user_strage())
 
-#     try:
-#         exe = f"yoyo apply --database {get_mysql_url()} {yoyo_dir}"
-#         print(exe)
-#         subprocess.call(exe, shell=True)
-#     except Exception as ex:
-#         print(ex)
-#     finally:
-#         os.chdir(origin_path)
+    for user in users:
+        create.create(user["id"], user["pw"], user["name"])
 
 
 def migrate():
     from Infrastructures.IOC import get_strage_factory
-    from Infrastructures import IStorageFactory, IMigrations
+    from Infrastructures.Interfaces import IStorageFactory, IMigrations
+    from Domains.Entities import User, Post
 
     factory: IStorageFactory = get_strage_factory()
 
     m: IMigrations = factory.get_migrations()
 
     m.create_user()
-    # m.init_user()
-    # m.create_post()
-    # m.init_post
+    m.create_post()
+    init_user()
+
+
+def delete_storage():
+    from Infrastructures.IOC import get_strage_factory
+    from Infrastructures.Interfaces import IStorageFactory, IMigrations
+
+    factory: IStorageFactory = get_strage_factory()
+
+    m: IMigrations = factory.get_migrations()
+
+    m.delete_post()
+    m.delete_user()
 
 
 def set_storage(storage_type: str):
@@ -106,8 +127,8 @@ def main(opt):
             flask(opt.not_debug)
         case "migrate":
             migrate()
-        # case "create-table":
-        #     create_table()
+        case "delete-storage":
+            delete_storage()
         case _:
             print("'python manage.py -h' 명령어도 인자를 확인해 주세요.")
 

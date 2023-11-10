@@ -5,21 +5,8 @@ from Applications.Repositories.Interfaces import IUserRepository, IPostRepositor
 
 from Infrastructures.Interfaces import IStorageFactory
 
-
-def get_user_storage() -> IUserRepository:
-    from Tests.Applications.Implements.test_user_repository_list import (
-        TestUserRepositoryList,
-    )
-    from Domains.Entities import UserVO
-    from Commons import UserId, Uid, Password
-
-    repo = TestUserRepositoryList(
-        [UserVO(UserId(id="aaa"), "admin", Password(pw="aaa"), Uid(idx=1))]
-    )
-    return repo
-
-
 storage_type = "mysql"
+padding = "log_"
 
 
 def select_strage(type: str):
@@ -35,17 +22,32 @@ ValueError  > Possible inputs are 'mysql'
             )
 
 
-def get_strage_factory(name_padding: str = "log") -> IStorageFactory:
+def select_table_name_padding(table_name_padding: str = "log_"):
+    global padding
+    padding = table_name_padding
+
+
+def get_strage_factory() -> IStorageFactory:
     from Infrastructures.MySQL import MySqlFactory
+
+    global padding
 
     global storage_type
 
     match storage_type:
         case "mysql":
-            return MySqlFactory(name_padding)
+            return MySqlFactory(padding)
         case _:
             raise ValueError(
                 f"""
 ValueError  > Possible inputs are 'mysql'
-            > your input : {storage_type}"""
+            > your input : {storage_type}
+"""
             )
+
+
+def get_user_storage() -> IUserRepository:
+    global padding
+
+    f = get_strage_factory()
+    return f.get_user_strage()

@@ -26,11 +26,17 @@ def home():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    from icecream import ic
+
     if request.method == "POST":
+        ic()
         login = LoginUser(get_user_storage())
         userID = request.form["userID"]
         password = request.form["password"]
+        ic(userID, password)
         user = login.login(userID, password)
+        ic(user)
+        ic(isinstance(user, UserVO))
         match user:
             case _ if isinstance(user, UserVO):
                 session.permanent = True

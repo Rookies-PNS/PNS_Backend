@@ -36,12 +36,15 @@ class LoginUser:
         self.repository = repository
 
     def login(self, id: str, pw: str) -> Result[UserVO]:
+        from icecream import ic
+
         # check user id
         if not self.repository.check_exist_userid(id):
             return Fail_CheckUser_IDNotFound()
 
         # get user
         user = self.repository.search_by_userid(UserId(account=id))
+        ic(user)
 
         # check pw
         pw = Password(pw=pw)

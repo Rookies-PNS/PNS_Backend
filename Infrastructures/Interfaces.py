@@ -1,25 +1,12 @@
 from abc import *
+from collections.abc import Collection
 
-
-class IMigrations(metaclass=ABCMeta):
-    @abstractmethod
-    def create_user(self):
-        ...
-
-    @abstractmethod
-    def init_user(self):
-        ...
-
-    @abstractmethod
-    def create_post(self):
-        ...
-
-    @abstractmethod
-    def init_post(self):
-        ...
-
-
-from Applications.Repositories.Interfaces import IPostRepository, IUserRepository
+from Domains.Entities import UserVO, PostVO
+from Applications.Repositories.Interfaces import (
+    IPostRepository,
+    IUserRepository,
+    IMigrations,
+)
 
 
 class IStorageFactory(metaclass=ABCMeta):

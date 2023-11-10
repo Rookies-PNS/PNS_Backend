@@ -6,5 +6,3 @@ root_path = str(now_path.parent)
 
 if not (root_path in sys.path):
     sys.path.append(root_path)
-
-from Infrastructures.Interfaces import IMigrations, IStorageFactory
