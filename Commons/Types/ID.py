@@ -14,7 +14,7 @@ class Uid(Id):
 
 @dataclasses.dataclass
 class UserId:
-    id: str
+    account: str
 
 
 @dataclasses.dataclass(frozen=True)

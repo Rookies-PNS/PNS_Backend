@@ -68,7 +68,7 @@ class test_create_user(unittest.TestCase):
 
         self.assertDictEqual(
             {
-                "user_id": UserId(id="taks123"),
+                "user_id": UserId(account="taks123"),
                 "name": "takgyun Lee",
                 "password": Password(pw="1q2w3e4r!@#$"),
                 "uid": Uid(idx=1),
@@ -80,7 +80,7 @@ class test_create_user(unittest.TestCase):
 
         self.assertDictEqual(
             {
-                "user_id": UserId(id="hahahoho119"),
+                "user_id": UserId(account="hahahoho119"),
                 "name": "Ho Han",
                 "password": Password(pw="1b2n3m4!#@"),
                 "uid": Uid(idx=2),
@@ -92,7 +92,7 @@ class test_create_user(unittest.TestCase):
 
         self.assertDictEqual(
             {
-                "user_id": UserId(id="mygun7749"),
+                "user_id": UserId(account="mygun7749"),
                 "name": "Guna Yoo",
                 "password": Password(pw="$1#awb5$"),
                 "uid": Uid(idx=3),
@@ -121,7 +121,7 @@ class test_create_user(unittest.TestCase):
 
         self.assertDictEqual(
             {
-                "user_id": UserId(id="taks123"),
+                "user_id": UserId(account="taks123"),
                 "name": "takgyun Lee",
                 "password": Password(pw="1q2w3e4r!@#$"),
                 "uid": Uid(idx=1),
@@ -133,7 +133,7 @@ class test_create_user(unittest.TestCase):
 
         self.assertDictEqual(
             {
-                "user_id": UserId(id="hahahoho119"),
+                "user_id": UserId(account="hahahoho119"),
                 "name": "Ho Han",
                 "password": Password(pw="1b2n3m4!#@"),
                 "uid": Uid(idx=2),
@@ -145,7 +145,7 @@ class test_create_user(unittest.TestCase):
 
         self.assertDictEqual(
             {
-                "user_id": UserId(id="mygun7749"),
+                "user_id": UserId(account="mygun7749"),
                 "name": "Guna Yoo",
                 "password": Password(pw="$1#awb5$"),
                 "uid": Uid(idx=3),

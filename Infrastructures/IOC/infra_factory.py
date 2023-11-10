@@ -3,7 +3,7 @@ import __init__
 from Applications.Usecases import LoginUser
 from Applications.Repositories.Interfaces import IUserRepository, IPostRepository
 
-from Infrastructures import IStorageFactory
+from Infrastructures.Interfaces import IStorageFactory
 
 
 def get_user_storage() -> IUserRepository:
@@ -35,14 +35,14 @@ ValueError  > Possible inputs are 'mysql'
             )
 
 
-def get_strage_factory() -> IStorageFactory:
+def get_strage_factory(name_padding: str = "log") -> IStorageFactory:
     from Infrastructures.MySQL import MySqlFactory
 
     global storage_type
 
     match storage_type:
         case "mysql":
-            return MySqlFactory()
+            return MySqlFactory(name_padding)
         case _:
             raise ValueError(
                 f"""

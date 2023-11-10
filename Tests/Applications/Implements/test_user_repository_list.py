@@ -19,7 +19,7 @@ class TestUserRepositoryList(IUserRepository):
 
     def check_exist_userid(self, userid: str) -> bool:
         for user in self.arr:
-            if userid == user.user_id.id:
+            if userid == user.user_id.account:
                 return True
         return False
 

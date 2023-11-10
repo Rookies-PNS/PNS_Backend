@@ -30,7 +30,7 @@ class test_models(unittest.TestCase):
         user = User(UserId("taks123"), "takgyun", Password(pw="1qaz2wsx!@"), Uid(idx=1))
         self.assertDictEqual(
             {
-                "user_id": UserId(id="taks123"),
+                "user_id": UserId(account="taks123"),
                 "name": "takgyun",
                 "password": Password(pw="1qaz2wsx!@"),
                 "uid": Uid(idx=1),

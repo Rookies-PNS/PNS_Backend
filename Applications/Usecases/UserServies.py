@@ -21,7 +21,7 @@ class CreateUser:
         # check user id
         if self.repository.check_exist_userid(id):
             return Fail_CreateUser_IDAlreadyExists()
-        user_id = UserId(id=id)
+        user_id = UserId(account=id)
 
         # check passward
         password = Password(pw=pw)
@@ -41,7 +41,7 @@ class LoginUser:
             return Fail_CheckUser_IDNotFound()
 
         # get user
-        user = self.repository.search_by_userid(UserId(id=id))
+        user = self.repository.search_by_userid(UserId(account=id))
 
         # check pw
         pw = Password(pw=pw)
