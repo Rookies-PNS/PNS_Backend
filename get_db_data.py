@@ -1,4 +1,4 @@
-from mysql_config import mysql_db
+from db_config import mysql_db
 
 
 def get_mysql_url() -> str:
