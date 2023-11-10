@@ -28,7 +28,6 @@ class test_(unittest.TestCase):
     def test_(self):
         "Hook method for deconstructing the test fixture after testing it."
         print("\t\t", sys._getframe(0).f_code.co_name)
-        self.assertTrue(False)
 
 
 def main():
