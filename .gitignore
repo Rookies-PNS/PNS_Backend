@@ -163,4 +163,4 @@ cython_debug/
 # project
 secrets.json
 *config.py
-
+*/Yoyo/*
