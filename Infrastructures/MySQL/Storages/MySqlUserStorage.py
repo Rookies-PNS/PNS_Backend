@@ -53,9 +53,6 @@ class MySqlUserStorage(IUserRepository):
             return ret
 
     def save(self, user: User) -> Result[UserVO]:
-        if self.check_exist_userid(user.user_id.account):
-            return Fail_CreateUser_IDAlreadyExists()
-
         connection = self.connect()
         table_name = self.get_padding_name("user")
         try:
@@ -76,6 +73,7 @@ class MySqlUserStorage(IUserRepository):
         finally:
             # 연결 닫기
             connection.close()
+
         ret = self.search_by_userid(user.user_id.account)
         match ret:
             case _ if isinstance(ret, UserVO):
@@ -111,8 +109,6 @@ class MySqlUserStorage(IUserRepository):
             return ret
 
     def search_by_userid(self, userid: UserId) -> Optional[UserVO]:
-        from icecream import ic
-
         connection = self.connect()
         table_name = self.get_padding_name("user")
         ret: Optional[UserVO] = None
@@ -121,13 +117,11 @@ class MySqlUserStorage(IUserRepository):
             with connection.cursor() as cursor:
                 # 계정 검색 쿼리
                 select_query = f"SELECT * FROM {table_name} WHERE account = %s;"
-                ic(select_query, userid)
 
                 cursor.execute(select_query, (userid.account,))
 
                 # 결과 가져오기
                 result = cursor.fetchone()
-                ic(result)
 
                 if result:
                     ret = UserVO(
