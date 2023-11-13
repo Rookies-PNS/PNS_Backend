@@ -1,5 +1,5 @@
 import __init__
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, session, redirect, url_for
 
 from Domains.Entities import UserVO
 from Applications.Usecases import LoginUser
@@ -17,6 +17,11 @@ app = Flask(
 )
 app.secret_key = get_secrets_key()
 
+# Content Security Policy 설정
+csp_header = {
+    "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self';"
+}
+
 
 # Routing
 @app.route("/")
@@ -26,26 +31,27 @@ def home():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    from icecream import ic
-
     if request.method == "POST":
-        ic()
         login = LoginUser(get_user_storage())
         userID = request.form["userID"]
         password = request.form["password"]
-        ic(userID, password)
-        user = login.login(userID, password)
-        ic(user)
-        ic(isinstance(user, UserVO))
+        user: UserVO = login.login(userID, password)
         match user:
             case _ if isinstance(user, UserVO):
                 session.permanent = True
-                session["user_id"] = userID
-                return render_template("home/home.html")
+                session["user_id"] = user.name  # 딕셔너리
+                return redirect(url_for("home"))
             case _ if isinstance(user, Fail):
                 pass
 
     return render_template("auth/login.html")
+
+
+@app.route("/logout")
+def logout():
+    # 로그아웃 처리: 세션에서 'user_id'와 'username' 제거
+    session.pop("user_id", None)
+    return redirect(url_for("home"))
 
 
 if __name__ == "__main__":
