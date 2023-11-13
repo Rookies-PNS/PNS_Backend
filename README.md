@@ -8,12 +8,46 @@ pip install -r requirements.txt
 ```
 
 # How to Start
+
+## Download Code
 ```bash
 git clone https://github.com/Cloud-is-best-beer/Log_Board_Tak.git
 cd Log_Board_Tak
 pip install -r requirments.txt
-python manage.py --run migrate
 ```
+
+### Make secrets.json and db_config.py
+`secrets.json`
+```json
+{
+    "SECRET_KEY": ""
+}
+```
+
+`db_config.py`
+```python
+mysql_db = {
+    "user": "USER_NAME",
+    "password": "DB_PASSWORD",
+    "host": "localhost",
+    "port": "3306",
+    "database": "DATABASE_NAME",
+    "charset": "utf8",
+}
+```
+
+### Set MySQL
+1. `download` mysql and base setting
+2. `create` mysql user and database
+   ```sql
+    create database "DATABASE_NAME";
+    create user "USER_NAME"@localhost identified by 'DB_PASSWORD';
+    grant all privilege on "DATABASE_NAME".* to 'USER_NAME'@'localhost';
+   ```
+3. `run` manage.py
+    ```bash
+    python manage.py --run migrate
+    ```
 
 # How to Run
 ```bash
