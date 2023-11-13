@@ -36,7 +36,7 @@ class MySqlMigrations(IMigrations):
                 create_table_query = f"""
 CREATE TABLE IF NOT EXISTS {table_name} (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    pw VARCHAR(255) NOT NULL,
+    pw VARCHAR(511) NOT NULL,
     account VARCHAR(50) NOT NULL,
     name VARCHAR(100) NOT NULL
 );

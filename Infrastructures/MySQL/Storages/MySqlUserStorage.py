@@ -74,7 +74,8 @@ class MySqlUserStorage(IUserRepository):
             # 연결 닫기
             connection.close()
 
-        ret = self.search_by_userid(user.user_id.account)
+        ret = self.search_by_userid(user.user_id)
+
         match ret:
             case _ if isinstance(ret, UserVO):
                 return ret
@@ -130,11 +131,12 @@ class MySqlUserStorage(IUserRepository):
                         password=Password(pw=result[1]),
                         uid=Uid(idx=result[0]),
                     )
+        except Exception as ex:
+            connection.rollback()
 
         finally:
             # 연결 닫기
             connection.close()
-            ic(ret)
             return ret
 
     def update(self, user: UserVO) -> Result[UserVO]:

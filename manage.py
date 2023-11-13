@@ -3,6 +3,7 @@ import __init__
 import argparse
 import os
 import subprocess
+from icecream import ic
 
 
 def parse_opt():
@@ -23,6 +24,7 @@ def parse_opt():
             r"Tests\Applications\Usecases\test_user_services.py",
             r"Tests\Infrastructures\Storage\test_.py",
             r"Tests\Infrastructures\Storage\test_migrate.py",
+            r"Tests\Applications\Usecases\test_password.py",
         ],
     )
     opt = parser.parse_args()
@@ -65,13 +67,14 @@ def flask(debug=True):
 
 def init_user():
     from Applications.Usecases import CreateUser
+    from Domains.Entities.User import UserVO
     from Infrastructures.IOC import get_strage_factory
     from Infrastructures.Interfaces import IStorageFactory
     from Applications.Repositories.Interfaces import IUserRepository
 
     admin = {
         "id": "admin",
-        "pw": "admin123",
+        "pw": "Admin123!@",
         "name": "관리자",
     }
     users = [
@@ -80,7 +83,12 @@ def init_user():
     create = CreateUser(get_strage_factory().get_user_strage())
 
     for user in users:
-        create.create(user["id"], user["pw"], user["name"])
+        ret = create.create(user["id"], user["pw"], user["name"])
+        match ret:
+            case _ if isinstance(ret, UserVO):
+                ic(ret)
+            case _:
+                ic("Fail", ret)
 
 
 def migrate():

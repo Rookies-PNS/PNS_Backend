@@ -3,6 +3,10 @@ from typing import List, Optional
 
 from Commons import UserId, Uid, Password, PostId
 from Domains.Entities import User, UserVO
+from Applications.Usecases.AppUsecaseExtention import (
+    check_valid_password,
+    convert_to_Password_with_hashing,
+)
 from Applications.Repositories.Interfaces import IUserRepository
 from Applications.Results import (
     Result,
@@ -24,7 +28,15 @@ class CreateUser:
         user_id = UserId(account=id)
 
         # check passward
-        password = Password(pw=pw)
+        if check_valid_password(pw):
+            hash_pw = convert_to_Password_with_hashing(pw)
+            match hash_pw:
+                case _ if isinstance(hash_pw, Password):
+                    password = hash_pw
+                case _:
+                    return Fail(type="Fail_CreateUser_Invalid_Password")
+        else:
+            return Fail("Fail_CreateUser_Invalid_Password")
 
         # create User
         user = User(user_id, name, password)
@@ -36,18 +48,17 @@ class LoginUser:
         self.repository = repository
 
     def login(self, id: str, pw: str) -> Result[UserVO]:
-        from icecream import ic
-
         # check user id
         if not self.repository.check_exist_userid(id):
             return Fail_CheckUser_IDNotFound()
 
         # get user
         user = self.repository.search_by_userid(UserId(account=id))
-        ic(user)
 
-        # check pw
-        pw = Password(pw=pw)
-        if pw == user.password:
-            return user
+        match user:
+            case _ if isinstance(user, UserVO):
+                # check pw
+                pw = convert_to_Password_with_hashing(pw)
+                if pw == user.password:
+                    return user
         return Fail_CheckUser_PasswardNotCorrect()
