@@ -2,11 +2,11 @@ import __init__
 import unittest
 import sys
 from typing import List
-from icecream import ic
 
 from Commons import UserId, Uid, Password
 from Domains.Entities import UserVO, User
 from Applications.Usecases import CreateUser, LoginUser
+from Applications.Usecases.AppUsecaseExtention import convert_to_Password_with_hashing
 from Applications.Results import (
     Fail,
     Fail_CheckUser_IDNotFound,
@@ -37,7 +37,6 @@ class test_user_services(unittest.TestCase):
             migrate.delete_user()
         # 테이블 생성
         migrate.create_user()
-        ic(migrate.check_exist_user())
 
         # 기본세팅
         repo = test_selector.get_user_storage()
@@ -45,11 +44,11 @@ class test_user_services(unittest.TestCase):
         login_user = LoginUser(repo)
 
         users = []
-        u = create_user.create("taks123", "1q2w3e4r!@#$", "takgyun Lee")
+        u = create_user.create("taks123", "1Q2w3e4r!@$", "takgyun Lee")
         users.append(u)
-        u = create_user.create("hahahoho119", "1b2n3m4!#@", "Ho Han")
+        u = create_user.create("hahahoho119", "1B2n3m4!@", "Ho Han")
         users.append(u)
-        u = create_user.create("mygun7749", "$1#awb5$", "Guna Yoo")
+        u = create_user.create("mygun7749", "$1Awb5$123", "Guna Yoo")
         users.append(u)
 
         self.create_user = CreateUser(repo)
@@ -68,14 +67,14 @@ class test_user_services(unittest.TestCase):
     def test_login_user_로그인_안_되는거_확인(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
 
-        user = self.login_user.login("tak123", "1q2w3e4r!@#$")
+        user: UserVO = self.login_user.login("tak123", "1Q2w3e4r!@$")
 
         self.assertDictEqual(
             {"type": "IDNotFound"},
             user.__dict__,
         )
 
-        user = self.login_user.login("hahahoho119", "2n3m4!#@")
+        user = self.login_user.login("hahahoho119", "2N3m4!@")
 
         self.assertDictEqual(
             {"type": "PasswardNotCorrect"},
@@ -85,37 +84,42 @@ class test_user_services(unittest.TestCase):
     def test_login_user_잘_로그인_되는거_확인(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
 
-        user = self.login_user.login("taks123", "1q2w3e4r!@#$")
+        user = self.login_user.login("taks123", "1Q2w3e4r!@$")
+        match user:
+            case _ if isinstance(user, Fail):
+                self.assertTrue(False)
+            case _:
+                pass
 
         self.assertDictEqual(
             {
                 "user_id": UserId(account="taks123"),
                 "name": "takgyun Lee",
-                "password": Password(pw="1q2w3e4r!@#$"),
+                "password": convert_to_Password_with_hashing("1Q2w3e4r!@$"),
                 "uid": Uid(idx=1),
             },
             user.__dict__,
         )
 
-        user = self.login_user.login("hahahoho119", "1b2n3m4!#@")
+        user = self.login_user.login("hahahoho119", "1B2n3m4!@")
 
         self.assertDictEqual(
             {
                 "user_id": UserId(account="hahahoho119"),
                 "name": "Ho Han",
-                "password": Password(pw="1b2n3m4!#@"),
+                "password": convert_to_Password_with_hashing("1B2n3m4!@"),
                 "uid": Uid(idx=2),
             },
             user.__dict__,
         )
 
-        user = self.login_user.login("mygun7749", "$1#awb5$")
+        user = self.login_user.login("mygun7749", "$1Awb5$123")
 
         self.assertDictEqual(
             {
                 "user_id": UserId(account="mygun7749"),
                 "name": "Guna Yoo",
-                "password": Password(pw="$1#awb5$"),
+                "password": convert_to_Password_with_hashing("$1Awb5$123"),
                 "uid": Uid(idx=3),
             },
             user.__dict__,
@@ -137,39 +141,37 @@ class test_user_services(unittest.TestCase):
 
     def test_start_data(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-
-        user = self.login_user.login("taks123", "1q2w3e4r!@#$")
-        ic(user)
+        user = self.login_user.login("taks123", "1Q2w3e4r!@$")
 
         self.assertDictEqual(
             {
                 "user_id": UserId(account="taks123"),
                 "name": "takgyun Lee",
-                "password": Password(pw="1q2w3e4r!@#$"),
+                "password": convert_to_Password_with_hashing("1Q2w3e4r!@$"),
                 "uid": Uid(idx=1),
             },
             user.__dict__,
         )
 
-        user = self.login_user.login("hahahoho119", "1b2n3m4!#@")
+        user = self.login_user.login("hahahoho119", "1B2n3m4!@")
 
         self.assertDictEqual(
             {
                 "user_id": UserId(account="hahahoho119"),
                 "name": "Ho Han",
-                "password": Password(pw="1b2n3m4!#@"),
+                "password": convert_to_Password_with_hashing("1B2n3m4!@"),
                 "uid": Uid(idx=2),
             },
             user.__dict__,
         )
 
-        user = self.login_user.login("mygun7749", "$1#awb5$")
+        user = self.login_user.login("mygun7749", "$1Awb5$123")
 
         self.assertDictEqual(
             {
                 "user_id": UserId(account="mygun7749"),
                 "name": "Guna Yoo",
-                "password": Password(pw="$1#awb5$"),
+                "password": convert_to_Password_with_hashing("$1Awb5$123"),
                 "uid": Uid(idx=3),
             },
             user.__dict__,
@@ -179,7 +181,7 @@ class test_user_services(unittest.TestCase):
         print("\t\t", sys._getframe(0).f_code.co_name)
 
         # 중복 아이디
-        ret = self.create_user.create("taks123", "1q2w3e4r!@#$", "takgyun Lee")
+        ret = self.create_user.create("taks123", "1Q2w3e4r!@$", "takgyun Lee")
         match ret:
             case _ if isinstance(ret, Fail):
                 self.assertTrue(True)
