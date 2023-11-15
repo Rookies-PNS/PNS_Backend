@@ -20,7 +20,7 @@ pip install -r requirments.txt
 `secrets.json`
 ```json
 {
-    "SECRET_KEY": ""
+    "SECRET_KEY": "YOUR_SECRET_KEY"
 }
 ```
 
