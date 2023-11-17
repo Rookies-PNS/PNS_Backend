@@ -4,8 +4,6 @@ import sys
 from icecream import ic
 from Applications.Usecases.AppUsecaseExtention import *
 
-import Tests.Applications.Usecases.storage_selecter as test_selector
-
 
 class test_user_services(unittest.TestCase):
     @classmethod
