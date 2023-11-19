@@ -1,7 +1,8 @@
 import __init__
 from flask import Flask, render_template, request, session, redirect, url_for
+from icecream import ic
 
-from Domains.Entities import UserVO
+from Domains.Entities import SimpleUser
 from Applications.Usecases import LoginUser
 from Applications.Results import Fail, Result
 
@@ -35,9 +36,9 @@ def login():
         login = LoginUser(get_user_storage())
         userID = request.form["userID"]
         password = request.form["password"]
-        user: UserVO = login.login(userID, password)
+        user: SimpleUser = login.login(userID, password)
         match user:
-            case _ if isinstance(user, UserVO):
+            case _ if isinstance(user, SimpleUser):
                 session.permanent = True
                 session["user_id"] = user.name  # 딕셔너리
                 return redirect(url_for("home"))
