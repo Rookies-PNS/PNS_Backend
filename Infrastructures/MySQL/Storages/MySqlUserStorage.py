@@ -2,7 +2,7 @@ import __init__
 from typing import Optional
 
 from Commons import Uid, UserId, Password
-from Domains.Entities import User, UserVO
+from Domains.Entities import User, UserVO, SimpleUser
 from Applications.Results import Result, Fail, Fail_CreateUser_IDAlreadyExists
 from Applications.Repositories.Interfaces import IUserRepository
 
@@ -11,8 +11,6 @@ import pymysql
 
 class MySqlUserStorage(IUserRepository):
     def __init__(self, name_padding: str = "log_"):
-        from get_db_data import get_mysql_dict
-
         self.name_padding = name_padding
 
     def connect(self):
@@ -52,7 +50,7 @@ class MySqlUserStorage(IUserRepository):
             connection.close()
             return ret
 
-    def save(self, user: User) -> Result[UserVO]:
+    def save(self, user: User) -> Result[SimpleUser]:
         connection = self.connect()
         table_name = self.get_padding_name("user")
         try:
@@ -78,7 +76,7 @@ class MySqlUserStorage(IUserRepository):
 
         match ret:
             case _ if isinstance(ret, UserVO):
-                return ret
+                return ret.get_simple_user()
             case _:
                 return Fail(type="MysqlNotSaveUser")
 
@@ -139,7 +137,7 @@ class MySqlUserStorage(IUserRepository):
             connection.close()
             return ret
 
-    def update(self, user: UserVO) -> Result[UserVO]:
+    def update(self, user: UserVO) -> Result[SimpleUser]:
         raise NotImplementedError()
 
     def delete(self, user: UserVO) -> Result[Uid]:
