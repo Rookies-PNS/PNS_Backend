@@ -24,3 +24,13 @@ class UserVO:
     name: str
     password: Password
     uid: Uid
+
+    def get_simple_user(self):
+        return SimpleUser(user_id=self.user_id, name=self.name, uid=self.uid)
+
+
+@dataclass(frozen=True)
+class SimpleUser:
+    user_id: UserId
+    name: str
+    uid: Uid

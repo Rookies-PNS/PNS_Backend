@@ -67,7 +67,7 @@ def flask(debug=True):
 
 def init_user():
     from Applications.Usecases import CreateUser
-    from Domains.Entities.User import UserVO
+    from Domains.Entities.User import SimpleUser
     from Infrastructures.IOC import get_strage_factory
     from Infrastructures.Interfaces import IStorageFactory
     from Applications.Repositories.Interfaces import IUserRepository
@@ -85,7 +85,7 @@ def init_user():
     for user in users:
         ret = create.create(user["id"], user["pw"], user["name"])
         match ret:
-            case _ if isinstance(ret, UserVO):
+            case _ if isinstance(ret, SimpleUser):
                 ic(ret)
             case _:
                 ic("Fail", ret)

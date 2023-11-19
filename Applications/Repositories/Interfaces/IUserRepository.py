@@ -3,7 +3,7 @@ from typing import Optional
 from abc import *
 
 from Commons import Uid, UserId
-from Domains.Entities import User, UserVO
+from Domains.Entities import User, UserVO, SimpleUser
 from Applications.Results import Result
 
 
@@ -13,7 +13,7 @@ class IUserRepository(metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
-    def save(self, user: User) -> Result[UserVO]:
+    def save(self, user: User) -> Result[SimpleUser]:
         pass
 
     @abstractclassmethod
@@ -25,7 +25,7 @@ class IUserRepository(metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
-    def update(self, user: UserVO) -> Result[UserVO]:
+    def update(self, user: UserVO) -> Result[SimpleUser]:
         pass
 
     @abstractmethod

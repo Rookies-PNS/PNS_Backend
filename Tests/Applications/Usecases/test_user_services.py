@@ -95,7 +95,6 @@ class test_user_services(unittest.TestCase):
             {
                 "user_id": UserId(account="taks123"),
                 "name": "takgyun Lee",
-                "password": convert_to_Password_with_hashing("1Q2w3e4r!@$"),
                 "uid": Uid(idx=1),
             },
             user.__dict__,
@@ -107,7 +106,6 @@ class test_user_services(unittest.TestCase):
             {
                 "user_id": UserId(account="hahahoho119"),
                 "name": "Ho Han",
-                "password": convert_to_Password_with_hashing("1B2n3m4!@"),
                 "uid": Uid(idx=2),
             },
             user.__dict__,
@@ -119,7 +117,6 @@ class test_user_services(unittest.TestCase):
             {
                 "user_id": UserId(account="mygun7749"),
                 "name": "Guna Yoo",
-                "password": convert_to_Password_with_hashing("$1Awb5$123"),
                 "uid": Uid(idx=3),
             },
             user.__dict__,
@@ -147,7 +144,6 @@ class test_user_services(unittest.TestCase):
             {
                 "user_id": UserId(account="taks123"),
                 "name": "takgyun Lee",
-                "password": convert_to_Password_with_hashing("1Q2w3e4r!@$"),
                 "uid": Uid(idx=1),
             },
             user.__dict__,
@@ -159,7 +155,6 @@ class test_user_services(unittest.TestCase):
             {
                 "user_id": UserId(account="hahahoho119"),
                 "name": "Ho Han",
-                "password": convert_to_Password_with_hashing("1B2n3m4!@"),
                 "uid": Uid(idx=2),
             },
             user.__dict__,
@@ -171,7 +166,6 @@ class test_user_services(unittest.TestCase):
             {
                 "user_id": UserId(account="mygun7749"),
                 "name": "Guna Yoo",
-                "password": convert_to_Password_with_hashing("$1Awb5$123"),
                 "uid": Uid(idx=3),
             },
             user.__dict__,

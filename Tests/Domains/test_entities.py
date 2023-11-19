@@ -1,9 +1,18 @@
 import __init__
 import unittest
 import sys
+import datetime
 
 from Domains.Entities import User, Post
-from Commons import Uid, UserId, PostId, Password, Content
+from Commons import (
+    Uid,
+    UserId,
+    PostId,
+    Password,
+    Content,
+    PostCreateTime,
+    PostUpdateTime,
+)
 
 
 class test_models(unittest.TestCase):
@@ -40,13 +49,16 @@ class test_models(unittest.TestCase):
 
     def test_Post_1(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post = Post("test", Content(content="test 입니다."), PostId(idx=1), Uid(idx=1))
+        post = Post("test", Content(content="test 입니다."))
+
         self.assertDictEqual(
             {
                 "title": "test",
                 "content": Content(content="test 입니다."),
-                "post_id": PostId(idx=1),
-                "user_id": Uid(idx=1),
+                "create_time": PostCreateTime(time=post.create_time.get_time()),
+                "update_time": PostUpdateTime(time=post.update_time.get_time()),
+                "post_id": None,
+                "user": None,
             },
             post.__dict__,
         )
