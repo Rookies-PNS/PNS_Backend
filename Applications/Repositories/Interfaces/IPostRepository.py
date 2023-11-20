@@ -15,16 +15,19 @@ class IPostRepository(metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
-    def get_post_list(
+    def get_post_per_page_list(
         self,
-        query: IPostQuery,
         page: Optional[int] = None,
         posts_per_page: Optional[int] = None,
     ) -> Collection[SimplePost]:
         pass
 
     @abstractclassmethod
-    def search_by_uid(self, uid: Uid) -> Optional[PostVO]:
+    def search_by_uid(self, post_id: PostId) -> Optional[PostVO]:
+        pass
+
+    @abstractclassmethod
+    def search_by_query(self, query: IPostQuery) -> Collection[SimplePost]:
         pass
 
     @abstractclassmethod
