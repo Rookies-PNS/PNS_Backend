@@ -25,6 +25,7 @@ def parse_opt():
             r"Tests\Infrastructures\Storage\test_.py",
             r"Tests\Infrastructures\Storage\test_migrate.py",
             r"Tests\Applications\Usecases\test_password.py",
+            r"Tests\Applications\Usecases\test_contents.py",
         ],
     )
     opt = parser.parse_args()
@@ -91,6 +92,19 @@ def init_user():
                 ic("Fail", ret)
 
 
+def delete_storage():
+    from Infrastructures.IOC import get_strage_factory
+    from Infrastructures.Interfaces import IStorageFactory, IMigrations
+
+    factory: IStorageFactory = get_strage_factory()
+
+    m: IMigrations = factory.get_migrations()
+
+    if m.check_exist_post():
+        m.delete_post()
+    if m.check_exist_user():
+        m.delete_user()
+
 def migrate():
     from Infrastructures.IOC import get_strage_factory
     from Infrastructures.Interfaces import IStorageFactory, IMigrations
@@ -100,21 +114,10 @@ def migrate():
 
     m: IMigrations = factory.get_migrations()
 
+    delete_storage()
     m.create_user()
     m.create_post()
     init_user()
-
-
-def delete_storage():
-    from Infrastructures.IOC import get_strage_factory
-    from Infrastructures.Interfaces import IStorageFactory, IMigrations
-
-    factory: IStorageFactory = get_strage_factory()
-
-    m: IMigrations = factory.get_migrations()
-
-    m.delete_post()
-    m.delete_user()
 
 
 def set_storage(storage_type: str):
@@ -124,10 +127,17 @@ def set_storage(storage_type: str):
 
 
 def main(opt):
+    from icecream import ic
+    if opt.not_debug:
+        ic.disable()
+    else :
+        ic.enable()
+
     print(f"Run {opt.run}")
     set_storage(opt.storage_type)
     match opt.run:
         case "test":
+            ic.enable()
             test(opt.test_file)
         case "git-push":
             git_push(opt.test_file, opt.branch)
