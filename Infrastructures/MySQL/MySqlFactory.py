@@ -22,4 +22,4 @@ class MySqlFactory(IStorageFactory):
     def get_post_strage(self) -> IPostRepository:
         from Infrastructures.MySQL.Storages.MySqlPostStorage import MySqlPostStorage
 
-        return MySqlPostStorage(self.padding)
+        return MySqlPostStorage(self.get_user_strage(), self.padding)

@@ -26,6 +26,8 @@ def parse_opt():
             r"Tests\Infrastructures\Storage\test_migrate.py",
             r"Tests\Applications\Usecases\test_password.py",
             r"Tests\Applications\Usecases\test_contents.py",
+            r"Tests\Applications\Usecases\test_post_services.py"
+
         ],
     )
     opt = parser.parse_args()

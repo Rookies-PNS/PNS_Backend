@@ -101,6 +101,8 @@ class MySqlUserStorage(IUserRepository):
                         password=Password(pw=result[1]),
                         uid=Uid(idx=result[0]),
                     )
+        except:
+            connection.rollback()
 
         finally:
             # 연결 닫기

@@ -57,11 +57,6 @@ class test_migrate(unittest.TestCase):
         self.migrate.create_post()
         self.assertTrue(self.migrate.check_exist_post())
 
-    def test_init(self):
-        "Hook method for deconstructing the test fixture after testing it."
-        print("\t\t", sys._getframe(0).f_code.co_name)
-        ic("            Not implements")
-
 
 def main():
     unittest.main()

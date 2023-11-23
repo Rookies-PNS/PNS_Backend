@@ -32,6 +32,9 @@ class Post:
 
     def set_update_time(self):
         self.update_time.set_time()
+    
+                    
+
 
 
 @dataclass(frozen=True)
@@ -60,3 +63,29 @@ class SimplePost:
     create_time: PostCreateTime
     update_time: PostUpdateTime
     user: Optional[SimpleUser] = None
+
+def PostVO_to_Post(postvo)->Post:
+    return Post(
+        postvo.title,
+        postvo.content,
+        postvo.create_time,
+        postvo.update_time,
+        postvo.post_id,
+        postvo.user
+    )
+
+def Post_to_PostVO(post:Post) -> Optional[PostVO]:
+    if post.post_id is None:
+        return None
+    if post.create_time is None:
+        return None
+    if post.update_time is None:
+        return None
+    return PostVO(
+        post.title,
+        post.content,
+        post.post_id,
+        post.create_time,
+        post.update_time,
+        post.user
+    )
