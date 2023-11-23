@@ -1,28 +1,21 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인 페이지</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='auth/login/styles.css') }}">
-</head>
-<body>
-<header>
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='home/phantom.png') }}" alt="Logo" style="width: 150px"></a></li>
-                <li><a href="{{ url_for('login') }}">로그인/회원가입</a></li>
-            </ul>
-        </nav>
-    </header>
-<div class="login-page">
-  <div class="form">
-    <form class="login-form" action="{{ url_for('login') }}" method="post">
-      <input type="text" placeholder="username" name="userID"/>
-      <input type="password" placeholder="password" name="password"/>
-      <button type="submit">login</button>
+﻿{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h5 class="my-3 border-bottom pb-2">로그인</h5>
+    <form method="post">
+        {{ form.csrf_token }}
+        {% include "form_errors.html" %}
+        <div class="mb-3">
+            <label for="userid">아이디</label>
+            <input type="text" class="form-control" name="userid" id="userid"
+                   value="{{ form.userid.data or '' }}">
+        </div>
+        <div class="mb-3">
+            <label for="password">비밀번호</label>
+            <input type="password" class="form-control" name="password" id="password"
+                   value="{{ form.password.data or '' }}">
+        </div>
+        <button type="submit" class="btn btn-primary">로그인</button>
     </form>
-  </div>
 </div>
-</body>
-</html>
+{% endblock %}
