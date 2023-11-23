@@ -1,0 +1,30 @@
+﻿{% extends 'base.html' %}
+{% block content %}
+<!-- 게시판 -->
+<div class="container my-3">
+    <table class="table">
+        <thead>
+        <tr class="table-dark">
+            <th>번호</th>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>작성일시</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for post in post_list %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+                <a href="{{ url_for('post.detail', post_id=post["id"]) }}">{{ post["title"] }}</a>
+            </td>
+            <td>{{ post["user_account"] }}</td>
+            <td>{{ post["create_time"] }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ url_for('post.create') }}" class="btn btn-primary">게시글 등록하기</a>
+</div>
+{% endblock %}
