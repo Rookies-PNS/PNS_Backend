@@ -26,8 +26,7 @@ def parse_opt():
             r"Tests\Infrastructures\Storage\test_migrate.py",
             r"Tests\Applications\Usecases\test_password.py",
             r"Tests\Applications\Usecases\test_contents.py",
-            r"Tests\Applications\Usecases\test_post_services.py"
-
+            r"Tests\Applications\Usecases\test_post_services.py",
         ],
     )
     opt = parser.parse_args()
@@ -93,13 +92,15 @@ def init_user():
             case _:
                 ic("Fail", ret)
 
+
 def init_post():
     from Applications.Usecases import CreatePost, LoginUser
     from Domains.Entities import SimplePost
-    from Infrastructures.IOC import get_post_storage,get_user_storage
+    from Infrastructures.IOC import get_post_storage, get_user_storage
     from Infrastructures.Interfaces import IStorageFactory
     from Applications.Repositories.Interfaces import IUserRepository, IPostRepository
     from datetime import datetime, timedelta
+
     now = datetime.now()
     now = now.replace(microsecond=0)
 
@@ -109,7 +110,7 @@ def init_post():
 
     start = {
         "title": "사이트의 시작을 알립니다.",
-        "content": f"""이 사이트는 '{now.strftime("%d/%m/%Y")}'에 시작했습니다.
+        "content": f"""이 사이트는 {now.strftime("%Y/%m/%d")}에 시작했습니다.
 이용자 여러분 앞으로 잘 부탁드립니다.""",
         "user": admin,
         "time": now,
@@ -128,7 +129,8 @@ def init_post():
         anony_post,
     ]
     for post in posts:
-        create.create(post["title"],post["content"], post["time"], post["user"])
+        create.create(post["title"], post["content"], post["time"], post["user"])
+
 
 def delete_storage():
     from Infrastructures.IOC import get_strage_factory
@@ -142,6 +144,7 @@ def delete_storage():
         m.delete_post()
     if m.check_exist_user():
         m.delete_user()
+
 
 def migrate():
     from Infrastructures.IOC import get_strage_factory
@@ -167,9 +170,10 @@ def set_storage(storage_type: str):
 
 def main(opt):
     from icecream import ic
+
     if opt.not_debug:
         ic.disable()
-    else :
+    else:
         ic.enable()
 
     print(f"Run {opt.run}")
