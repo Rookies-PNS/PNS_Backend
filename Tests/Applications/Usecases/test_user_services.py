@@ -30,8 +30,9 @@ class test_user_services(unittest.TestCase):
     def setUp(self):
         "Hook method for setting up the test fixture before exercising it."
         print("\t", sys._getframe(0).f_code.co_name)
+        factory = test_selector.get_test_factory("user_service_test_")
 
-        migrate = test_selector.get_usecase_migration()
+        migrate = test_selector.get_usecase_migration(factory)
         # 깔끔하게 지우고 시작
         if migrate.check_exist_user():
             migrate.delete_user()
@@ -39,7 +40,7 @@ class test_user_services(unittest.TestCase):
         migrate.create_user()
 
         # 기본세팅
-        repo = test_selector.get_user_storage()
+        repo = test_selector.get_user_storage(factory)
         create_user = CreateUser(repo)
         login_user = LoginUser(repo)
 
@@ -57,8 +58,9 @@ class test_user_services(unittest.TestCase):
     def tearDown(self):
         "Hook method for deconstructing the test fixture after testing it."
         print("\t", sys._getframe(0).f_code.co_name)
+        factory = test_selector.get_test_factory("user_service_test_")
         # 썻으면 삭제
-        migrate = test_selector.get_usecase_migration()
+        migrate = test_selector.get_usecase_migration(factory)
         if migrate.check_exist_user():
             migrate.delete_user()
 

@@ -53,7 +53,7 @@ def validate_user_input(user_input: str) -> Result[str]:
     sql_injection_patterns = ["--", "DROP", "DELETE", "UPDATE", "INSERT", "SELECT"]
     for pattern in sql_injection_patterns:
         if pattern in user_input.upper():
-            input_text = input_text.replace(pattern, f"`{pattern}`")
+            user_input = user_input.replace(pattern, f"`{pattern}`")
 
     # 기타 사용자 정의 검증 규칙 추가 가능
 

@@ -2,7 +2,6 @@ import __init__
 from typing import Optional
 from collections.abc import Collection
 from datetime import datetime
-from icecream import ic
 
 from Commons import Uid, UserId, PostId, PostCreateTime, PostUpdateTime, Content
 from Domains.Entities import PostVO, Post, SimplePost, SimpleUser
@@ -149,17 +148,12 @@ class MySqlPostStorage(IPostRepository):
         # This query will return a list of post_ids in descending order, limited by posts_per_page and offset by page*posts_per_page
         select_query = f"SELECT * FROM {table_name} ORDER BY post_id DESC LIMIT %s OFFSET %s;"
         try:
-            ic()
             with connection.cursor() as cursor:
                 # Execute the query with the given parameters
                 cursor.execute(select_query, (posts_per_page, (page)*posts_per_page))
                 # Fetch all the results of the query
                 results = cursor.fetchall()
-                ic()
-                ic(results)
         except Exception as ex:
-            ic()
-            ic(ex)
             connection.rollback()
             return Fail(type="Fail_Mysql_LoadPostList_unknown")
         finally:
@@ -179,7 +173,6 @@ class MySqlPostStorage(IPostRepository):
                 if result:
                     return self._convert_to_postvo(result)
         except:
-            ic()
             connection.rollback()
         finally:
             connection.close()
@@ -217,8 +210,6 @@ class MySqlPostStorage(IPostRepository):
     def update(self, post: PostVO) -> Result[SimplePost]:
         connection = self.connect()
         table_name = self.get_padding_name("post")
-        ic()
-        ic(post)
 
         update_query = f"UPDATE {table_name} SET title = %s, content = %s, update_time = %s WHERE post_id = %s;"
         try:
@@ -226,8 +217,6 @@ class MySqlPostStorage(IPostRepository):
                 cursor.execute(update_query, (post.title, post.content.content, post.update_time.get_time(), post.post_id.idx))
                 connection.commit()
         except Exception as ex:
-            ic()
-            ic(ex)
             connection.rollback()
             return Fail(type="Fail_Mysql_UpdatePost_unknown")
         finally:

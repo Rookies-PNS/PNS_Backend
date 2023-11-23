@@ -4,7 +4,6 @@ import unittest
 import sys
 from typing import List
 from datetime import datetime, timezone
-from icecream import ic
 
 from Commons import UserId, Uid, Password
 from Domains.Entities import UserVO, User, Post, PostVO, SimplePost
@@ -137,8 +136,6 @@ class test_post_services(unittest.TestCase):
         print("\t\t", sys._getframe(0).f_code.co_name)
         post = self.get_post.get_post_from_post_id(PostId(idx=1))
         updated_post = self.update_post.update(post, "Updated Post", "Updated Content")
-        ic()
-        ic(updated_post)
         self.assertEqual(updated_post.title, "Updated Post")
         self.assertEqual(
             post.create_time.get_time(),
