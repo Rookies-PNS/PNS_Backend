@@ -6,7 +6,7 @@ from abc import *
 from Commons import Uid, PostId
 from Domains.Entities import Post, PostVO, SimplePost
 from Applications.Results import Result
-from Applications.Repositories.Queries import IPostQuery
+from Applications.Repositories.Queries import IConditionRanderForPostQuery
 
 
 class IPostRepository(metaclass=ABCMeta):
@@ -15,19 +15,37 @@ class IPostRepository(metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
+    def check_exist_pid(self, post_id: PostId) -> bool:
+        pass
+
+    @abstractclassmethod
     def get_post_per_page_list(
         self,
-        page: Optional[int] = None,
+        page: int = 0,
         posts_per_page: Optional[int] = None,
-    ) -> Collection[SimplePost]:
+    ) -> Result[Collection[SimplePost]]:
         pass
 
     @abstractclassmethod
-    def search_by_uid(self, post_id: PostId) -> Optional[PostVO]:
+    def search_by_pid(self, post_id: PostId) -> Optional[PostVO]:
         pass
 
     @abstractclassmethod
-    def search_by_query(self, query: IPostQuery) -> Collection[SimplePost]:
+    def search_by_uid(
+        self, 
+        user_id: Uid,
+        page: int = 0,
+        posts_per_page: Optional[int] = None,
+        ) -> Result[Collection[SimplePost]]:
+        pass
+
+    @abstractclassmethod
+    def search_by_query(
+        self, 
+        query: IConditionRanderForPostQuery,
+        page: int = 0,
+        posts_per_page: Optional[int] = None,
+        ) -> Result[Collection[SimplePost]]:
         pass
 
     @abstractclassmethod

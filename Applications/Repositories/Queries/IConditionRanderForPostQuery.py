@@ -6,7 +6,7 @@ from abc import *
 from Domains.Entities import PostVO
 
 
-class IPostQurey(metaclass=ABCMeta):
+class IConditionRanderForPostQurey(metaclass=ABCMeta):
     @abstractmethod
-    def query(self, oper: Optional[str] = None) -> Collection[PostVO]:
+    def query(self) -> Collection[PostVO]:
         pass

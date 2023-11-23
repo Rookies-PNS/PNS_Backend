@@ -50,29 +50,6 @@ CREATE TABLE IF NOT EXISTS {table_name} (
             # 연결 닫기
             connection.close()
 
-    def init_user(self, init_users: Collection[UserVO] = []):
-        connection = self.connect()
-        table_name = self.get_padding_name("user")
-        try:
-            # 커서 생성
-            with connection.cursor() as cursor:
-                # 데이터 삽입 쿼리
-                insert_query = (
-                    f"INSERT INTO {table_name} (pw, account, name) VALUES (%s, %s, %s);"
-                )
-                for user in init_users:
-                    cursor.execute(
-                        insert_query,
-                        (user.password.pw, user.user_id.account, user.name),
-                    )
-
-            # 변경 사항을 커밋
-            connection.commit()
-
-        finally:
-            # 연결 닫기
-            connection.close()
-
     def delete_user(self):
         connection = self.connect()
         table_name = self.get_padding_name("user")
@@ -126,6 +103,8 @@ CREATE TABLE IF NOT EXISTS {table_name} (
     post_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     content TEXT,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     user_id INT,
     FOREIGN KEY (user_id) REFERENCES {table_user}(id)
 );
@@ -134,28 +113,8 @@ CREATE TABLE IF NOT EXISTS {table_name} (
 
             # 변경 사항을 커밋
             connection.commit()
-
-        finally:
-            # 연결 닫기
-            connection.close()
-
-    def init_post(self, init_posts: Collection[PostVO] = []):
-        connection = self.connect()
-        table_name = self.get_padding_name("post")
-        try:
-            # 커서 생성
-            with connection.cursor() as cursor:
-                # 데이터 삽입 쿼리
-                insert_query = f"INSERT INTO {table_name} (title, content, user_id) VALUES (%s, %s, %s);"
-                for post in init_posts:
-                    cursor.execute(
-                        insert_query,
-                        (post.title, post.content, post.user_id),
-                    )
-
-            # 변경 사항을 커밋
-            connection.commit()
-
+        except :
+            connection.rollback()
         finally:
             # 연결 닫기
             connection.close()
