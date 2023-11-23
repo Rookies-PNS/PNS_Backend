@@ -1,5 +1,6 @@
 from typing import Optional
 from dataclasses import dataclass
+from icecream import ic
 
 from Commons import Content, PostId, PostCreateTime, PostUpdateTime, get_current_time
 from Domains.Entities.User import SimpleUser
@@ -33,6 +34,16 @@ class Post:
     def set_update_time(self):
         self.update_time.set_time()
     
+    def get_account(self)->str:
+        ic()
+        ic(self.user)
+        match self.user:
+            case user if isinstance(user, SimpleUser):
+                return user.user_id.account
+            case _:
+                return "익명"
+    def get_content(self)->str:
+        return self.content.content
                     
 
 
@@ -54,6 +65,16 @@ class PostVO:
             update_time=self.update_time,
             user=self.user,
         )
+    def get_account(self)->str:
+        ic()
+        ic(self.user)
+        match self.user:
+            case user if isinstance(user, SimpleUser):
+                return user.user_id.account
+            case _:
+                return "익명"
+    def get_content(self)->str:
+        return self.content.content
 
 
 @dataclass(frozen=True)
@@ -63,6 +84,16 @@ class SimplePost:
     create_time: PostCreateTime
     update_time: PostUpdateTime
     user: Optional[SimpleUser] = None
+    def get_account(self)->str:
+        ic()
+        ic(self.user)
+        match self.user:
+            case user if isinstance(user, SimpleUser):
+                return user.user_id.account
+            case _:
+                return "익명"
+    def get_content(self)->str:
+        return self.content.content
 
 def PostVO_to_Post(postvo)->Post:
     return Post(

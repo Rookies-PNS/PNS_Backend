@@ -47,7 +47,10 @@ ValueError  > Possible inputs are 'mysql'
 
 
 def get_user_storage() -> IUserRepository:
-    global padding
-
     f = get_strage_factory()
     return f.get_user_strage()
+
+def get_post_storage() -> IPostRepository:
+    f = get_strage_factory()
+    return f.get_post_strage()
+    

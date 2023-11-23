@@ -93,6 +93,42 @@ def init_user():
             case _:
                 ic("Fail", ret)
 
+def init_post():
+    from Applications.Usecases import CreatePost, LoginUser
+    from Domains.Entities import SimplePost
+    from Infrastructures.IOC import get_post_storage,get_user_storage
+    from Infrastructures.Interfaces import IStorageFactory
+    from Applications.Repositories.Interfaces import IUserRepository, IPostRepository
+    from datetime import datetime, timedelta
+    now = datetime.now()
+    now = now.replace(microsecond=0)
+
+    login = LoginUser(get_user_storage())
+    admin = login.login("admin", "Admin123!@")
+    create = CreatePost(get_post_storage(), get_post_storage())
+
+    start = {
+        "title": "사이트의 시작을 알립니다.",
+        "content": f"""이 사이트는 '{now.strftime("%d/%m/%Y")}'에 시작했습니다.
+이용자 여러분 앞으로 잘 부탁드립니다.""",
+        "user": admin,
+        "time": now,
+    }
+    now = now + timedelta(minutes=5)
+    anony_post = {
+        "title": "여기 짱이 누구냐",
+        "content": f"""짜잔! 내가 등장했다!!
+이 게시판은 내가 먹도록 하겠다.""",
+        "user": None,
+        "time": now,
+    }
+
+    posts = [
+        start,
+        anony_post,
+    ]
+    for post in posts:
+        create.create(post["title"],post["content"], post["time"], post["user"])
 
 def delete_storage():
     from Infrastructures.IOC import get_strage_factory
@@ -120,6 +156,7 @@ def migrate():
     m.create_user()
     m.create_post()
     init_user()
+    init_post()
 
 
 def set_storage(storage_type: str):

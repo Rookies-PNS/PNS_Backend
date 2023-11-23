@@ -100,7 +100,8 @@ class GetPost:
     def __init__(self, repository: IPostRepository):
         self.repository = repository
 
-    def get_post_from_post_id(self, post_id: PostId) -> Optional[PostVO]:
+    def get_post_from_post_id(self, post_id: int) -> Optional[PostVO]:
+        post_id = PostId(idx=post_id)
         return self.repository.search_by_pid(post_id)
 
 
