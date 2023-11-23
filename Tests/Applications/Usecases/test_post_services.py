@@ -108,56 +108,66 @@ class test_post_services(unittest.TestCase):
         print("\t\t", sys._getframe(0).f_code.co_name)
         now = datetime.now(tz=timezone.utc)
         now = now.replace(microsecond=0)
-        
+
         new_post = self.create_post.create("New Post", "New Content", now)
         self.assertEqual("New Post", new_post.title)
-        self.assertEqual(now.strftime("%d/%m/%Y, %H:%M:%S"), new_post.create_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"))
-        self.assertEqual(now.strftime("%d/%m/%Y, %H:%M:%S"), new_post.update_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"))
+        self.assertEqual(
+            now.strftime("%d/%m/%Y, %H:%M:%S"),
+            new_post.create_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"),
+        )
+        self.assertEqual(
+            now.strftime("%d/%m/%Y, %H:%M:%S"),
+            new_post.update_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"),
+        )
 
-        check_post = self.get_post.get_post_from_post_id(new_post.post_id)
+        check_post = self.get_post.get_post_from_post_id(new_post.post_id.idx)
         self.assertEqual("New Post", check_post.title)
         self.assertEqual("New Content", check_post.content.content)
-        self.assertEqual(now.strftime("%d/%m/%Y, %H:%M:%S"), check_post.create_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"))
-        self.assertEqual(now.strftime("%d/%m/%Y, %H:%M:%S"), check_post.update_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"))
+        self.assertEqual(
+            now.strftime("%d/%m/%Y, %H:%M:%S"),
+            check_post.create_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"),
+        )
+        self.assertEqual(
+            now.strftime("%d/%m/%Y, %H:%M:%S"),
+            check_post.update_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"),
+        )
 
         post_list = self.get_post_list.get_list_no_filter()
         self.assertEqual(len(post_list), 4)
 
     def test_get_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post = self.get_post.get_post_from_post_id(PostId(idx=1))
-        self.assertEqual( "Post 1",post.title)
-        self.assertEqual( "Content 1", post.content.content)
-        
+        post = self.get_post.get_post_from_post_id(1)
+        self.assertEqual("Post 1", post.title)
+        self.assertEqual("Content 1", post.content.content)
+
         post_list = self.get_post_list.get_list_no_filter()
         self.assertEqual(len(post_list), 3)
 
     def test_update_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post = self.get_post.get_post_from_post_id(PostId(idx=1))
+        post = self.get_post.get_post_from_post_id(1)
         updated_post = self.update_post.update(post, "Updated Post", "Updated Content")
         self.assertEqual(updated_post.title, "Updated Post")
         self.assertEqual(
-            post.create_time.get_time(),
-            updated_post.create_time.get_time()
-            )
+            post.create_time.get_time(), updated_post.create_time.get_time()
+        )
         self.assertNotEqual(
-            post.update_time.get_time(),
-            updated_post.create_time.get_time()
-            )
+            post.update_time.get_time(), updated_post.create_time.get_time()
+        )
 
         post_list = self.get_post_list.get_list_no_filter()
         self.assertEqual(len(post_list), 3)
 
-        check_post = self.get_post.get_post_from_post_id(updated_post.post_id)
-        self.assertEqual( check_post.title, "Updated Post")
+        check_post = self.get_post.get_post_from_post_id(updated_post.post_id.idx)
+        self.assertEqual(check_post.title, "Updated Post")
         self.assertEqual(check_post.content.content, "Updated Content")
 
     def test_delete_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post = self.get_post.get_post_from_post_id(PostId(idx=1))
+        post = self.get_post.get_post_from_post_id(1)
         self.delete_post.delete(post)
-        deleted_post = self.get_post.get_post_from_post_id(PostId(idx=1))
+        deleted_post = self.get_post.get_post_from_post_id(1)
         self.assertIsNone(deleted_post)
 
         post_list = self.get_post_list.get_list_no_filter()
