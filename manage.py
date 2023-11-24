@@ -14,7 +14,7 @@ def parse_opt():
         default="flask",
     )
     parser.add_argument("--branch", default="main")
-    parser.add_argument("--not_debug", action="store_false", default=True)
+    parser.add_argument("--not_debug", action="store_true", default=False)
     parser.add_argument("--storage_type", default="mysql")
     parser.add_argument(
         "--test_file",
@@ -170,11 +170,12 @@ def set_storage(storage_type: str):
 
 def main(opt):
     from icecream import ic
+    debug = not opt.not_debug
 
-    if opt.not_debug:
-        ic.disable()
-    else:
+    if debug:
         ic.enable()
+    else:
+        ic.disable()
 
     print(f"Run {opt.run}")
     set_storage(opt.storage_type)
@@ -185,7 +186,7 @@ def main(opt):
         case "git-push":
             git_push(opt.test_file, opt.branch)
         case "flask":
-            flask(opt.not_debug)
+            flask(debug)
         case "migrate":
             migrate()
         case "delete-storage":
