@@ -27,6 +27,7 @@ def parse_opt():
             r"Tests\Applications\Usecases\test_password.py",
             r"Tests\Applications\Usecases\test_contents.py",
             r"Tests\Applications\Usecases\test_post_services.py",
+            r"Tests\Applications\Usecases\test_post_user_services.py"
         ],
     )
     opt = parser.parse_args()
@@ -106,7 +107,7 @@ def init_post():
 
     login = LoginUser(get_user_storage())
     admin = login.login("admin", "Admin123!@")
-    create = CreatePost(get_post_storage(), get_post_storage())
+    create = CreatePost(get_post_storage(), get_user_storage())
 
     start = {
         "title": "사이트의 시작을 알립니다.",

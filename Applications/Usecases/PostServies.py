@@ -20,6 +20,7 @@ from Applications.Results import (
     Fail,
 )
 
+from icecream import ic
 
 class GetPostList:
     def __init__(self, repository: IPostRepository):
@@ -56,6 +57,10 @@ class CreatePost:
         create_time: Optional[datetime] = None,
         user: Optional[SimpleUser] = None,
     ) -> Result[SimplePost]:
+        from Applications.Usecases.AppUsecaseExtention import (
+            validate_user_input,
+            convert_to_content,
+        )
 
         match create_time:
             case _ if create_time is None:
@@ -64,22 +69,11 @@ class CreatePost:
                 create_time = PostCreateTime(time=create_time)
 
         match user:
-            # case _ if isinstance(user, SimpleUser):
-            #     if not self.user_repo.check_exist_user(user):
-            #         return Fail(type="Fail_CreatePost_UserNotExist")
+            case u if isinstance(u, SimpleUser):
+                if not self.user_repo.check_exist_userid(u.get_account()):
+                    return Fail(type="Fail_CreatePost_UserNotExist")
             case _:
-                return self._anony_create(title, content, create_time)
-
-    def _anony_create(
-        self,
-        title: str,
-        content: str,
-        create_time: PostCreateTime,
-    ) -> Result[SimplePost]:
-        from Applications.Usecases.AppUsecaseExtention import (
-            validate_user_input,
-            convert_to_content,
-        )
+                pass
 
         match validate_user_input(title):
             case value if isinstance(value, Fail):
@@ -92,9 +86,9 @@ class CreatePost:
             content=converted_content,
             create_time=create_time,
             update_time=create_time,
+            user=user
         )
         return self.repository.save(post)
-
 
 class GetPost:
     def __init__(self, repository: IPostRepository):
@@ -102,6 +96,8 @@ class GetPost:
 
     def get_post_from_post_id(self, post_id: int) -> Optional[PostVO]:
         post_id = PostId(idx=post_id)
+        ic()
+        ic(post_id)
         return self.repository.search_by_pid(post_id)
 
 

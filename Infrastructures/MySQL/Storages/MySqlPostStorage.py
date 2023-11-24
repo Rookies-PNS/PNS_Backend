@@ -38,7 +38,7 @@ class MySqlPostStorage(IPostRepository):
             create_time=PostCreateTime(time=row["create_time"]),#time=datetime.strptime(row["create_time"], '%Y-%m-%d %H:%M:%S')),
             update_time=PostUpdateTime(time=row["update_time"]),#time=datetime.strptime(row["update_time"], '%Y-%m-%d %H:%M:%S')),
             post_id=PostId(idx=row["post_id"]),
-            user=self.user_repo.search_by_uid(Uid(idx=row["user_id"]))
+            user=self.user_repo.search_by_uid(Uid(idx=row["user_id"])).get_simple_user()
         )
 
     def get_padding_name(self, name: str) -> str:
@@ -162,6 +162,7 @@ class MySqlPostStorage(IPostRepository):
         return [self._convert_to_postvo(row).get_simple_post() for row in results]
 
     def search_by_pid(self, post_id: PostId) -> Optional[PostVO]:
+        from icecream import ic
         connection = self.connect()
         table_name = self.get_padding_name("post")
         try:
@@ -169,10 +170,16 @@ class MySqlPostStorage(IPostRepository):
                 select_query = f"SELECT * FROM {table_name} WHERE post_id = %s;"
                 cursor.execute(select_query, (post_id.idx,))
                 result = cursor.fetchone()
+                ic()
+                ic(select_query)
 
                 if result:
+                    ic()
+                    ic(result)
                     return self._convert_to_postvo(result)
-        except:
+        except Exception as ex:
+            ic()
+            ic(ex)
             connection.rollback()
         finally:
             connection.close()

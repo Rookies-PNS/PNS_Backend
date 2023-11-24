@@ -6,7 +6,7 @@ from typing import List
 from datetime import datetime, timezone
 
 from Commons import UserId, Uid, Password
-from Domains.Entities import SimpleUser
+from Domains.Entities import UserVO, User, Post, PostVO, SimplePost,SimpleUser
 from Applications.Usecases import CreateUser, LoginUser
 from Applications.Usecases import (
     CreatePost,
@@ -23,13 +23,12 @@ from Applications.Results import (
 import Tests.Applications.Usecases.storage_selecter as test_selector
 from icecream import ic
 
-
-class test_post_services(unittest.TestCase):
+class test_post_user_services(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = "test"
         print(sys._getframe(0).f_code.co_name)
-        cls.factory = test_selector.get_test_factory("post_service_test_")
+        cls.factory = test_selector.get_test_factory("post_user_service_test_")
 
         migrate = test_selector.get_usecase_migration(cls.factory)
         # 깔끔하게 지우고 시작
@@ -41,6 +40,7 @@ class test_post_services(unittest.TestCase):
         # 테이블 생성
         migrate.create_user()
 
+        # 기본세팅
         repo = test_selector.get_user_storage(cls.factory)
         create_user = CreateUser(repo)
         login_user = LoginUser(repo)
@@ -56,7 +56,6 @@ class test_post_services(unittest.TestCase):
         cls.origin_users = users
         cls.create_user = CreateUser(repo)
         cls.login_user = LoginUser(repo)
-
 
     @classmethod
     def tearDownClass(cls):
@@ -87,9 +86,9 @@ class test_post_services(unittest.TestCase):
         self.update_post = UpdatePost(post_repo, user_repo)
         self.delete_post = DeletePost(post_repo, user_repo)
 
-        post1 = self.create_post.create("Post 1", "Content 1")
-        post2 = self.create_post.create("Post 2", "Content 2")
-        post3 = self.create_post.create("Post 3", "Content 3")
+        post1 = self.create_post.create("Post 1", "Content 1",user = self.origin_users[0])
+        post2 = self.create_post.create("Post 2", "Content 2",user = self.origin_users[1])
+        post3 = self.create_post.create("Post 3", "Content 3",user = self.origin_users[2])
 
     def tearDown(self):
         "Hook method for deconstructing the test fixture after testing it."
@@ -100,18 +99,16 @@ class test_post_services(unittest.TestCase):
             migrate.delete_post()
         self.assertFalse(migrate.check_exist_post())
 
-    def test_get_post_list(self):
+    def test_(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post_list = self.get_post_list.get_list_no_filter()
 
-        self.assertEqual(len(post_list), 3)
-
-    def test_create_post(self):
+    def test_(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
         now = datetime.now(tz=timezone.utc)
         now = now.replace(microsecond=0)
+        user = self.origin_users[0]
 
-        new_post = self.create_post.create("New Post", "New Content", now)
+        new_post = self.create_post.create("New Post", "New Content", now,user)
         self.assertEqual("New Post", new_post.title)
         self.assertEqual(
             now.strftime("%d/%m/%Y, %H:%M:%S"),
@@ -133,53 +130,13 @@ class test_post_services(unittest.TestCase):
             now.strftime("%d/%m/%Y, %H:%M:%S"),
             check_post.update_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"),
         )
+        self.assertEqual(
+            user.__dict__,
+            check_post.user.__dict__
+        )
 
         post_list = self.get_post_list.get_list_no_filter()
         self.assertEqual(len(post_list), 4)
-
-    def test_get_post(self):
-        print("\t\t", sys._getframe(0).f_code.co_name)
-        post = self.get_post.get_post_from_post_id(1)
-        self.assertEqual("Post 1", post.title)
-        self.assertEqual("Content 1", post.content.content)
-
-        post_list = self.get_post_list.get_list_no_filter()
-        self.assertEqual(len(post_list), 3)
-
-    def test_update_post(self):
-        print("\t\t", sys._getframe(0).f_code.co_name)
-        post = self.get_post.get_post_from_post_id(1)
-        ic(post)
-        self.assertIsNotNone(post)
-        updated_post = self.update_post.update(post, "Updated Post", "Updated Content")
-        self.assertEqual(updated_post.title, "Updated Post")
-        self.assertEqual(
-            post.create_time.get_time(), updated_post.create_time.get_time()
-        )
-        self.assertNotEqual(
-            post.update_time.get_time(), updated_post.create_time.get_time()
-        )
-
-        post_list = self.get_post_list.get_list_no_filter()
-        self.assertEqual(len(post_list), 3)
-
-        check_post = self.get_post.get_post_from_post_id(updated_post.post_id.idx)
-        self.assertEqual(check_post.title, "Updated Post")
-        self.assertEqual(check_post.content.content, "Updated Content")
-
-    def test_delete_post(self):
-        print("\t\t", sys._getframe(0).f_code.co_name)
-        post = self.get_post.get_post_from_post_id(1)
-        self.delete_post.delete(post)
-        deleted_post = self.get_post.get_post_from_post_id(1)
-        self.assertIsNone(deleted_post)
-
-        post_list = self.get_post_list.get_list_no_filter()
-        self.assertEqual(len(post_list), 2)
-
-    def test_(self):
-        print("\t\t", sys._getframe(0).f_code.co_name)
-
 
 def main():
     unittest.main()

@@ -1,4 +1,4 @@
-﻿from flask import Blueprint, redirect, render_template, request, url_for
+﻿from flask import Blueprint, redirect, render_template, request, url_for, session
 from werkzeug.utils import redirect
 
 from Domains.Entities import Post,PostVO, SimplePost
@@ -42,7 +42,8 @@ def create():
 
     if request.method == 'POST' and form.validate_on_submit():
         service  = CreatePost(get_post_storage(), get_user_storage)
-        match service.create(form.subject.data, form.content.data):
+        user = session["user"]
+        match service.create(form.subject.data, form.content.data,user=user):
             case post if isinstance(post, SimplePost):
                 return redirect(url_for('main.index'))
             case Fail(type=type):

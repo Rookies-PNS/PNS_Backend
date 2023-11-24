@@ -7,8 +7,6 @@ from Domains.Entities import *
 
 
 def user_to_dict(user:SimpleUser)->Dict[str, str]:
-    ic()
-    ic(user)
     return {
         "id" : str(user.uid.idx),
         "account" : user.user_id.account,
@@ -16,25 +14,21 @@ def user_to_dict(user:SimpleUser)->Dict[str, str]:
     }
 
 def simple_post_to_dict(post:SimplePost)->Dict[str,str]:
-    ic()
-    ic(post)
     return {
         "id": str(post.post_id.idx) ,
         "title": post.title ,
         "user_account": post.get_account() ,
-        "create_time": post.create_time.get_time().strftime("%Y/%m/%d - %H:%M:%S") ,
-        "update_time": post.update_time.get_time().strftime("%Y/%m/%d - %H:%M:%S")  ,
+        "create_time": post.create_time.get_time().strftime("%m/%d-%H:%M") ,
+        "update_time": post.update_time.get_time().strftime("%m/%d-%H:%M")  ,
     }
 def post_to_dict(post:PostVO)->Dict[str,str]:
-    ic()
-    ic(post)
     return {
         "id": str(post.post_id.idx) ,
         "title": post.title ,
         "content": post.get_content(),
-        "user_account": post.get_account() ,
-        "create_time": post.create_time.get_time().strftime("%Y/%m/%d - %H:%M:%S") ,
-        "update_time": post.update_time.get_time().strftime("%Y/%m/%d - %H:%M:%S")  ,
+        "user_account": post.get_account(),
+        "create_time": post.create_time.get_time().strftime("%m/%d-%H:%M") ,
+        "update_time": post.update_time.get_time().strftime("%m/%d-%H:%M")  ,
     }
 
 def users_to_dicts(users:Collection[SimpleUser])->List[Dict[str,str]]:
@@ -43,8 +37,6 @@ def users_to_dicts(users:Collection[SimpleUser])->List[Dict[str,str]]:
     ]
 
 def posts_to_dicts(posts:Collection[Union[PostVO,SimplePost]])->List[Dict[str,str]]:
-    ic()
-    ic(posts)
     ret = []
     for p in posts:
         match p:
