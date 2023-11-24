@@ -1,5 +1,5 @@
 ﻿from typing import Optional
-from flask import Blueprint, redirect, render_template, request, url_for, flash,session,g
+from flask import Blueprint, redirect, render_template, request, url_for, flash,session
 from werkzeug.utils import redirect
 
 from Domains.Entities import UserVO, SimpleUser
@@ -64,14 +64,3 @@ def logout():
     return redirect(url_for('main.index'))
     
 
-# 로그인 여부 확인
-# 하단의 애너테이션이 적용된 함수는 모든(다른 파일포함) 라우팅 함수보다 항상 먼저 실행된다
-@bp.before_app_request
-def load_logged_in_user():
-    # g의 의미는 global이며 전역적으로 사용되는 개체이다
-    # request 변수처럼 요청/응답 과정에서 유효하다
-    match session.get('user'):
-        case user if isinstance(user, SimpleUser):
-            g.user = user_to_dict(user)
-        case _:
-            g.user = None
