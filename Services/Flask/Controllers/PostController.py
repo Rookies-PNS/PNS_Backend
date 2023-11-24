@@ -1,15 +1,15 @@
-﻿from datetime import datetime
-
-from flask import Blueprint, redirect, render_template, request, url_for
+﻿from flask import Blueprint, redirect, render_template, request, url_for
 from werkzeug.utils import redirect
 
 from Domains.Entities import Post,PostVO, SimplePost
 from Applications.Usecases import GetPostList, GetPost, CreatePost
+from Applications.Results import Result, Fail
 from Infrastructures.IOC import get_user_storage, get_post_storage
 
 from Services.Flask.Models import post_to_dict, posts_to_dicts
 from Services.Flask.Views.forms import PostForm
 
+from icecream import ic
 bp = Blueprint('post', __name__, url_prefix='/post')
 
 
@@ -42,7 +42,14 @@ def create():
 
     if request.method == 'POST' and form.validate_on_submit():
         service  = CreatePost(get_post_storage(), get_user_storage)
-        post = service.create(form.subject.data, form.content.data)
-        return redirect(url_for('main.index'))
+        match service.create(form.subject.data, form.content.data):
+            case post if isinstance(post, SimplePost):
+                return redirect(url_for('main.index'))
+            case Fail(type=type):
+                ic()
+                ic(type, "NotImplementedError")
+            case _:
+                ic()
+                pass
 
     return render_template('post/post_form.html', form=form)

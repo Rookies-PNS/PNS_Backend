@@ -16,6 +16,8 @@ class User:
         self.name = name
         self.password = password
         self.uid = uid
+    def get_account(self)->str:
+        return self.user_id.account
 
 
 @dataclass(frozen=True)
@@ -28,9 +30,14 @@ class UserVO:
     def get_simple_user(self):
         return SimpleUser(user_id=self.user_id, name=self.name, uid=self.uid)
 
+    def get_account(self)->str:
+        return self.user_id.account
 
 @dataclass(frozen=True)
 class SimpleUser:
     user_id: UserId
     name: str
     uid: Uid
+
+    def get_account(self)->str:
+        return self.user_id.account

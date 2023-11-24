@@ -25,16 +25,6 @@
             <input type="password" class="form-control" name="password2" id="password2"
                    value="{{ form.password2.data or '' }}">
         </div>
-        <div class="mb-3">
-            <label for="phonenum">전화번호</label>
-            <input type="text" class="form-control" name="phonenum" id="phonenum"
-                   value="{{ form.phonenum.data or '' }}">
-        </div>
-        <div class="mb-3">
-            <label for="email">이메일</label>
-            <input type="text" class="form-control" name="email" id="email"
-                   value="{{ form.email.data or '' }}">
-        </div>
         <button type="submit" class="btn btn-primary">생성하기</button>
     </form>
 </div>

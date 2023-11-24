@@ -5,7 +5,7 @@
     </a>
 
     <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-      <li><h2><a href="{{ url_for('main.index') }}" class="nav-link px-2 link-secondary">Home</a></h2></li>
+      <li><h2><a href="{{ url_for('main.index') }}" class="nav-link px-2 link-secondary"><img src="{{ url_for('static', filename='phantom.png') }}" alt="Logo" style="width: 150px"></a></h2></li>
       <!-- <li><a href="#" class="nav-link px-2 link-dark">Features</a></li>
       <li><a href="#" class="nav-link px-2 link-dark">Pricing</a></li>
       <li><a href="#" class="nav-link px-2 link-dark">FAQs</a></li>
@@ -13,6 +13,13 @@
     </ul>
 
     <div class="col-md-3 text-end">
+      {% if "user" in session %}
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-primary me-2">Logout</button>
+        <a>{{session["user"].name}}님</a>
+      {% else %}
+        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary me-2">Login</button>
+        <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">Sign-up</a>
+      {% endif %}
     </div>
   </header>
 </div>

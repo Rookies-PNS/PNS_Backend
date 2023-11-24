@@ -4,7 +4,7 @@ from flask import Flask, Blueprint, url_for
 from werkzeug.utils import redirect
 from Services import get_secrets_key
 from Services.Flask.Controllers import (
-#     AuthController,
+    AuthController,
     PostController
 #     CommentController,
 )
@@ -23,11 +23,10 @@ main_bp = Blueprint('main', __name__, url_prefix='/')
 
 @main_bp.route('/')
 def index():
-    # return "hihi"
     return redirect(url_for('post._list', page=1))
 
 app.register_blueprint(main_bp)
-# app.register_blueprint(AuthController.bp)
+app.register_blueprint(AuthController.bp)
 app.register_blueprint(PostController.bp)
 # app.register_blueprint(CommentController.bp)
 
