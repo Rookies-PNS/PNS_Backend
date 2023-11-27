@@ -9,6 +9,7 @@ from Applications.Repositories.Interfaces import IPostRepository, IUserRepositor
 from Applications.Repositories.Queries import IConditionRanderForPostQuery
 from Applications.Results import Result, Fail
 
+from icecream import ic
 import pymysql
 
 
@@ -32,14 +33,25 @@ class MySqlPostStorage(IPostRepository):
 
     
     def _convert_to_postvo(self, row:dict)->PostVO:
-        return PostVO(
-            title=row["title"],
-            content=Content(content=row["content"]),
-            create_time=PostCreateTime(time=row["create_time"]),#time=datetime.strptime(row["create_time"], '%Y-%m-%d %H:%M:%S')),
-            update_time=PostUpdateTime(time=row["update_time"]),#time=datetime.strptime(row["update_time"], '%Y-%m-%d %H:%M:%S')),
-            post_id=PostId(idx=row["post_id"]),
-            user=self.user_repo.search_by_uid(Uid(idx=row["user_id"])).get_simple_user()
-        )
+        match row["user_id"]:
+            case user_id if user_id is not None:
+                return PostVO(
+                    title=row["title"],
+                    content=Content(content=row["content"]),
+                    create_time=PostCreateTime(time=row["create_time"]),#time=datetime.strptime(row["create_time"], '%Y-%m-%d %H:%M:%S')),
+                    update_time=PostUpdateTime(time=row["update_time"]),#time=datetime.strptime(row["update_time"], '%Y-%m-%d %H:%M:%S')),
+                    post_id=PostId(idx=row["post_id"]),
+                    user=self.user_repo.search_by_uid(Uid(idx=row["user_id"])).get_simple_user()
+                )
+            case _:
+                return PostVO(
+                    title=row["title"],
+                    content=Content(content=row["content"]),
+                    create_time=PostCreateTime(time=row["create_time"]),#time=datetime.strptime(row["create_time"], '%Y-%m-%d %H:%M:%S')),
+                    update_time=PostUpdateTime(time=row["update_time"]),#time=datetime.strptime(row["update_time"], '%Y-%m-%d %H:%M:%S')),
+                    post_id=PostId(idx=row["post_id"]),
+                    user=None
+                )
 
     def get_padding_name(self, name: str) -> str:
         return f"{self.name_padding}{name}"
@@ -170,16 +182,10 @@ class MySqlPostStorage(IPostRepository):
                 select_query = f"SELECT * FROM {table_name} WHERE post_id = %s;"
                 cursor.execute(select_query, (post_id.idx,))
                 result = cursor.fetchone()
-                ic()
-                ic(select_query)
 
                 if result:
-                    ic()
-                    ic(result)
                     return self._convert_to_postvo(result)
         except Exception as ex:
-            ic()
-            ic(ex)
             connection.rollback()
         finally:
             connection.close()

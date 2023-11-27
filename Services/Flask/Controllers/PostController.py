@@ -41,7 +41,7 @@ def create():
     form = PostForm()
 
     if request.method == 'POST' and form.validate_on_submit():
-        service  = CreatePost(get_post_storage(), get_user_storage)
+        service  = CreatePost(get_post_storage(), get_user_storage())
         user = session["user"]
         match service.create(form.subject.data, form.content.data,user=user):
             case post if isinstance(post, SimplePost):
