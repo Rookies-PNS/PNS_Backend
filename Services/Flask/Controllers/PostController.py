@@ -1,12 +1,13 @@
-﻿from flask import Blueprint, redirect, render_template, request, url_for, session
+﻿from flask import Blueprint, redirect, render_template, request, url_for, session, flash
 from werkzeug.utils import redirect
+from Commons import PostId
 
 from Domains.Entities import Post,PostVO, SimplePost
-from Applications.Usecases import GetPostList, GetPost, CreatePost
+from Applications.Usecases import GetPostList, GetPost, CreatePost, DeletePost
 from Applications.Results import Result, Fail
 from Infrastructures.IOC import get_user_storage, get_post_storage
 
-from Services.Flask.Models import post_to_dict, posts_to_dicts
+from Services.Flask.Models import post_to_dict, posts_to_dicts, dict_to_user
 from Services.Flask.Views.forms import PostForm
 
 from icecream import ic
@@ -40,9 +41,15 @@ def detail(post_id):
 def create():
     form = PostForm()
 
+
     if request.method == 'POST' and form.validate_on_submit():
         service  = CreatePost(get_post_storage(), get_user_storage())
-        user = session["user"]
+        if "user" in session:
+            ic()
+            ic(session["user"])
+            user = dict_to_user(session["user"])
+        else:
+            user = None
         match service.create(form.subject.data, form.content.data,user=user):
             case post if isinstance(post, SimplePost):
                 return redirect(url_for('main.index'))
@@ -54,3 +61,21 @@ def create():
                 pass
 
     return render_template('post/post_form.html', form=form)
+    
+
+# @bp.route('/delete/<int:post_id>/', methods=['POST'])
+# def delete(post_id):
+#     service = DeletePost(get_post_storage(), get_user_storage())
+#     if "user" in session:
+#         user = dict_to_user(session["user"])
+#     else:
+#         user = None
+#     match service.delete(post_id, user):
+#         case id if isinstance(id, PostId):
+#             return redirect(url_for('post._list', page=1))
+#         case Fail(type=type):
+#             ic()
+#             ic(type, "NotImplementedError")
+#         case _:
+#             ic()
+#             pass

@@ -4,7 +4,15 @@ from collections.abc import Collection
 from icecream import ic
 
 from Domains.Entities import *
+from Commons import UserId,Uid
 
+
+def dict_to_user(user:Dict[str,Union[Dict[str,any],str]])->SimpleUser:
+    return SimpleUser(
+        user_id=UserId(account=user["user_id"]["account"]),
+        name = user["name"],
+        uid = Uid(idx=int(user["uid"]["idx"])),
+    )
 
 def user_to_dict(user:SimpleUser)->Dict[str, str]:
     return {
