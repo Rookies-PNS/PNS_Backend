@@ -108,11 +108,12 @@ class SimplePost:
                 return "익명"
 
 def PostVO_to_Post(postvo)->Post:
+    import copy
     return Post(
         postvo.title,
         postvo.content,
         postvo.create_time,
-        postvo.update_time,
+        copy.copy(postvo.update_time),
         postvo.post_id,
         postvo.user
     )
