@@ -6,6 +6,7 @@ from Domains.Entities import User, SimpleUser, UserVO
 from Applications.Usecases.AppUsecaseExtention import (
     check_valid_password,
     convert_to_Password_with_hashing,
+    validate_user_input,
 )
 from Applications.Repositories.Interfaces import IUserRepository
 from Applications.Results import (
@@ -20,12 +21,27 @@ from Applications.Results import (
 class CreateUser:
     def __init__(self, repository: IUserRepository):
         self.repository = repository
+        self.account_len = 50
+        self.name_len = 100
+
 
     def create(self, id: str, pw: str, name: str) -> Result[SimpleUser]:
         # check user id
         if self.repository.check_exist_userid(id):
             return Fail_CreateUser_IDAlreadyExists()
-        user_id = UserId(account=id)
+        
+        match id:
+            case valide_id if validate_user_input(valide_id, self.account_len):
+                user_id = UserId(account=valide_id)
+            case Fail(type=type):
+                return Fail(type=f"{type}_in_CreateUser_from_account")
+
+        match name:
+            case valide_name if validate_user_input(valide_id, self.name_len):
+                checked_name = valide_name
+            case Fail(type=type):
+                return Fail(type=f"{type}_in_CreateUser_from_name")
+
 
         # check passward
         if check_valid_password(pw):
@@ -39,7 +55,7 @@ class CreateUser:
             return Fail("Fail_CreateUser_Invalid_Password")
 
         # create User
-        user = User(user_id, name, password)
+        user = User(user_id, checked_name, password)
         return self.repository.save(user)
 
 

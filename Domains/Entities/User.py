@@ -18,6 +18,14 @@ class User:
         self.uid = uid
     def get_account(self)->str:
         return self.user_id.account
+    def check_equal(self, uid:Optional[Uid])->bool:
+        if self.uid ==None:
+            return False
+        match uid:
+            case id if isinstance(id, Uid):
+                return uid == self.uid
+            case _ :
+                return False
 
 
 @dataclass(frozen=True)
@@ -32,6 +40,12 @@ class UserVO:
 
     def get_account(self)->str:
         return self.user_id.account
+    def check_equal(self, uid:Optional[Uid])->bool:
+        match uid:
+            case id if isinstance(id, Uid):
+                return uid == self.uid
+            case _ :
+                return False
 
 @dataclass(frozen=True)
 class SimpleUser:
@@ -41,3 +55,9 @@ class SimpleUser:
 
     def get_account(self)->str:
         return self.user_id.account
+    def check_equal(self, uid:Optional[Uid])->bool:
+        match uid:
+            case id if isinstance(id, Uid):
+                return uid == self.uid
+            case _ :
+                return False

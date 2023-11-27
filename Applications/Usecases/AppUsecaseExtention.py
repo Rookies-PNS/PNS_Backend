@@ -29,35 +29,15 @@ def convert_to_Password_with_hashing(password: str) -> Optional[Password]:
     return Password(pw=hashed_password)
 
 
-def validate_user_input(user_input: str) -> Result[str]:
+def validate_user_input(user_input: str, max_len:int=50) -> Result[str]:
     import html
 
     """
     회원의 id, name과 게시글의 title을 검증하는 함수
     """
-    # XSS 방지: HTML 태그 제거
-    user_input = html.escape(user_input)
-
-    # CSRF 방지: 특정 문자열이나 패턴을 필터링
-    csrf_patterns = ["{{", "}}", "{%", "%}", "<%", "%>", "<$"]
-    for pattern in csrf_patterns:
-        if pattern in user_input:
-            return Fail(type=f"Fail_Not_Validate_UserInput({pattern})")
-
-    # SQL Injection 방지: 특수 문자 필터링
-    sql_injection_patterns = [";"]
-    for pattern in sql_injection_patterns:
-        if pattern in user_input:
-            return Fail(type=f"Fail_Not_Validate_UserInput({pattern})")
-
-    sql_injection_patterns = ["--", "DROP", "DELETE", "UPDATE", "INSERT", "SELECT"]
-    for pattern in sql_injection_patterns:
-        if pattern in user_input.upper():
-            user_input = user_input.replace(pattern, f"`{pattern}`")
-
-    # 기타 사용자 정의 검증 규칙 추가 가능
-
-    # 모든 검증을 통과하면 True 반환
+    if len(user_input) > max_len:
+        return Fail(type="Fail_InvalidateUserInput_ToMush")
+    
     return user_input
 
 

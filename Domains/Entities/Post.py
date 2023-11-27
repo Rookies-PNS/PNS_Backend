@@ -2,7 +2,7 @@ from typing import Optional
 from dataclasses import dataclass
 from icecream import ic
 
-from Commons import Content, PostId, PostCreateTime, PostUpdateTime, get_current_time
+from Commons import Content, PostId, PostCreateTime, PostUpdateTime, get_current_time, Uid
 from Domains.Entities.User import SimpleUser
 
 
@@ -49,6 +49,12 @@ class Post:
                 return user.name
             case _:
                 return "익명"
+    def get_uid(self)->Optional[Uid]:
+        match self.user:
+            case user if isinstance(user, SimpleUser):
+                return self.user.uid
+            case _:
+                return None
 
 
 
@@ -75,8 +81,6 @@ class PostVO:
                 return user.user_id.account
             case _:
                 return "익명"
-    def get_content(self)->str:
-        return self.content.content
 
     def get_username(self)->str:
         match self.user:
@@ -84,6 +88,17 @@ class PostVO:
                 return user.name
             case _:
                 return "익명"
+    def get_uid(self)->Optional[Uid]:
+        match self.user:
+            case user if isinstance(user, SimpleUser):
+                return self.user.uid
+            case _:
+                return None
+
+    def get_title(self)->str:
+        return self.title
+    def get_content(self)->str:
+        return self.content.content
 
 @dataclass(frozen=True)
 class SimplePost:
@@ -98,8 +113,15 @@ class SimplePost:
                 return user.user_id.account
             case _:
                 return "익명"
-    def get_content(self)->str:
-        return self.content.content
+    def get_title(self)->str:
+        return self.title
+    def get_uid(self)->Optional[Uid]:
+        match self.user:
+            case user if isinstance(user, SimpleUser):
+                return self.user.uid
+            case _:
+                return None
+
     def get_username(self)->str:
         match self.user:
             case user if isinstance(user, SimpleUser):

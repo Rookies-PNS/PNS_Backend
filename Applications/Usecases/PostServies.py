@@ -20,7 +20,6 @@ from Applications.Results import (
     Fail,
 )
 
-from icecream import ic
 
 class GetPostList:
     def __init__(self, repository: IPostRepository):
@@ -75,9 +74,9 @@ class CreatePost:
             case _:
                 pass
 
-        # match validate_user_input(title):
-        #     case value if isinstance(value, Fail):
-        #         return Fail(type="Fail_CreatePost_Nonvalidated_Title")
+        match validate_user_input(title, 250):
+            case value if isinstance(value, Fail):
+                return Fail(type="Fail_CreatePost_Nonvalidated_Title")
 
         converted_content = convert_to_content(content)
 
@@ -147,7 +146,7 @@ class UpdatePost:
                 # Anonymous posts can be modified by anyone
                 pass
 
-        match validate_user_input(title):
+        match validate_user_input(title, 250):
             case value if isinstance(value, Fail):
                 return Fail(type="Fail_UpdatePost_Nonvalidated_Title")
 
@@ -166,6 +165,6 @@ class UpdatePost:
                 if updated_post is not None:
                     return self.post_repo.update(updated_post)
                 else:
-                    return Fail(type=f"Fail_UpdatePost_ConverFail")
+                    return Fail(type=f"Fail_UpdatePost_ConvertFail")
             case _:
                 return Fail(type=f"Fail_UpdatePost_Unknown_type")
