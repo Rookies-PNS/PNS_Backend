@@ -60,7 +60,7 @@ python manage.py
 python manage.py --not-debug
 ```
 
-### 기본제공 ID
+### 기본제공 ID(테스트용)
 ```bash
 ID : admin
 PW : Admin123!@
