@@ -78,7 +78,7 @@ class MySqlPostStorage(IPostRepository):
         try:
             with connection.cursor() as cursor:
                 match post.user:
-                    case _ if isinstance(post.user, SimpleUser):
+                    case user if isinstance(user, SimpleUser):
                         insert_query = (
                             f"INSERT INTO {table_name} (title, content, user_id, create_time, update_time) VALUES (%s, %s, %s, %s, %s);"
                         )
@@ -86,7 +86,7 @@ class MySqlPostStorage(IPostRepository):
                             insert_query,
                             (post.title, post.content.content, post.user.uid.idx, post.create_time.get_time(), post.update_time.get_time()),
                         )
-                    case _ if post.user is None:
+                    case none if none is None:
                         insert_query = (
                             f"INSERT INTO {table_name} (title, content, create_time, update_time) VALUES (%s, %s, %s, %s);"
                         )
@@ -94,6 +94,8 @@ class MySqlPostStorage(IPostRepository):
                             insert_query,
                             (post.title, post.content.content, post.create_time.get_time(), post.update_time.get_time()),
                         )
+                    case d if isinstance(d, dict):
+                        return Fail(type="Fail_Mysql_SavePost_ValueError(user.type==dict)")
                     case _:
                         return Fail(type="Fail_Mysql_SavePost_unknown")
                 # 마지막 실행 파일 찾기 

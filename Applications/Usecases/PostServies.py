@@ -75,9 +75,9 @@ class CreatePost:
             case _:
                 pass
 
-        match validate_user_input(title):
-            case value if isinstance(value, Fail):
-                return Fail(type="Fail_CreatePost_Nonvalidated_Title")
+        # match validate_user_input(title):
+        #     case value if isinstance(value, Fail):
+        #         return Fail(type="Fail_CreatePost_Nonvalidated_Title")
 
         converted_content = convert_to_content(content)
 
