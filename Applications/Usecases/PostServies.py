@@ -162,9 +162,6 @@ class UpdatePost:
             case new_content if isinstance(new_content, Content):
                 # update
                 convert_post.content = new_content
-
-                from icecream import ic
-
                 updated_post = Post_to_PostVO(convert_post)
                 if updated_post is not None:
                     return self.post_repo.update(updated_post)
