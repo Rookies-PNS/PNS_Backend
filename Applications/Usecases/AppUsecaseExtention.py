@@ -42,13 +42,13 @@ def validate_user_input(user_input: str) -> Result[str]:
     csrf_patterns = ["{{", "}}", "{%", "%}", "<%", "%>", "<$"]
     for pattern in csrf_patterns:
         if pattern in user_input:
-            return Fail(type="Fail_Not_Validate_UserInput")
+            return Fail(type=f"Fail_Not_Validate_UserInput({pattern})")
 
     # SQL Injection 방지: 특수 문자 필터링
     sql_injection_patterns = [";"]
     for pattern in sql_injection_patterns:
-        if pattern in user_input.upper():
-            return Fail(type="Fail_Not_Validate_UserInput")
+        if pattern in user_input:
+            return Fail(type=f"Fail_Not_Validate_UserInput({pattern})")
 
     sql_injection_patterns = ["--", "DROP", "DELETE", "UPDATE", "INSERT", "SELECT"]
     for pattern in sql_injection_patterns:
@@ -65,13 +65,14 @@ def convert_to_content(board_content: str) -> Result[Content]:
     """
     게시판 content를 검증하고 적절히 변환하는 함수
     """
-    # Markdown 코드 블록 안의 코드는 안전하다고 가정하고 HTML 이스케이프 적용
-    board_content = process_markdown_code_blocks(board_content)
-
-    # SQL Injection, XSS, CSRF 등 방지를 위한 필터링
-    board_content = prevent_security_attacks(board_content)
-
     return Content(content=board_content)
+    # # Markdown 코드 블록 안의 코드는 안전하다고 가정하고 HTML 이스케이프 적용
+    # board_content = process_markdown_code_blocks(board_content)
+
+    # # SQL Injection, XSS, CSRF 등 방지를 위한 필터링
+    # board_content = prevent_security_attacks(board_content)
+
+    # return Content(content=board_content)
 
 
 def process_markdown_code_blocks(input_text: str) -> str:
