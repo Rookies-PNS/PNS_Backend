@@ -17,13 +17,19 @@ bp = Blueprint('post', __name__, url_prefix='/post')
 
 @bp.route('/list/<int:page>')
 def _list(page):
+    ic()
+    ic(page)
+    posts_per_page = 10
+    page = max(page, 1)
     serivce = GetPostList(get_post_storage())
-    post_list = posts_to_dicts(serivce.get_list_no_filter(page-1))
+    post_list = posts_to_dicts(serivce.get_list_no_filter(page-1, posts_per_page))
     
     if page > 1 and len(post_list)==0:# 넘치는 페이지를 요청할 경우
-        return redirect(url_for("post._list", page=1))
+        return redirect(url_for("post._list", page=page-1, start_page=(int(page)<=1),end_page=True))
+    elif 0< len(post_list)<posts_per_page:# 넘치는 페이지를 요청할 경우
+        return render_template('post/post_list.html', post_list=post_list, page=page, start_page=(int(page)<=1),end_page=True)
     else:# 정상 요청
-       return render_template('post/post_list.html', post_list=post_list)
+        return render_template('post/post_list.html', post_list=post_list, page=page,start_page=(int(page)<=1), end_page=False)
 
 
 @bp.route('/detail/<int:post_id>/')

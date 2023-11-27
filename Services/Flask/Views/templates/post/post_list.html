@@ -27,4 +27,15 @@
 
     <a href="{{ url_for('post.create') }}" class="btn btn-primary">게시글 등록하기</a>
 </div>
+<div class="pagination d-flex justify-content-center">
+    <div class="pagination d-flex justify-content-center">
+        {% if not start_page %}
+            <a href="{{ url_for('post._list', page=page-1) }}" class="btn btn-secondary me-2">Prev</a>
+        {% endif %}
+        <span class="fw-bold text-danger">{{ page }}</span>
+        {% if not end_page%}
+            <a href="{{ url_for('post._list', page=page+1) }}" class="btn btn-secondary ms-2">Next</a>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
