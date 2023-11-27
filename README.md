@@ -50,8 +50,20 @@ mysql_db = {
     ```
 
 # How to Run
+### debug mode
 ```bash
 python manage.py
+```
+
+### service mode
+```bash
+python manage.py --not-debug
+```
+
+### 기본제공 ID
+```bash
+ID : admin
+PW : Admin123!@
 ```
 
 # How to Test
