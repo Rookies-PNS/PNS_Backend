@@ -17,7 +17,7 @@ def simple_post_to_dict(post:SimplePost)->Dict[str,str]:
     return {
         "id": str(post.post_id.idx) ,
         "title": post.title ,
-        "user_account": post.get_account() ,
+        "user_name": post.get_username() ,
         "create_time": post.create_time.get_time().strftime("%m/%d-%H:%M") ,
         "update_time": post.update_time.get_time().strftime("%m/%d-%H:%M")  ,
     }
@@ -26,7 +26,7 @@ def post_to_dict(post:PostVO)->Dict[str,str]:
         "id": str(post.post_id.idx) ,
         "title": post.title ,
         "content": post.get_content(),
-        "user_account": post.get_account(),
+        "user_name": post.get_username(),
         "create_time": post.create_time.get_time().strftime("%m/%d-%H:%M") ,
         "update_time": post.update_time.get_time().strftime("%m/%d-%H:%M")  ,
     }

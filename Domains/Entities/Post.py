@@ -35,8 +35,6 @@ class Post:
         self.update_time.set_time()
     
     def get_account(self)->str:
-        ic()
-        ic(self.user)
         match self.user:
             case user if isinstance(user, SimpleUser):
                 return user.user_id.account
@@ -45,6 +43,12 @@ class Post:
     def get_content(self)->str:
         return self.content.content
                     
+    def get_username(self)->str:
+        match self.user:
+            case user if isinstance(user, SimpleUser):
+                return user.name
+            case _:
+                return "익명"
 
 
 
@@ -66,8 +70,6 @@ class PostVO:
             user=self.user,
         )
     def get_account(self)->str:
-        ic()
-        ic(self.user)
         match self.user:
             case user if isinstance(user, SimpleUser):
                 return user.user_id.account
@@ -76,6 +78,12 @@ class PostVO:
     def get_content(self)->str:
         return self.content.content
 
+    def get_username(self)->str:
+        match self.user:
+            case user if isinstance(user, SimpleUser):
+                return user.name
+            case _:
+                return "익명"
 
 @dataclass(frozen=True)
 class SimplePost:
@@ -85,8 +93,6 @@ class SimplePost:
     update_time: PostUpdateTime
     user: Optional[SimpleUser] = None
     def get_account(self)->str:
-        ic()
-        ic(self.user)
         match self.user:
             case user if isinstance(user, SimpleUser):
                 return user.user_id.account
@@ -94,6 +100,12 @@ class SimplePost:
                 return "익명"
     def get_content(self)->str:
         return self.content.content
+    def get_username(self)->str:
+        match self.user:
+            case user if isinstance(user, SimpleUser):
+                return user.name
+            case _:
+                return "익명"
 
 def PostVO_to_Post(postvo)->Post:
     return Post(

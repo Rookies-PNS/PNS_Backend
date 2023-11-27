@@ -18,7 +18,7 @@
             <td>
                 <a href="{{ url_for('post.detail', post_id=post["id"]) }}">{{ post["title"] }}</a>
             </td>
-            <td>{{ post["user_account"] }}</td>
+            <td>{{ post["user_name"] }}</td>
             <td>{{ post["create_time"] }}</td>
         </tr>
         {% endfor %}
