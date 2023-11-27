@@ -2,6 +2,7 @@ import __init__
 
 from flask import Flask, Blueprint, url_for
 from werkzeug.utils import redirect
+from flask_wtf import CSRFProtect
 from Services import get_secrets_key
 from Services.Flask.Controllers import (
     AuthController,
@@ -17,6 +18,7 @@ app = Flask(
     template_folder=str(flask_path/"Views/templates"),
 )
 app.secret_key = get_secrets_key()
+csrf = CSRFProtect(app)
 
 
 main_bp = Blueprint('main', __name__, url_prefix='/')

@@ -1,9 +1,10 @@
 ﻿from flask import Blueprint, redirect, render_template, request, url_for, session, flash
 from werkzeug.utils import redirect
+from werkzeug.datastructures import MultiDict
 from Commons import PostId
 
-from Domains.Entities import Post,PostVO, SimplePost
-from Applications.Usecases import GetPostList, GetPost, CreatePost, DeletePost
+from Domains.Entities import Post,PostVO, SimplePost, SimpleUser
+from Applications.Usecases import GetPostList, GetPost, CreatePost, DeletePost, UpdatePost
 from Applications.Results import Result, Fail
 from Infrastructures.IOC import get_user_storage, get_post_storage
 
@@ -30,23 +31,23 @@ def detail(post_id):
     service = GetPost(get_post_storage())
     match  service.get_post_from_post_id(post_id):
         case post if isinstance(post, PostVO):
+            auth = (post.get_uid() is None)
+            if not auth and "user" in session:
+                user = dict_to_user(session["user"])
+                auth = user.check_equal(post.get_uid())
             post = post_to_dict(post)
-            return render_template('post/post_detail.html', post=post)
+            return render_template('post/post_detail.html', post=post,auth = auth)
         case _:
-            return redirect(url_for('post._list'), page=1)
+            return redirect(url_for('post._list', page=1))
 
 
 
 @bp.route('/create/', methods=('GET', 'POST'))
 def create():
     form = PostForm()
-
-
     if request.method == 'POST' and form.validate_on_submit():
         service  = CreatePost(get_post_storage(), get_user_storage())
         if "user" in session:
-            ic()
-            ic(session["user"])
             user = dict_to_user(session["user"])
         else:
             user = None
@@ -63,19 +64,59 @@ def create():
     return render_template('post/post_form.html', form=form)
     
 
-# @bp.route('/delete/<int:post_id>/', methods=['POST'])
-# def delete(post_id):
-#     service = DeletePost(get_post_storage(), get_user_storage())
-#     if "user" in session:
-#         user = dict_to_user(session["user"])
-#     else:
-#         user = None
-#     match service.delete(post_id, user):
-#         case id if isinstance(id, PostId):
-#             return redirect(url_for('post._list', page=1))
-#         case Fail(type=type):
-#             ic()
-#             ic(type, "NotImplementedError")
-#         case _:
-#             ic()
-#             pass
+@bp.route('/delete/<int:post_id>/', methods=['Get','POST'])
+def delete(post_id):
+    if "user" in session:
+        user = dict_to_user(session["user"])
+    else:
+        user = None
+
+    match GetPost(get_post_storage()).get_post_from_post_id(post_id):
+        case post if isinstance(post, PostVO):
+            service = DeletePost(get_post_storage(), get_user_storage())
+            match service.delete(post, user):
+                case id if isinstance(id, PostId):
+                    return redirect(url_for('main.index', page=1))
+                case Fail(type=type) if type == "Fail_DeletePost_UserMismatch":
+                    flash("삭제 권한이 없습니다.")
+                case Fail(type=type):
+                    ic()
+                    ic(type, "NotImplementedError")
+                case _:
+                    ic()
+    return redirect(url_for('post.detail', post_id=post_id))
+    
+
+@bp.route('/update/<int:post_id>/', methods=('GET', 'POST'))
+def update(post_id):
+    post = GetPost(get_post_storage()).get_post_from_post_id(post_id)
+    
+    if isinstance(post.user, SimpleUser) and "user" in session:
+        user = dict_to_user(session["user"])
+        if not user.check_equal(post.user.uid):
+            flash("수정 권한이 없습니다.")
+            return redirect(url_for('post.detail', post_id=post_id, auth=False))
+    else:
+        user = None
+    # form = PostForm(formdata=MultiDict({'subject':post.get_title(), 'content':post.get_content()}))
+    # form = PostForm(subject=post.get_title(), content=post.get_content())
+
+    form = PostForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        service  = UpdatePost(get_post_storage(), get_user_storage())
+        match service.update(post, form.subject.data, form.content.data, user=user):
+            case post if isinstance(post, SimplePost):
+                return redirect(url_for('main.index', post_id=post_id))
+            case Fail(type=type) if type == "Fail_UpdatePost_UserMismatch":
+                flash("수정 권한이 없습니다.")
+                return redirect(url_for('post.detail', post_id=post_id))
+            case Fail(type=type):
+                ic()
+                ic(type, "NotImplementedError")
+            case _:
+                pass
+    
+    form.subject.data = post.get_title()
+    form.content.data = post.get_content()
+    # return render_template('post/post_edit.html', form=form, subject=post.get_title(), content=post.get_content())
+    return render_template('post/post_edit.html', form=form)
