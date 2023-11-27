@@ -147,16 +147,21 @@ class test_post_services(unittest.TestCase):
         self.assertEqual(len(post_list), 3)
 
     def test_update_post(self):
+        import time
+        time.sleep(1)
         print("\t\t", sys._getframe(0).f_code.co_name)
         post = self.get_post.get_post_from_post_id(1)
-        self.assertIsNotNone(post)
+
         updated_post = self.update_post.update(post, "Updated Post", "Updated Content")
         self.assertEqual(updated_post.title, "Updated Post")
         self.assertEqual(
             post.create_time.get_time(), updated_post.create_time.get_time()
         )
         self.assertNotEqual(
-            post.update_time.get_time(), updated_post.create_time.get_time()
+            post.update_time.get_time(), updated_post.update_time.get_time()
+        )
+        self.assertTrue(
+            (post.update_time.get_time() - updated_post.update_time.get_time()).total_seconds() < 0
         )
 
         post_list = self.get_post_list.get_list_no_filter()

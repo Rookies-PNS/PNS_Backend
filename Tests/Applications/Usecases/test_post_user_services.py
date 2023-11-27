@@ -102,7 +102,7 @@ class test_post_user_services(unittest.TestCase):
     def test_(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
 
-    def test_(self):
+    def test_create_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
         now = datetime.now(tz=timezone.utc)
         now = now.replace(microsecond=0)
@@ -110,6 +110,7 @@ class test_post_user_services(unittest.TestCase):
 
         new_post = self.create_post.create("New Post", "New Content", now,user)
         self.assertEqual("New Post", new_post.title)
+        self.assertEqual(user.get_account(), new_post.get_account())
         self.assertEqual(
             now.strftime("%d/%m/%Y, %H:%M:%S"),
             new_post.create_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"),
@@ -130,6 +131,7 @@ class test_post_user_services(unittest.TestCase):
             now.strftime("%d/%m/%Y, %H:%M:%S"),
             check_post.update_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"),
         )
+        self.assertEqual(user.get_account(), check_post.get_account())
         self.assertEqual(
             user.__dict__,
             check_post.user.__dict__
@@ -137,6 +139,101 @@ class test_post_user_services(unittest.TestCase):
 
         post_list = self.get_post_list.get_list_no_filter()
         self.assertEqual(len(post_list), 4)
+
+    def test_delete_post_ok(self):
+        print("\t\t", sys._getframe(0).f_code.co_name)
+        user = self.origin_users[0]
+        post = self.get_post.get_post_from_post_id(1)
+        self.delete_post.delete(post,user)
+
+        deleted_post = self.get_post.get_post_from_post_id(1)
+        self.assertIsNone(deleted_post)
+
+        post_list = self.get_post_list.get_list_no_filter()
+        self.assertEqual(len(post_list), 2)
+
+    def test_delete_post_lock(self):
+        print("\t\t", sys._getframe(0).f_code.co_name)
+
+        post = self.get_post.get_post_from_post_id(1)
+        self.delete_post.delete(post)
+        deleted_post = self.get_post.get_post_from_post_id(1)
+        self.assertEqual(post, deleted_post)
+
+        no_owner = self.origin_users[1]
+        post = self.get_post.get_post_from_post_id(1)
+        self.delete_post.delete(post,no_owner)
+        deleted_post = self.get_post.get_post_from_post_id(1)
+        self.assertEqual(post, deleted_post)
+
+        no_owner = self.origin_users[2]
+        post = self.get_post.get_post_from_post_id(1)
+        self.delete_post.delete(post,no_owner)
+        deleted_post = self.get_post.get_post_from_post_id(1)
+        self.assertEqual(post, deleted_post)
+
+        post_list = self.get_post_list.get_list_no_filter()
+        self.assertEqual(len(post_list), 3)
+
+        user = self.origin_users[0]
+        self.delete_post.delete(post,user)
+
+        deleted_post = self.get_post.get_post_from_post_id(1)
+        self.assertIsNone(deleted_post)
+
+        post_list = self.get_post_list.get_list_no_filter()
+        self.assertEqual(len(post_list), 2)
+
+    def test_update_post_lock(self):
+        import time
+        time.sleep(1)
+        print("\t\t", sys._getframe(0).f_code.co_name)
+        post = self.get_post.get_post_from_post_id(1)
+        updated_post = self.update_post.update(post, "Updated Post", "Updated Content")
+        self.assertEqual(Fail(type="Fail_UpdatePost_UserMismatch"), updated_post)
+
+        no_owner = self.origin_users[1]
+        post = self.get_post.get_post_from_post_id(1)
+        updated_post = self.update_post.update(post, "Updated Post", "Updated Content",no_owner)
+        self.assertEqual(Fail(type="Fail_UpdatePost_UserMismatch"), updated_post)
+
+        no_owner = self.origin_users[2]
+        post = self.get_post.get_post_from_post_id(1)
+        updated_post = self.update_post.update(post, "Updated Post", "Updated Content",no_owner)
+        self.assertEqual(Fail(type="Fail_UpdatePost_UserMismatch"), updated_post)
+
+        post_list = self.get_post_list.get_list_no_filter()
+        self.assertEqual(len(post_list), 3)
+
+        check_post = self.get_post.get_post_from_post_id(post.post_id.idx)
+        self.assertNotEqual(check_post.title, "Updated Post")
+        self.assertNotEqual(check_post.content.content, "Updated Content")
+        
+    def test_update_post_ok(self):
+        import time
+        time.sleep(1)
+        print("\t\t", sys._getframe(0).f_code.co_name)
+        user = self.origin_users[0]
+        post = self.get_post.get_post_from_post_id(1)
+        updated_post = self.update_post.update(post, "Updated Post", "Updated Content",user)
+        self.assertEqual(updated_post.title, "Updated Post")
+        self.assertEqual(
+            post.create_time.get_time(), updated_post.create_time.get_time()
+        )
+        self.assertNotEqual(
+            post.update_time.get_time(), updated_post.update_time.get_time()
+        )
+        self.assertTrue(
+            (post.update_time.get_time() - updated_post.update_time.get_time()).total_seconds() < 0
+        )
+
+
+        post_list = self.get_post_list.get_list_no_filter()
+        self.assertEqual(len(post_list), 3)
+
+        check_post = self.get_post.get_post_from_post_id(updated_post.post_id.idx)
+        self.assertEqual(check_post.title, "Updated Post")
+        self.assertEqual(check_post.content.content, "Updated Content")
 
 def main():
     unittest.main()
