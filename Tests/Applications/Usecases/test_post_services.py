@@ -149,7 +149,6 @@ class test_post_services(unittest.TestCase):
     def test_update_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
         post = self.get_post.get_post_from_post_id(1)
-        ic(post)
         self.assertIsNotNone(post)
         updated_post = self.update_post.update(post, "Updated Post", "Updated Content")
         self.assertEqual(updated_post.title, "Updated Post")
