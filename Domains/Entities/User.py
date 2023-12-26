@@ -27,7 +27,8 @@ class User:
             case id if isinstance(id, Uid):
                 return uid == self.uid
             case _:
-                return False
+                ...
+        return False
 
     def get_user_name(self) -> str:
         return self.name
@@ -54,7 +55,8 @@ class UserVO:
             case id if isinstance(id, Uid):
                 return uid == self.uid
             case _:
-                return False
+                ...
+        return False
 
     def get_user_name(self) -> str:
         return self.name

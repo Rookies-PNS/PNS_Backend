@@ -1,6 +1,5 @@
 from typing import Optional
 from dataclasses import dataclass
-from icecream import ic
 
 from Commons import (
     Content,
