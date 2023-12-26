@@ -27,7 +27,7 @@ def parse_opt():
             r"Tests\Applications\Usecases\test_password.py",
             r"Tests\Applications\Usecases\test_contents.py",
             r"Tests\Applications\Usecases\test_post_services.py",
-            r"Tests\Applications\Usecases\test_post_user_services.py"
+            r"Tests\Applications\Usecases\test_post_user_services.py",
         ],
     )
     opt = parser.parse_args()
@@ -130,7 +130,12 @@ def init_post():
         anony_post,
     ]
     for post in posts:
-        create.create(post["title"], post["content"], post["time"], post["user"])
+        create.create(
+            title=post["title"],
+            content=post["content"],
+            create_time=post["time"],
+            user=post["user"],
+        )
 
 
 def delete_storage():
@@ -171,6 +176,7 @@ def set_storage(storage_type: str):
 
 def main(opt):
     from icecream import ic
+
     debug = not opt.not_debug
 
     if debug:
