@@ -77,7 +77,7 @@ class SimpleUser:
     def check_equal(self, uid: Optional[Uid]) -> bool:
         match uid:
             case id if isinstance(id, Uid):
-                return uid == self._uid
+                return uid == self.uid
             case _:
                 return False
 
