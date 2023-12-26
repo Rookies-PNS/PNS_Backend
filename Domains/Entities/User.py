@@ -1,7 +1,7 @@
 from typing import List, Optional
 from dataclasses import dataclass
 
-from Commons import UserId, Uid, Password, PostId
+from Commons import UserId, Uid, Password
 
 
 class User:
@@ -16,16 +16,24 @@ class User:
         self.name = name
         self.password = password
         self.uid = uid
-    def get_account(self)->str:
+
+    def get_account(self) -> str:
         return self.user_id.account
-    def check_equal(self, uid:Optional[Uid])->bool:
-        if self.uid ==None:
+
+    def check_equal(self, uid: Optional[Uid]) -> bool:
+        if self.uid == None:
             return False
         match uid:
             case id if isinstance(id, Uid):
                 return uid == self.uid
-            case _ :
+            case _:
                 return False
+
+    def get_user_name(self) -> str:
+        return self.name
+
+    def get_uid(self) -> Optional[Uid]:
+        return self.uid
 
 
 @dataclass(frozen=True)
@@ -38,14 +46,22 @@ class UserVO:
     def get_simple_user(self):
         return SimpleUser(user_id=self.user_id, name=self.name, uid=self.uid)
 
-    def get_account(self)->str:
+    def get_account(self) -> str:
         return self.user_id.account
-    def check_equal(self, uid:Optional[Uid])->bool:
+
+    def check_equal(self, uid: Optional[Uid]) -> bool:
         match uid:
             case id if isinstance(id, Uid):
                 return uid == self.uid
-            case _ :
+            case _:
                 return False
+
+    def get_user_name(self) -> str:
+        return self.name
+
+    def get_uid(self) -> Uid:
+        return self.uid
+
 
 @dataclass(frozen=True)
 class SimpleUser:
@@ -53,11 +69,18 @@ class SimpleUser:
     name: str
     uid: Uid
 
-    def get_account(self)->str:
+    def get_account(self) -> str:
         return self.user_id.account
-    def check_equal(self, uid:Optional[Uid])->bool:
+
+    def check_equal(self, uid: Optional[Uid]) -> bool:
         match uid:
             case id if isinstance(id, Uid):
-                return uid == self.uid
-            case _ :
+                return uid == self._uid
+            case _:
                 return False
+
+    def get_user_name(self) -> str:
+        return self.name
+
+    def get_uid(self) -> Uid:
+        return self.uid

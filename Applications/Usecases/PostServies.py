@@ -19,6 +19,7 @@ from Applications.Results import (
     Result,
     Fail,
 )
+from icecream import ic
 
 
 class GetPostList:
@@ -53,8 +54,8 @@ class CreatePost:
         self,
         title: str,
         content: str,
+        user: SimpleUser,
         create_time: Optional[datetime] = None,
-        user: Optional[SimpleUser] = None,
     ) -> Result[SimplePost]:
         from Applications.Usecases.AppUsecaseExtention import (
             validate_user_input,
@@ -62,17 +63,19 @@ class CreatePost:
         )
 
         match create_time:
-            case _ if create_time is None:
-                create_time = PostCreateTime(time=datetime.now())
             case _ if isinstance(create_time, datetime):
                 create_time = PostCreateTime(time=create_time)
+                update_time = PostUpdateTime(time=create_time.time)
+            case _:
+                create_time = PostCreateTime(time=datetime.now())
+                update_time = PostUpdateTime(time=create_time.time)
 
         match user:
             case u if isinstance(u, SimpleUser):
                 if not self.user_repo.check_exist_userid(u.get_account()):
                     return Fail(type="Fail_CreatePost_UserNotExist")
             case _:
-                pass
+                return Fail(type="Fail_CreatePost_NoUser")
 
         match validate_user_input(title, 250):
             case value if isinstance(value, Fail):
@@ -84,10 +87,11 @@ class CreatePost:
             title=title,
             content=converted_content,
             create_time=create_time,
-            update_time=create_time,
-            user=user
+            update_time=update_time,
+            user=user,
         )
         return self.repository.save(post)
+
 
 class GetPost:
     def __init__(self, repository: IPostRepository):
@@ -115,7 +119,7 @@ class DeletePost:
                     return Fail(type="Fail_DeletePost_UserMismatch")
             case None:
                 # Anonymous posts can be deleted by anyone
-                pass
+                return Fail(type="Fail_DeletePost_NoUser")
         return self.post_repo.delete(post)
 
 
@@ -125,7 +129,7 @@ class UpdatePost:
         self.user_repo = user_repo
 
     def update(
-        self, post: PostVO, title: str, content: str, user: Optional[SimpleUser] = None
+        self, post: PostVO, title: str, content: str, user: SimpleUser
     ) -> Result[SimplePost]:
         from Applications.Usecases.AppUsecaseExtention import (
             validate_user_input,

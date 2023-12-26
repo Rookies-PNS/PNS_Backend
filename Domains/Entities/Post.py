@@ -2,7 +2,14 @@ from typing import Optional
 from dataclasses import dataclass
 from icecream import ic
 
-from Commons import Content, PostId, PostCreateTime, PostUpdateTime, get_current_time, Uid
+from Commons import (
+    Content,
+    PostId,
+    PostCreateTime,
+    PostUpdateTime,
+    get_current_time,
+    Uid,
+)
 from Domains.Entities.User import SimpleUser
 
 
@@ -11,51 +18,86 @@ class Post:
         self,
         title: str,
         content: Content,
+        user: SimpleUser,
         create_time: Optional[PostCreateTime] = None,
         update_time: Optional[PostUpdateTime] = None,
         post_id: Optional[PostId] = None,
-        user: Optional[SimpleUser] = None,
     ):
         self.title = title
         self.content = content
         self.user = user
         self.post_id = post_id
         match create_time:
-            case _ if create_time is not None:
-                self.create_time = create_time
+            case time if isinstance(time, PostCreateTime):
+                self.create_time = time
             case _:
                 self.create_time = PostCreateTime(time=get_current_time())
+
         match update_time:
-            case _ if update_time is not None:
-                self.update_time = update_time
+            case time if isinstance(time, PostUpdateTime):
+                self.update_time = time
             case _:
                 self.update_time = PostUpdateTime(time=get_current_time())
 
     def set_update_time(self):
         self.update_time.set_time()
-    
-    def get_account(self)->str:
+
+    def get_account(self) -> str:
         match self.user:
             case user if isinstance(user, SimpleUser):
-                return user.user_id.account
+                return user.get_account()
             case _:
                 return "익명"
-    def get_content(self)->str:
+
+    def get_content(self) -> str:
         return self.content.content
-                    
-    def get_username(self)->str:
+
+    def get_username(self) -> str:
         match self.user:
             case user if isinstance(user, SimpleUser):
-                return user.name
+                return user.get_user_name()
             case _:
                 return "익명"
-    def get_uid(self)->Optional[Uid]:
+
+    def get_uid(self) -> Optional[Uid]:
         match self.user:
             case user if isinstance(user, SimpleUser):
-                return self.user.uid
+                return user.get_uid()
             case _:
                 return None
 
+
+@dataclass(frozen=True)
+class SimplePost:
+    title: str
+    post_id: PostId
+    user: SimpleUser
+    create_time: PostCreateTime
+    update_time: PostUpdateTime
+
+    def get_account(self) -> str:
+        match self.user:
+            case user if isinstance(user, SimpleUser):
+                return user.get_account()
+            case _:
+                return "익명"
+
+    def get_title(self) -> str:
+        return self.title
+
+    def get_uid(self) -> Optional[Uid]:
+        match self.user:
+            case user if isinstance(user, SimpleUser):
+                return user.get_uid()
+            case _:
+                return None
+
+    def get_username(self) -> str:
+        match self.user:
+            case user if isinstance(user, SimpleUser):
+                return user.get_user_name()
+            case _:
+                return "익명"
 
 
 @dataclass(frozen=True)
@@ -63,11 +105,11 @@ class PostVO:
     title: str
     content: Content
     post_id: PostId
+    user: SimpleUser
     create_time: PostCreateTime
     update_time: PostUpdateTime
-    user: Optional[SimpleUser] = None
 
-    def get_simple_post(self):
+    def get_simple_post(self) -> SimplePost:
         return SimplePost(
             title=self.title,
             post_id=self.post_id,
@@ -75,72 +117,49 @@ class PostVO:
             update_time=self.update_time,
             user=self.user,
         )
-    def get_account(self)->str:
+
+    def get_account(self) -> str:
         match self.user:
             case user if isinstance(user, SimpleUser):
-                return user.user_id.account
+                return user.get_account()
             case _:
                 return "익명"
 
-    def get_username(self)->str:
-        match self.user:
-            case user if isinstance(user, SimpleUser):
-                return user.name
-            case _:
-                return "익명"
-    def get_uid(self)->Optional[Uid]:
-        match self.user:
-            case user if isinstance(user, SimpleUser):
-                return self.user.uid
-            case _:
-                return None
-
-    def get_title(self)->str:
+    def get_title(self) -> str:
         return self.title
-    def get_content(self)->str:
+
+    def get_content(self) -> str:
         return self.content.content
 
-@dataclass(frozen=True)
-class SimplePost:
-    title: str
-    post_id: PostId
-    create_time: PostCreateTime
-    update_time: PostUpdateTime
-    user: Optional[SimpleUser] = None
-    def get_account(self)->str:
+    def get_username(self) -> str:
         match self.user:
             case user if isinstance(user, SimpleUser):
-                return user.user_id.account
+                return user.get_user_name()
             case _:
                 return "익명"
-    def get_title(self)->str:
-        return self.title
-    def get_uid(self)->Optional[Uid]:
+
+    def get_uid(self) -> Optional[Uid]:
         match self.user:
             case user if isinstance(user, SimpleUser):
-                return self.user.uid
+                return user.get_uid()
             case _:
                 return None
 
-    def get_username(self)->str:
-        match self.user:
-            case user if isinstance(user, SimpleUser):
-                return user.name
-            case _:
-                return "익명"
 
-def PostVO_to_Post(postvo)->Post:
+def PostVO_to_Post(postvo: PostVO) -> Post:
     import copy
+
     return Post(
-        postvo.title,
-        postvo.content,
-        postvo.create_time,
-        copy.copy(postvo.update_time),
-        postvo.post_id,
-        postvo.user
+        title=postvo.title,
+        content=postvo.content,
+        create_time=postvo.create_time,
+        update_time=copy.copy(postvo.update_time),
+        post_id=postvo.post_id,
+        user=postvo.user,
     )
 
-def Post_to_PostVO(post:Post) -> Optional[PostVO]:
+
+def Post_to_PostVO(post: Post) -> Optional[PostVO]:
     if post.post_id is None:
         return None
     if post.create_time is None:
@@ -148,10 +167,10 @@ def Post_to_PostVO(post:Post) -> Optional[PostVO]:
     if post.update_time is None:
         return None
     return PostVO(
-        post.title,
-        post.content,
-        post.post_id,
-        post.create_time,
-        post.update_time,
-        post.user
+        title=post.title,
+        content=post.content,
+        post_id=post.post_id,
+        create_time=post.create_time,
+        update_time=post.update_time,
+        user=post.user,
     )
