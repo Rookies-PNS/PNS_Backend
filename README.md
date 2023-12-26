@@ -83,4 +83,4 @@ python manage.py --run git-push
 
 # TimeLine
 
-[진행상황](https://docs.google.com/spreadsheets/d/12uU9tzwKI6kATs_Ijud8bKqW2Ijg9RNQYvF_wUSeZ-M/edit#gid=1490708584)https://docs.google.com/spreadsheets/d/12uU9tzwKI6kATs_Ijud8bKqW2Ijg9RNQYvF_wUSeZ-M/edit#gid=1490708584)
+[진행상황](https://docs.google.com/spreadsheets/d/12uU9tzwKI6kATs_Ijud8bKqW2Ijg9RNQYvF_wUSeZ-M/edit#gid=1490708584)
