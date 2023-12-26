@@ -17,8 +17,10 @@
             </div>
         </div>
     </div>
-    {% if auth %}
+    {% if delete_auth %}
         <a href="{{ url_for('post.delete', post_id=post["id"]) }}" class="btn btn-outline-primary me-2">삭제하기</button></a>
+    {% endif %}
+    {% if update_auth %}
         <a href="{{ url_for('post.update', post_id=post["id"]) }}" class="btn btn-primary">수정하기</button></a>
     {% endif %}
 </div>
