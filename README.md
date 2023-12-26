@@ -12,7 +12,7 @@ pip install -r requirements.txt
 ## Download Code
 ```bash
 git clone https://github.com/Rookies-PNS/PNS_Backend.git
-cd Log_Board_Tak
+cd PNS_Backend
 pip install -r requirments.txt
 ```
 
@@ -78,9 +78,9 @@ python manage.py --run git-push
 
 # Docs
 
-[회원기능](https://github.com/Cloud-is-best-beer/Log_Board_Tak/blob/main/Applications/README.md)
+[회원기능](https://github.com/Rookies-PNS/PNS_Backend/blob/main/Applications/README.md)
 
 
 # TimeLine
 
-[이탁균 진행상황](https://docs.google.com/spreadsheets/d/1lDSmwstYR6058RaqRJcVM6E0k69j6pXSGbfq7WrgrpE/edit#gid=386990213)
+[진행상황](https://docs.google.com/spreadsheets/d/12uU9tzwKI6kATs_Ijud8bKqW2Ijg9RNQYvF_wUSeZ-M/edit#gid=1490708584)https://docs.google.com/spreadsheets/d/12uU9tzwKI6kATs_Ijud8bKqW2Ijg9RNQYvF_wUSeZ-M/edit#gid=1490708584)
