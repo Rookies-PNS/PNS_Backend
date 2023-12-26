@@ -45,7 +45,7 @@ class test_post_services(unittest.TestCase):
         create_user = CreateUser(repo)
         login_user = LoginUser(repo)
 
-        users:List[SimpleUser] = []
+        users: List[SimpleUser] = []
         u = create_user.create("taks123", "1Q2w3e4r!@$", "takgyun Lee")
         users.append(u)
         u = create_user.create("hahahoho119", "1B2n3m4!@", "Ho Han")
@@ -56,7 +56,6 @@ class test_post_services(unittest.TestCase):
         cls.origin_users = users
         cls.create_user = CreateUser(repo)
         cls.login_user = LoginUser(repo)
-
 
     @classmethod
     def tearDownClass(cls):
@@ -87,9 +86,9 @@ class test_post_services(unittest.TestCase):
         self.update_post = UpdatePost(post_repo, user_repo)
         self.delete_post = DeletePost(post_repo, user_repo)
 
-        post1 = self.create_post.create("Post 1", "Content 1")
-        post2 = self.create_post.create("Post 2", "Content 2")
-        post3 = self.create_post.create("Post 3", "Content 3")
+        post1 = self.create_post.create("Post 1", "Content 1", self.origin_users[0])
+        post2 = self.create_post.create("Post 2", "Content 2", self.origin_users[1])
+        post3 = self.create_post.create("Post 3", "Content 3", self.origin_users[2])
 
     def tearDown(self):
         "Hook method for deconstructing the test fixture after testing it."
@@ -111,7 +110,9 @@ class test_post_services(unittest.TestCase):
         now = datetime.now(tz=timezone.utc)
         now = now.replace(microsecond=0)
 
-        new_post = self.create_post.create("New Post", "New Content", now)
+        new_post = self.create_post.create(
+            "New Post", "New Content", self.origin_users[0], now
+        )
         self.assertEqual("New Post", new_post.title)
         self.assertEqual(
             now.strftime("%d/%m/%Y, %H:%M:%S"),
@@ -148,11 +149,14 @@ class test_post_services(unittest.TestCase):
 
     def test_update_post(self):
         import time
+
         time.sleep(1)
         print("\t\t", sys._getframe(0).f_code.co_name)
         post = self.get_post.get_post_from_post_id(1)
 
-        updated_post = self.update_post.update(post, "Updated Post", "Updated Content")
+        updated_post = self.update_post.update(
+            post, "Updated Post", "Updated Content", self.origin_users[0]
+        )
         self.assertEqual(updated_post.title, "Updated Post")
         self.assertEqual(
             post.create_time.get_time(), updated_post.create_time.get_time()
@@ -161,7 +165,10 @@ class test_post_services(unittest.TestCase):
             post.update_time.get_time(), updated_post.update_time.get_time()
         )
         self.assertTrue(
-            (post.update_time.get_time() - updated_post.update_time.get_time()).total_seconds() < 0
+            (
+                post.update_time.get_time() - updated_post.update_time.get_time()
+            ).total_seconds()
+            < 0
         )
 
         post_list = self.get_post_list.get_list_no_filter()
@@ -174,7 +181,7 @@ class test_post_services(unittest.TestCase):
     def test_delete_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
         post = self.get_post.get_post_from_post_id(1)
-        self.delete_post.delete(post)
+        self.delete_post.delete(post, self.origin_users[0])
         deleted_post = self.get_post.get_post_from_post_id(1)
         self.assertIsNone(deleted_post)
 

@@ -3,7 +3,7 @@ import unittest
 import sys
 import datetime
 
-from Domains.Entities import User, Post
+from Domains.Entities import User, Post, UserVO, SimpleUser
 from Commons import (
     Uid,
     UserId,
@@ -29,6 +29,9 @@ class test_models(unittest.TestCase):
     def setUp(self):
         "Hook method for setting up the test fixture before exercising it."
         print("\t", sys._getframe(0).f_code.co_name)
+        self.user = UserVO(
+            UserId("taks123"), "takgyun", Password(pw="1qaz2wsx!@"), Uid(idx=1)
+        )
 
     def tearDown(self):
         "Hook method for deconstructing the test fixture after testing it."
@@ -49,7 +52,7 @@ class test_models(unittest.TestCase):
 
     def test_Post_1(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post = Post("test", Content(content="test 입니다."))
+        post = Post("test", Content(content="test 입니다."), self.user.get_simple_user())
 
         self.assertDictEqual(
             {
@@ -58,7 +61,9 @@ class test_models(unittest.TestCase):
                 "create_time": PostCreateTime(time=post.create_time.get_time()),
                 "update_time": PostUpdateTime(time=post.update_time.get_time()),
                 "post_id": None,
-                "user": None,
+                "user": SimpleUser(
+                    user_id=UserId(account="taks123"), name="takgyun", uid=Uid(idx=1)
+                ),
             },
             post.__dict__,
         )
