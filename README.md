@@ -1,4 +1,4 @@
-# Log_Board_Tak
+# PNS_Backend
 간단한 게시판을 만드는 프로젝트 입니다. Flask를 사용하여 로그인 기능, 게시글 작성 및 확인 기능, 회원 권한으로 게시글 작성 기능을 구현합니다.
 
 # Requirements
@@ -11,7 +11,7 @@ pip install -r requirements.txt
 
 ## Download Code
 ```bash
-git clone https://github.com/Cloud-is-best-beer/Log_Board_Tak.git
+git clone https://github.com/Rookies-PNS/PNS_Backend.git
 cd Log_Board_Tak
 pip install -r requirments.txt
 ```
