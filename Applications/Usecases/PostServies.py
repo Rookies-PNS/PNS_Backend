@@ -50,6 +50,13 @@ class CreatePost:
         self.repository = repository
         self.user_repo = user_repo
 
+    def check_auth(self, user: SimpleUser) -> bool:
+        match user:
+            case u if isinstance(u, SimpleUser):
+                if self.user_repo.check_exist_userid(u.get_account()):
+                    return True
+        return False
+
     def create(
         self,
         title: str,
@@ -97,6 +104,9 @@ class GetPost:
     def __init__(self, repository: IPostRepository):
         self.repository = repository
 
+    def check_auth(self, user: SimpleUser) -> bool:
+        return True
+
     def get_post_from_post_id(self, post_id: int) -> Optional[PostVO]:
         post_id = PostId(idx=post_id)
         return self.repository.search_by_pid(post_id)
@@ -106,6 +116,17 @@ class DeletePost:
     def __init__(self, post_repo: IPostRepository, user_repo: IUserRepository):
         self.post_repo = post_repo
         self.user_repo = user_repo
+
+    def check_auth(self, post: PostVO, user: SimpleUser) -> bool:
+        if not self.post_repo.check_exist_pid(post.post_id):
+            return False
+
+        match post.user:
+            case user_in_post if isinstance(user_in_post, SimpleUser):
+                # Check if user_in_post and user are the same
+                if user_in_post == user:
+                    return True
+        return False
 
     def delete(self, post: PostVO, user: Optional[SimpleUser] = None) -> Result[PostId]:
         if not self.post_repo.check_exist_pid(post.post_id):
@@ -128,6 +149,17 @@ class UpdatePost:
         self.post_repo = post_repo
         self.user_repo = user_repo
 
+    def check_auth(self, post: PostVO, user: SimpleUser) -> bool:
+        if not self.post_repo.check_exist_pid(post.post_id):
+            return False
+
+        match post.user:
+            case user_in_post if isinstance(user_in_post, SimpleUser):
+                # Check if user_in_post and user are the same
+                if user_in_post == user:
+                    return True
+        return False
+
     def update(
         self, post: PostVO, title: str, content: str, user: SimpleUser
     ) -> Result[SimplePost]:
@@ -147,8 +179,8 @@ class UpdatePost:
                 else:
                     return Fail(type="Fail_UpdatePost_UserMismatch")
             case none if none is None:
-                # Anonymous posts can be modified by anyone
-                pass
+                # Anonymous posts can be deleted by anyone
+                return Fail(type="Fail_UpdatePost_NoUser")
 
         match validate_user_input(title, 250):
             case value if isinstance(value, Fail):
