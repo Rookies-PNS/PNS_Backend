@@ -24,7 +24,7 @@ pip install -r requirments.txt
 }
 ```
 
-`db_config.py`
+`mysql_config.py`
 ```python
 mysql_db = {
     "user": "USER_NAME",
