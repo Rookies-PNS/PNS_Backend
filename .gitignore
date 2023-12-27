@@ -164,3 +164,5 @@ cython_debug/
 secrets.json
 *config.py
 */Yoyo/*
+* copy/
+
