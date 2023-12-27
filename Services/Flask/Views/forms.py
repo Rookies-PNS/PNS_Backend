@@ -1,7 +1,7 @@
 ﻿from ast import Pass
 import email
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, PasswordField, EmailField
+from wtforms import StringField, TextAreaField, PasswordField
 from wtforms.validators import DataRequired, Length, EqualTo, Email
 
 
