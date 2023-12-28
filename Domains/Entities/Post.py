@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from Commons import (
     Content,
     PostId,
-    PostCreateTime,
-    PostUpdateTime,
+    TimeVO,
+    UpdateableTime,
     get_current_time,
     Uid,
 )
@@ -18,8 +18,8 @@ class Post:
         title: str,
         content: Content,
         user: SimpleUser,
-        create_time: Optional[PostCreateTime] = None,
-        update_time: Optional[PostUpdateTime] = None,
+        create_time: Optional[TimeVO] = None,
+        update_time: Optional[UpdateableTime] = None,
         post_id: Optional[PostId] = None,
     ):
         self.title = title
@@ -27,19 +27,19 @@ class Post:
         self.user = user
         self.post_id = post_id
         match create_time:
-            case time if isinstance(time, PostCreateTime):
+            case time if isinstance(time, TimeVO):
                 self.create_time = time
             case _:
-                self.create_time = PostCreateTime(time=get_current_time())
+                self.create_time = TimeVO(time=get_current_time())
 
         match update_time:
-            case time if isinstance(time, PostUpdateTime):
+            case time if isinstance(time, UpdateableTime):
                 self.update_time = time
             case _:
-                self.update_time = PostUpdateTime(time=get_current_time())
+                self.update_time = UpdateableTime(time=get_current_time())
 
     def set_update_time(self):
-        self.update_time.set_time()
+        self.update_time.set_now()
 
     def get_account(self) -> str:
         match self.user:
@@ -54,7 +54,7 @@ class Post:
     def get_username(self) -> str:
         match self.user:
             case user if isinstance(user, SimpleUser):
-                return user.get_user_name()
+                return user.get_user_nickname()
             case _:
                 return "익명"
 
@@ -71,8 +71,8 @@ class SimplePost:
     title: str
     post_id: PostId
     user: SimpleUser
-    create_time: PostCreateTime
-    update_time: PostUpdateTime
+    create_time: TimeVO
+    update_time: UpdateableTime
 
     def get_account(self) -> str:
         match self.user:
@@ -94,7 +94,7 @@ class SimplePost:
     def get_username(self) -> str:
         match self.user:
             case user if isinstance(user, SimpleUser):
-                return user.get_user_name()
+                return user.get_user_nickname()
             case _:
                 return "익명"
 
@@ -105,8 +105,8 @@ class PostVO:
     content: Content
     post_id: PostId
     user: SimpleUser
-    create_time: PostCreateTime
-    update_time: PostUpdateTime
+    create_time: TimeVO
+    update_time: UpdateableTime
 
     def get_simple_post(self) -> SimplePost:
         return SimplePost(
@@ -133,7 +133,7 @@ class PostVO:
     def get_username(self) -> str:
         match self.user:
             case user if isinstance(user, SimpleUser):
-                return user.get_user_name()
+                return user.get_user_nickname()
             case _:
                 return "익명"
 

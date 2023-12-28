@@ -3,7 +3,7 @@ from typing import List, Optional
 from collections.abc import Collection
 from datetime import datetime
 
-from Commons import PostId, PostCreateTime, PostUpdateTime, Content
+from Commons import PostId, TimeVO, UpdateableTime, Content
 from Domains.Entities import (
     SimpleUser,
     Post,
@@ -70,11 +70,11 @@ class CreatePost:
 
         match create_time:
             case _ if isinstance(create_time, datetime):
-                create_time = PostCreateTime(time=create_time)
-                update_time = PostUpdateTime(time=create_time.time)
+                create_time = TimeVO(time=create_time)
+                update_time = UpdateableTime(time=create_time.time)
             case _:
-                create_time = PostCreateTime(time=datetime.now())
-                update_time = PostUpdateTime(time=create_time.time)
+                create_time = TimeVO(time=datetime.now())
+                update_time = UpdateableTime(time=create_time.time)
 
         match user:
             case u if isinstance(u, SimpleUser):

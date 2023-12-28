@@ -149,7 +149,7 @@ def update(post_id):
 
     if isinstance(post.user, SimpleUser) and "user" in session:
         user = dict_to_user(session["user"])
-        if not user.check_equal(post.user.uid):
+        if not user.check_equal_uid(post.user.uid):
             flash("수정 권한이 없습니다.")
             return redirect(url_for("post.detail", post_id=post_id, auth=False))
     else:

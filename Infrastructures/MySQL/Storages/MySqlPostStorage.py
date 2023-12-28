@@ -3,7 +3,7 @@ from typing import Optional
 from collections.abc import Collection
 from datetime import datetime
 
-from Commons import Uid, UserId, PostId, PostCreateTime, PostUpdateTime, Content
+from Commons import Uid, UserId, PostId, TimeVO, UpdateableTime, Content
 from Domains.Entities import PostVO, Post, SimplePost, SimpleUser
 from Applications.Repositories.Interfaces import IPostRepository, IUserRepository
 from Applications.Results import Result, Fail
@@ -36,10 +36,10 @@ class MySqlPostStorage(IPostRepository):
                 return PostVO(
                     title=row["title"],
                     content=Content(content=row["content"]),
-                    create_time=PostCreateTime(
+                    create_time=TimeVO(
                         time=row["create_time"]
                     ),  # time=datetime.strptime(row["create_time"], '%Y-%m-%d %H:%M:%S')),
-                    update_time=PostUpdateTime(
+                    update_time=UpdateableTime(
                         time=row["update_time"]
                     ),  # time=datetime.strptime(row["update_time"], '%Y-%m-%d %H:%M:%S')),
                     post_id=PostId(idx=row["post_id"]),
@@ -51,10 +51,10 @@ class MySqlPostStorage(IPostRepository):
                 return PostVO(
                     title=row["title"],
                     content=Content(content=row["content"]),
-                    create_time=PostCreateTime(
+                    create_time=TimeVO(
                         time=row["create_time"]
                     ),  # time=datetime.strptime(row["create_time"], '%Y-%m-%d %H:%M:%S')),
-                    update_time=PostUpdateTime(
+                    update_time=UpdateableTime(
                         time=row["update_time"]
                     ),  # time=datetime.strptime(row["update_time"], '%Y-%m-%d %H:%M:%S')),
                     post_id=PostId(idx=row["post_id"]),
