@@ -5,7 +5,7 @@
 2. Post 공유 설정에 다한 권한
 3. Auth 권한 설정에 대한 권한
 4. User 조회하는 권한
-5. User 로그인 정지 해제 권한
+5. ~~User 로그인 정지 해제 권한~~
 6. User(사용자) 삭제 및 삭제한 User의 Post 삭제(비공개) 권한
 
 ## 정보
@@ -25,7 +25,7 @@
    - PostPrivateAblePolicy : 일기 비공개 할수 있는 권한
    - UserAuthLockOfPostCreateAndUpdatePolicy : 사용자의 일기 생성 수정 권한 정지시킬 수 있는 권한
    - UserAuthUnlockOfPostCreateAndUpdatePolicy : 사용자의 일기 생성 수정 권한 재개시킬 수 있는 권한
-   - UserLoginUnlockAblePolicy : 사용자의 로그인 정지 해제 시킬 수 있는 권한
+   - ~~UserLoginUnlockAblePolicy : 사용자의 로그인 정지 해제 시킬 수 있는 권한~~
    - UserDataReadAblePolicy : 사용자 데이터를 확인하는 권한
    - UserDataDeleteAblePolicy : 사용자 데이터를 삭제(비공개 플레그) 할수 있는 권한 
 2. Common.TargetRange : 권한을 행사할 수 있는 범위대한 열거형을 가지고 있다.
@@ -57,8 +57,8 @@
 - nickname : 별명 (공유 할때 보이는 이름)
 - last_update_date : 마지막으로 일기 쓴 날짜
 - count_of_post : 마지막 날에 일기 쓴 횟수(횟수 제한을 두기 위함)
-- count_of_try_login_fail : 로그인 시도 연속 실패횟수 기록
-- login_lock_flag : 로그인 금지 플레그
+- count_of_login_fail : 로그인 시도 연속 실패횟수 기록
+- login_lock_data : 로그인 금지에 관련된 데이터. 정지 여부, 정지 시간 등등 
 - delete_flag :삭제 플레그(숨김)
 
 ## 메모
