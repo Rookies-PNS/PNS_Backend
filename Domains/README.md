@@ -25,6 +25,8 @@
    - PostPrivateAblePolicy : 일기 비공개 할수 있는 권한
    - UserAuthLockOfPostCreateAndUpdatePolicy : 사용자의 일기 생성 수정 권한 정지시킬 수 있는 권한
    - UserAuthUnlockOfPostCreateAndUpdatePolicy : 사용자의 일기 생성 수정 권한 재개시킬 수 있는 권한
+   - UserAuthLockOfPostPublicPolicy : 사용자의 일기 공개 권한 정지시킬 수 있는 권한
+   - UserAuthUnlockOfPostPublicPolicy : 사용자의 일기 공개 권한 재개시킬 수 있는 권한
    - ~~UserLoginUnlockAblePolicy : 사용자의 로그인 정지 해제 시킬 수 있는 권한~~
    - UserDataReadAblePolicy : 사용자 데이터를 확인하는 권한
    - UserDataDeleteAblePolicy : 사용자 데이터를 삭제(비공개 플레그) 할수 있는 권한 
