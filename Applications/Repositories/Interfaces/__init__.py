@@ -8,5 +8,7 @@ if not (str(root_path) in sys.path):
     sys.path.append(str(root_path))
 
 from Applications.Repositories.Interfaces.IPostRepository import IPostRepository
+from Applications.Repositories.Interfaces.IPostVORepository import IPostVORepository
 from Applications.Repositories.Interfaces.IUserRepository import IUserRepository
+from Applications.Repositories.Interfaces.IUserVORepository import IUserVORepository
 from Applications.Repositories.Interfaces.IMigrations import IMigrations
