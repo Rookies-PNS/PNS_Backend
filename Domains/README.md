@@ -5,7 +5,8 @@
 2. Post 공유 설정에 다한 권한
 3. Auth 권한 설정에 대한 권한
 4. User 조회하는 권한
-5. User(사용자) 삭제 및 삭제한 User의 Post 삭제(비공개) 권한
+5. User 로그인 정지 해제 권한
+6. User(사용자) 삭제 및 삭제한 User의 Post 삭제(비공개) 권한
 
 ## 정보
 1. Common.AuthArchives : 계정이 가지고 있는 모든 권한을 표현한다.
@@ -24,6 +25,7 @@
    - PostPrivateAblePolicy : 일기 비공개 할수 있는 권한
    - UserAuthLockOfPostCreateAndUpdatePolicy : 사용자의 일기 생성 수정 권한 정지시킬 수 있는 권한
    - UserAuthUnlockOfPostCreateAndUpdatePolicy : 사용자의 일기 생성 수정 권한 재개시킬 수 있는 권한
+   - UserLoginUnlockAblePolicy : 사용자의 로그인 정지 해제 시킬 수 있는 권한
    - UserDataReadAblePolicy : 사용자 데이터를 확인하는 권한
    - UserDataDeleteAblePolicy : 사용자 데이터를 삭제(비공개 플레그) 할수 있는 권한 
 2. Common.TargetRange : 권한을 행사할 수 있는 범위대한 열거형을 가지고 있다.
@@ -55,7 +57,9 @@
 - nickname : 별명 (공유 할때 보이는 이름)
 - last_update_date : 마지막으로 일기 쓴 날짜
 - count_of_post : 마지막 날에 일기 쓴 횟수(횟수 제한을 두기 위함)
-- is_delete :삭제 플레그(숨김)
+- count_of_try_login_fail : 로그인 시도 연속 실패횟수 기록
+- login_lock_flag : 로그인 금지 플레그
+- delete_flag :삭제 플레그(숨김)
 
 ## 메모
 - 이메일? : 이메일 인증...
@@ -81,7 +85,7 @@
 - ~~viwer + is_share : 볼 수 있는 User / User 화이트 리스트(교환일기)~~
 - image_list : 썸네일 (100 미만)
 - is_share : 공유 여부 플레그
-- is_delete :삭제 플레그(숨김)
+- delete_flag :삭제 플레그(숨김)
 
 # UserSession
 
@@ -93,8 +97,9 @@
 - key : User 정보와 매핑된 발급 키값
 - user : 계정 정보
 - due_to : 세션 유효기간
-- is_delete : 폐기 여부 플래그
+- delete_flag : 폐기 여부 플래그
 
 ## 서비스
 1. 토큰 발급 요청 서비스 : simpleuser -> key
 2. 토큰 확인 요청 서비스 : key가 유효한지 확인, key, 삭자 안됐는지, 유효기간은 안지났는지 -> simpleuser
+

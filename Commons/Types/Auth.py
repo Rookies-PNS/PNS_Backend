@@ -12,6 +12,7 @@ class Policy(Enum):
     PostPrivateAblePolicy = auto()
     UserAuthLockOfPostCreateAndUpdatePolicy = auto()
     UserAuthUnlockOfPostCreateAndUpdatePolicy = auto()
+    UserLoginUnlockAblePolicy = auto()
     UserDataReadAblePolicy = auto()
     UserDataDeleteAblePolicy = auto()
 
