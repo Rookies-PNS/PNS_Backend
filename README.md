@@ -85,5 +85,4 @@ python manage.py --run git-push
 
 [목표 타임스케쥴](https://docs.google.com/spreadsheets/d/12uU9tzwKI6kATs_Ijud8bKqW2Ijg9RNQYvF_wUSeZ-M/edit#gid=1490708584)
 [Backend 진행상황](https://github.com/orgs/Rookies-PNS/projects/1)
-
 [문서 발표준비 진행상](https://github.com/orgs/Rookies-PNS/projects/2)
