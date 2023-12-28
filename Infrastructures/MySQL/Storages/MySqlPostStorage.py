@@ -6,7 +6,6 @@ from datetime import datetime
 from Commons import Uid, UserId, PostId, PostCreateTime, PostUpdateTime, Content
 from Domains.Entities import PostVO, Post, SimplePost, SimpleUser
 from Applications.Repositories.Interfaces import IPostRepository, IUserRepository
-from Applications.Repositories.Queries import IConditionRanderForPostQuery
 from Applications.Results import Result, Fail
 
 from icecream import ic
@@ -235,14 +234,6 @@ class MySqlPostStorage(IPostRepository):
             connection.close()
 
         return [self._convert_to_postvo(row).get_simple_post() for row in results]
-
-    def search_by_query(
-        self,
-        query: IConditionRanderForPostQuery,
-        page: int = 0,
-        posts_per_page: Optional[int] = None,
-    ) -> Result[Collection[SimplePost]]:
-        raise NotImplementedError()
 
     def update(self, post: PostVO) -> Result[SimplePost]:
         connection = self.connect()

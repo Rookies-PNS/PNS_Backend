@@ -13,7 +13,6 @@ from Domains.Entities import (
     PostVO_to_Post,
 )
 from Applications.Repositories.Interfaces import IPostRepository, IUserRepository
-from Applications.Repositories.Queries import SortOperation
 
 from Applications.Results import (
     Result,

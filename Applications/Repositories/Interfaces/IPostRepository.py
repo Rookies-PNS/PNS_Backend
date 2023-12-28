@@ -6,7 +6,6 @@ from abc import *
 from Commons import Uid, PostId
 from Domains.Entities import Post, PostVO, SimplePost
 from Applications.Results import Result
-from Applications.Repositories.Queries import IConditionRanderForPostQuery
 
 
 class IPostRepository(metaclass=ABCMeta):
@@ -32,20 +31,11 @@ class IPostRepository(metaclass=ABCMeta):
 
     @abstractclassmethod
     def search_by_uid(
-        self, 
+        self,
         user_id: Uid,
         page: int = 0,
         posts_per_page: Optional[int] = None,
-        ) -> Result[Collection[SimplePost]]:
-        pass
-
-    @abstractclassmethod
-    def search_by_query(
-        self, 
-        query: IConditionRanderForPostQuery,
-        page: int = 0,
-        posts_per_page: Optional[int] = None,
-        ) -> Result[Collection[SimplePost]]:
+    ) -> Result[Collection[SimplePost]]:
         pass
 
     @abstractclassmethod
