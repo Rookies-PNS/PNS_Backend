@@ -11,5 +11,6 @@ from Commons.Types.ID import Id, Uid, UserId, PostId
 from Commons.Types.Content import Content
 from Commons.Types.Password import Password
 from Commons.Types.Time import PostCreateTime, PostUpdateTime, get_current_time
+from Commons.Types.Auth import Policy, Auth, AuthArchives, UnionAuth, IntersectionAuth
 
 # __all__ = ["UserID", "Content", "Password"]
