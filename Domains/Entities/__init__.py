@@ -9,3 +9,4 @@ if not (str(root_path) in sys.path):
 
 from Domains.Entities.Post import Post, PostVO, SimplePost, Post_to_PostVO, PostVO_to_Post
 from Domains.Entities.User import User, UserVO, SimpleUser
+from Domains.Entities.UserSession import Session
