@@ -15,6 +15,7 @@
    - List[ Union[Auth,UnionAuth,IntersectionAuth] ]
 3. Common.IntersectionAuth : 서비스를 사용하기 위한 권한 정의를 표현한다. 교집합 형태로 모든 권한을 가져야 된다.
    - List[ Union[Auth,UnionAuth,IntersectionAuth] ]
+
 ### 추가 타입
 1. Common.Policy : 권한에 대한 열거형을 가지고 있다. ( 대상 + 행위 + 가능정책 ) 으로 이름 기술 
    - None : 권한 없음 
@@ -85,8 +86,8 @@
 - user -> maker : 생성 User
 - target_time : 일기의 날짜 시간은 제거 된다.(조정 가능하게 변경 필요)
 - ~~viwer + is_share : 볼 수 있는 User / User 화이트 리스트(교환일기)~~
-- image_list : 썸네일 (100 미만)
-- is_share : 공유 여부 플레그
+- image_list : 썸네일 (100 미만) , 목록조회에도 뜬다. 썸네일 용이랑 그냥이랑 분리
+- share_flag : 공유 여부 플레그
 - delete_flag :삭제 플레그(숨김)
 
 # UserSession
