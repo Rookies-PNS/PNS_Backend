@@ -38,3 +38,9 @@ class UpdateableTime(TIME):
 
     def set_minute(self, time: int):
         self.time = get_current_time() + timedelta(minutes=time)
+
+
+@dataclass
+class SelectTime(UpdateableTime):
+    def set_time(self, time: datetime):
+        self.time = time

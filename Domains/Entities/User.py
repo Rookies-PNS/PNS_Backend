@@ -38,27 +38,6 @@ class CommonUserAction:
     def get_uid(self) -> Uid:
         return self.uid
 
-    def get_count_of_login_fail(self) -> int:
-        return self.login_data.get_count_of_login_fail()
-
-    def get_due_to_of_login_lock(self) -> datetime:
-        return self.login_data.get_due_to_of_login_lock()
-
-    def check_login_able(self) -> bool:
-        """
-        로그인 가능 여부를 확인하는 함수
-        """
-        return self.login_data.check_login_able()
-
-    def fail_login(self):
-        return self.login_data.fail_login()
-
-    def success_login(self):
-        return self.login_data.success_login()
-
-    def lock_login(self, time_minute: int):
-        return self.login_data.lock_login(time_minute)
-
     def count_post_num(self):
         """
         현재 날짜와 last_update_date를 비교하여 게시물 수를 업데이트하는 메서드
@@ -85,6 +64,48 @@ class CommonUserAction:
 
 @dataclass(frozen=True)
 class SimpleUser(CommonUserAction):
+    """
+    가장 기본적인 유저 데이터
+    """
+
+    user_id: UserId
+    nickname: str
+    uid: Uid
+    auth: AuthArchives
+    post_count: PostCounter
+
+
+class SecurityUesrAction(CommonUserAction):
+    login_data: LoginData
+
+    def get_count_of_login_fail(self) -> int:
+        return self.login_data.get_count_of_login_fail()
+
+    def get_due_to_of_login_lock(self) -> datetime:
+        return self.login_data.get_due_to_of_login_lock()
+
+    def check_login_able(self) -> bool:
+        """
+        로그인 가능 여부를 확인하는 함수
+        """
+        return self.login_data.check_login_able()
+
+    def fail_login(self):
+        return self.login_data.fail_login()
+
+    def success_login(self):
+        return self.login_data.success_login()
+
+    def lock_login(self, time_minute: int):
+        return self.login_data.lock_login(time_minute)
+
+
+@dataclass(frozen=True)
+class SecuritySimpleUser(SecurityUesrAction):
+    """
+    차후 관리자가 사용하게 될 유저 데이터
+    """
+
     user_id: UserId
     nickname: str
     uid: Uid
@@ -92,8 +113,16 @@ class SimpleUser(CommonUserAction):
     login_data: LoginData
     post_count: PostCounter
 
+    def get_simple_user(self):
+        return SimpleUser(
+            user_id=self.user_id,
+            nickname=self.nickname,
+            uid=self.uid,
+            auth=self.auth,
+        )
 
-class FullUesrAction(CommonUserAction):
+
+class FullUesrAction(SecurityUesrAction):
     name: str
 
     def get_user_name(self) -> str:
@@ -114,6 +143,9 @@ class User(FullUesrAction):
     def get_passwd(self) -> str:
         return self.pw.pw
 
+    def get_uid(self) -> Optional[Uid]:
+        return self.uid
+
 
 @dataclass(frozen=True)
 class UserVO(FullUesrAction):
@@ -127,6 +159,14 @@ class UserVO(FullUesrAction):
 
     def get_simple_user(self):
         return SimpleUser(
+            user_id=self.user_id,
+            nickname=self.nickname,
+            uid=self.uid,
+            auth=self.auth,
+        )
+
+    def get_security_simple_user(self):
+        return SecuritySimpleUser(
             user_id=self.user_id,
             nickname=self.nickname,
             uid=self.uid,

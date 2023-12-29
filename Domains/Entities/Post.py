@@ -6,76 +6,24 @@ from Commons import (
     PostId,
     TimeVO,
     UpdateableTime,
+    SelectTime,
     get_current_time,
     Uid,
+    ImageKey,
 )
 from Domains.Entities.User import SimpleUser
 
 
-class Post:
-    def __init__(
-        self,
-        title: str,
-        content: Content,
-        user: SimpleUser,
-        create_time: Optional[TimeVO] = None,
-        update_time: Optional[UpdateableTime] = None,
-        post_id: Optional[PostId] = None,
-    ):
-        self.title = title
-        self.content = content
-        self.user = user
-        self.post_id = post_id
-        match create_time:
-            case time if isinstance(time, TimeVO):
-                self.create_time = time
-            case _:
-                self.create_time = TimeVO(time=get_current_time())
-
-        match update_time:
-            case time if isinstance(time, UpdateableTime):
-                self.update_time = time
-            case _:
-                self.update_time = UpdateableTime(time=get_current_time())
-
-    def set_update_time(self):
-        self.update_time.set_now()
-
-    def get_account(self) -> str:
-        match self.user:
-            case user if isinstance(user, SimpleUser):
-                return user.get_account()
-            case _:
-                return "익명"
-
-    def get_content(self) -> str:
-        return self.content.content
-
-    def get_username(self) -> str:
-        match self.user:
-            case user if isinstance(user, SimpleUser):
-                return user.get_user_nickname()
-            case _:
-                return "익명"
-
-    def get_uid(self) -> Optional[Uid]:
-        match self.user:
-            case user if isinstance(user, SimpleUser):
-                return user.get_uid()
-            case _:
-                return None
-
-
-@dataclass(frozen=True)
-class SimplePost:
+class CommonPostAction:
     title: str
     post_id: PostId
-    user: SimpleUser
-    create_time: TimeVO
-    update_time: UpdateableTime
+    owner: SimpleUser
+    target_time: SelectTime
+    share_flag: bool
+    img_key: Optional[ImageKey]
 
     def get_account(self) -> str:
-        match self.user:
+        match self.owner:
             case user if isinstance(user, SimpleUser):
                 return user.get_account()
             case _:
@@ -85,14 +33,14 @@ class SimplePost:
         return self.title
 
     def get_uid(self) -> Optional[Uid]:
-        match self.user:
+        match self.owner:
             case user if isinstance(user, SimpleUser):
                 return user.get_uid()
             case _:
                 return None
 
-    def get_username(self) -> str:
-        match self.user:
+    def get_owner_nickname(self) -> str:
+        match self.owner:
             case user if isinstance(user, SimpleUser):
                 return user.get_user_nickname()
             case _:
@@ -100,13 +48,73 @@ class SimplePost:
 
 
 @dataclass(frozen=True)
-class PostVO:
+class SimplePost(CommonPostAction):
     title: str
-    content: Content
     post_id: PostId
-    user: SimpleUser
+    owner: SimpleUser
+    target_time: SelectTime
+    img_key: Optional[ImageKey]
+    share_flag: bool
+
+    def get_uid(self) -> Uid:
+        match self.owner:
+            case user if isinstance(user, SimpleUser):
+                return user.get_uid()
+            case _:
+                raise ValueError(
+                    f"SimplePost.get_uid - {self.owner}({type(self.owner)})"
+                )
+
+
+class FullPostAction(CommonPostAction):
+    title: str
+    content: str
+    post_id: PostId
+    owner: SimpleUser
+    target_time: SelectTime
+    img_key: Optional[ImageKey]
+    share_flag: bool
     create_time: TimeVO
     update_time: UpdateableTime
+
+    def set_update_time(self):
+        self.update_time.set_now()
+
+    def get_content(self) -> str:
+        return self.content.content
+
+
+@dataclass
+class Post(FullPostAction):
+    title: str
+    content: str
+    owner: SimpleUser
+    target_time: SelectTime
+    img_key: Optional[ImageKey]
+    share_flag: bool
+    create_time: TimeVO
+    update_time: UpdateableTime
+    post_id: Optional[PostId]
+
+    def get_uid(self) -> Optional[Uid]:
+        match self.user:
+            case user if isinstance(user, SimpleUser):
+                return user.get_uid()
+            case _:
+                return None
+
+
+@dataclass(frozen=True)
+class PostVO(FullPostAction):
+    title: str
+    content: str
+    owner: SimpleUser
+    target_time: SelectTime
+    share_flag: bool
+    img_key: Optional[ImageKey]
+    create_time: TimeVO
+    update_time: UpdateableTime
+    post_id: Optional[PostId]
 
     def get_simple_post(self) -> SimplePost:
         return SimplePost(
@@ -117,33 +125,6 @@ class PostVO:
             user=self.user,
         )
 
-    def get_account(self) -> str:
-        match self.user:
-            case user if isinstance(user, SimpleUser):
-                return user.get_account()
-            case _:
-                return "익명"
-
-    def get_title(self) -> str:
-        return self.title
-
-    def get_content(self) -> str:
-        return self.content.content
-
-    def get_username(self) -> str:
-        match self.user:
-            case user if isinstance(user, SimpleUser):
-                return user.get_user_nickname()
-            case _:
-                return "익명"
-
-    def get_uid(self) -> Optional[Uid]:
-        match self.user:
-            case user if isinstance(user, SimpleUser):
-                return user.get_uid()
-            case _:
-                return None
-
 
 def PostVO_to_Post(postvo: PostVO) -> Post:
     import copy
@@ -151,10 +132,13 @@ def PostVO_to_Post(postvo: PostVO) -> Post:
     return Post(
         title=postvo.title,
         content=postvo.content,
+        owner=postvo.owner,
+        target_time=postvo.target_time,
+        share_flag=postvo.share_flag,
+        img_key=postvo.img_key,
         create_time=postvo.create_time,
         update_time=copy.copy(postvo.update_time),
         post_id=postvo.post_id,
-        user=postvo.user,
     )
 
 
@@ -168,8 +152,11 @@ def Post_to_PostVO(post: Post) -> Optional[PostVO]:
     return PostVO(
         title=post.title,
         content=post.content,
-        post_id=post.post_id,
+        owner=post.owner,
+        target_time=post.target_time,
+        share_flag=post.share_flag,
+        img_key=post.img_key,
         create_time=post.create_time,
-        update_time=post.update_time,
-        user=post.user,
+        update_time=UpdateableTime(post.update_time.get_time()),
+        post_id=post.post_id,
     )

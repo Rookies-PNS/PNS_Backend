@@ -3,7 +3,7 @@ import unittest
 import sys
 from datetime import datetime, timedelta
 
-from Domains.Entities import User, UserVO, SimpleUser
+from Domains.Entities import User, UserVO, SimpleUser, SecuritySimpleUser
 from Commons import (
     Uid,
     UserId,
@@ -245,6 +245,93 @@ class test_user(unittest.TestCase):
 
         # get_post_num 메서드 호출 후 게시물 수 확인
         self.assertEqual(0, user.get_post_num())
+
+    def test_simple_user(self):
+        print("\t\t", sys._getframe(0).f_code.co_name)
+        auths = [
+            Auth(Policy.UserDataReadAblePolicy, TargetRange.Own),
+            Auth(Policy.PostPrivateAblePolicy, TargetRange.Own),
+            Auth(Policy.UserAuthLockOfPostPublicPolicy, TargetRange.Own),
+            Auth(Policy.UserAuthUnlockOfPostPublicPolicy, TargetRange.Own),
+            Auth(Policy.UserDataReadAblePolicy, TargetRange.Own),
+            Auth(Policy.UserDataDeleteAblePolicy, TargetRange.Own),
+        ]
+        now = datetime.now()
+        user = SimpleUser(
+            user_id=UserId("taks123"),
+            nickname="일반사용자",
+            uid=Uid(idx=1),
+            auth=AuthArchives(auths=self.공유일기관리자_auths),
+            post_count=PostCounter(UpdateableTime(now)),
+        )
+        for auth in reversed(auths):
+            self.assertTrue(user.check_get_auth(auth))
+
+        now = datetime.now()
+        user = SimpleUser(
+            user_id=UserId("taks123"),
+            nickname="일반사용자",
+            uid=Uid(idx=1),
+            auth=AuthArchives(auths=self.공유일기관리자_auths),
+            post_count=PostCounter(
+                last_update_date=UpdateableTime(datetime.now() - timedelta(days=1)),
+                post_num=2,
+            ),
+        )
+
+        # get_post_num 메서드 호출 후 게시물 수 확인
+        self.assertEqual(0, user.get_post_num())
+
+        # count_post_num 메서드 호출 후 게시물 수 확인
+        user.count_post_num()
+        self.assertEqual(1, user.get_post_num())
+
+    def test_security_simple_user(self):
+        print("\t\t", sys._getframe(0).f_code.co_name)
+        # 잠긴 상태로 설정하고, 잠긴 시간을 현재 시간에서 5분 전으로 설정
+        before = datetime.now() - timedelta(minutes=5)
+        user = SecuritySimpleUser(
+            user_id=UserId("taks123"),
+            nickname="일반사용자",
+            uid=Uid(idx=1),
+            auth=AuthArchives(auths=self.일반사용자_auths),
+            login_data=LoginData(
+                lock_time=UpdateableTime(before),
+                lock_flag=True,
+                count_of_login_fail=3,
+            ),
+            post_count=PostCounter(UpdateableTime(before)),
+        )
+        # 로그인이 가능한 상태 확인 (잠긴 상태가 해제됨)
+        self.assertTrue(user.check_login_able())
+        self.assertEqual(3, user.get_count_of_login_fail())
+
+        # 로그인 성공
+        user.success_login()
+        self.assertEqual(0, user.get_count_of_login_fail())
+        before = datetime.now() - timedelta(minutes=5)
+        user = SecuritySimpleUser(
+            user_id=UserId("taks123"),
+            nickname="일반사용자",
+            uid=Uid(idx=1),
+            auth=AuthArchives(auths=self.일반사용자_auths),
+            login_data=LoginData(UpdateableTime(before), True),
+            post_count=PostCounter(UpdateableTime(before)),
+        )
+        # 잠긴 상태로 설정하고, 잠긴 시간을 현재 시간에서 5분 전으로 설정
+        # 로그인이 가능한 상태 확인 (잠긴 상태가 해제됨)
+        self.assertTrue(user.check_login_able())
+        self.assertEqual(0, user.get_count_of_login_fail())
+        # 로그인 성공
+        user.success_login()
+
+        # lock
+        user.lock_login(5)
+        self.assertFalse(user.check_login_able())
+        self.assertEqual(0, user.get_count_of_login_fail())
+        # 로그인 성공
+        user.success_login()
+        self.assertTrue(user.check_login_able())
 
 
 def main():
