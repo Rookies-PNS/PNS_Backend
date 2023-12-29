@@ -9,7 +9,7 @@ from Commons import (
     LoginData,
     PostCounter,
     Policy,
-    TargetRange,
+    TargetScope,
     Auth,
     AuthArchives,
 )
@@ -48,14 +48,14 @@ class CreateUserService:
         name: str,
         nickname: str,
         auths: List[Auth] = [  # Nomal User Auth List
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.Allowed),
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.Own),
-            Auth(Policy.PostCreateAndUpdateAblePolicy, TargetRange.Own),
-            Auth(Policy.PostDeleteAblePolicy, TargetRange.Own),
-            Auth(Policy.PostPublicAblePolicy, TargetRange.Own),
-            Auth(Policy.PostPrivateAblePolicy, TargetRange.Own),
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.Own),
-            Auth(Policy.UserDataDeleteAblePolicy, TargetRange.Own),
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.Own),  # 자기 계정 삭제가능
+            Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
+            Auth(Policy.PostReadAblePolicy, TargetScope.Own),  # 자기 일기 읽기 가능
+            Auth(Policy.PostDeleteAblePolicy, TargetScope.Own),  # 자기 일기 삭제가능
+            Auth(Policy.PostCreateAndUpdateAblePolicy, TargetScope.Own),  # 자기 일기 수정가능
+            Auth(Policy.PostPublicAblePolicy, TargetScope.Own),  # 자기 일기 공개가능
+            Auth(Policy.PostPrivateAblePolicy, TargetScope.Own),  # 자기 일기 비공개가능
         ],
     ) -> Optional[Fail]:
         # chece validate id
