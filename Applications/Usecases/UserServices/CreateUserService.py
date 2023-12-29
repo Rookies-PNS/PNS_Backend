@@ -44,7 +44,7 @@ class CreateUserService:
     def create(
         self,
         account: str,
-        pw: str,
+        passwd: str,
         name: str,
         nickname: str,
         auths: List[Auth] = [  # Nomal User Auth List
@@ -90,11 +90,11 @@ class CreateUserService:
             case _:
                 return Fail(type="Fail_type_error_CreateUser_from_nickname")
         # check passward
-        if not check_valid_password(pw):
+        if not check_valid_password(passwd):
             return Fail("Fail_CreateUser_Invalid_Password")
 
         match convert_to_Password_with_hashing(
-            pw, get_padding_adder(account, nickname)
+            passwd, get_padding_adder(account, nickname)
         ):
             case hash_pw if isinstance(hash_pw, Password):
                 password = hash_pw
