@@ -3,7 +3,7 @@ import unittest
 import sys
 from datetime import datetime, timedelta
 
-from Domains.Entities import User, UserVO, SimpleUser, SecuritySimpleUser
+from Domains.Entities import User, SimpleUser, SecuritySimpleUser
 from Commons import (
     Uid,
     UserId,
@@ -12,7 +12,7 @@ from Commons import (
     AuthArchives,
     Auth,
     Policy,
-    TargetRange,
+    TargetScope,
     LoginData,
     PostCounter,
 )
@@ -25,31 +25,39 @@ class test_user(unittest.TestCase):
         cls.driver = "test"
         print(sys._getframe(0).f_code.co_name, f"(test_user)")
         cls.일반사용자_auths = [
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.Allowed),
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.Own),
-            Auth(Policy.PostCreateAndUpdateAblePolicy, TargetRange.Own),
-            Auth(Policy.PostDeleteAblePolicy, TargetRange.Own),
-            Auth(Policy.PostPublicAblePolicy, TargetRange.Own),
-            Auth(Policy.PostPrivateAblePolicy, TargetRange.Own),
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.Own),
-            Auth(Policy.UserDataDeleteAblePolicy, TargetRange.Own),
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.Own),  # 자기 계정 삭제가능
+            Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
+            Auth(Policy.PostReadAblePolicy, TargetScope.Own),  # 자기 일기 읽기 가능
+            Auth(Policy.PostDeleteAblePolicy, TargetScope.Own),  # 자기 일기 삭제가능
+            Auth(Policy.PostCreateAndUpdateAblePolicy, TargetScope.Own),  # 자기 일기 수정가능
+            Auth(Policy.PostPublicAblePolicy, TargetScope.Own),  # 자기 일기 공개가능
+            Auth(Policy.PostPrivateAblePolicy, TargetScope.Own),  # 자기 일기 비공개가능
         ]
         cls.공유일기관리자_auths = [
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.Allowed),
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.Own),
-            Auth(Policy.PostPrivateAblePolicy, TargetRange.All),
-            Auth(Policy.UserAuthLockOfPostPublicPolicy, TargetRange.All),
-            Auth(Policy.UserAuthUnlockOfPostPublicPolicy, TargetRange.All),
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.All),
-            Auth(Policy.UserDataDeleteAblePolicy, TargetRange.Own),
+            Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(Policy.PostPrivateAblePolicy, TargetScope.All),  # 모든 일기 비공개가능
+            Auth(
+                Policy.UserAuthLockOfPostPublicPolicy, TargetScope.All
+            ),  # 모든 유저 일기공개 권한정지 권한
+            Auth(
+                Policy.UserAuthUnlockOfPostPublicPolicy, TargetScope.All
+            ),  # 모든 유저 일기공개 권한정지 해제 권한
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.All),  # 모든 유저 정보 열람가
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.Own),  # 자기 계정 삭제가능
         ]
         cls.계정관리자_auths = [
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.Allowed),
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.Own),
-            Auth(Policy.UserAuthLockOfPostCreateAndUpdatePolicy, TargetRange.All),
-            Auth(Policy.UserAuthUnlockOfPostCreateAndUpdatePolicy, TargetRange.All),
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.All),
-            Auth(Policy.UserDataDeleteAblePolicy, TargetRange.All),
+            Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(
+                Policy.UserAuthLockOfPostCreateAndUpdatePolicy, TargetScope.All
+            ),  # 일기 쓰기 권한정지 권한
+            Auth(
+                Policy.UserAuthUnlockOfPostCreateAndUpdatePolicy, TargetScope.All
+            ),  # 일기 쓰기 권한정기 해제 권한
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.All),  # 모든 유저 정보 열람가
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.All),  # 모든 계정 삭제가능
         ]
 
     @classmethod
@@ -122,12 +130,12 @@ class test_user(unittest.TestCase):
     def test_auth_1(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
         auths = [
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.Own),
-            Auth(Policy.PostPrivateAblePolicy, TargetRange.Own),
-            Auth(Policy.UserAuthLockOfPostPublicPolicy, TargetRange.Own),
-            Auth(Policy.UserAuthUnlockOfPostPublicPolicy, TargetRange.Own),
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.Own),
-            Auth(Policy.UserDataDeleteAblePolicy, TargetRange.Own),
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),
+            Auth(Policy.PostPrivateAblePolicy, TargetScope.Own),
+            Auth(Policy.UserAuthLockOfPostPublicPolicy, TargetScope.Own),
+            Auth(Policy.UserAuthUnlockOfPostPublicPolicy, TargetScope.Own),
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.Own),
         ]
         now = datetime.now()
         user = User(
@@ -141,7 +149,7 @@ class test_user(unittest.TestCase):
             post_count=PostCounter(UpdateableTime(now)),
         )
         for auth in reversed(auths):
-            self.assertTrue(user.check_get_auth(auth))
+            self.assertTrue(auth.target_range, user.check_policy(auth.policy))
 
     def test_User_1(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
@@ -154,14 +162,22 @@ class test_user(unittest.TestCase):
             uid=Uid(idx=1),
             auth=AuthArchives(
                 auths=[
-                    Auth(Policy.UserDataReadAblePolicy, TargetRange.Allowed),
-                    Auth(Policy.UserDataReadAblePolicy, TargetRange.Own),
-                    Auth(Policy.PostCreateAndUpdateAblePolicy, TargetRange.Own),
-                    Auth(Policy.PostDeleteAblePolicy, TargetRange.Own),
-                    Auth(Policy.PostPublicAblePolicy, TargetRange.Own),
-                    Auth(Policy.PostPrivateAblePolicy, TargetRange.Own),
-                    Auth(Policy.UserDataReadAblePolicy, TargetRange.Own),
-                    Auth(Policy.UserDataDeleteAblePolicy, TargetRange.Own),
+                    Auth(
+                        Policy.UserDataReadAblePolicy, TargetScope.Own
+                    ),  # 자신의 유저 정보 열람가능
+                    Auth(
+                        Policy.UserDataDeleteAblePolicy, TargetScope.Own
+                    ),  # 자기 계정 삭제가능
+                    Auth(
+                        Policy.PostReadAblePolicy, TargetScope.Allowed
+                    ),  # 공개된 일기 읽기 가능
+                    Auth(Policy.PostReadAblePolicy, TargetScope.Own),  # 자기 일기 읽기 가능
+                    Auth(Policy.PostDeleteAblePolicy, TargetScope.Own),  # 자기 일기 삭제가능
+                    Auth(
+                        Policy.PostCreateAndUpdateAblePolicy, TargetScope.Own
+                    ),  # 자기 일기 수정가능
+                    Auth(Policy.PostPublicAblePolicy, TargetScope.Own),  # 자기 일기 공개가능
+                    Auth(Policy.PostPrivateAblePolicy, TargetScope.Own),  # 자기 일기 비공개가능
                 ]
             ),
             login_data=LoginData(UpdateableTime(now)),
@@ -173,15 +189,16 @@ class test_user(unittest.TestCase):
         self.assertEqual("1qaz2wsx!@", user.get_passwd())
         self.assertEqual(Uid(idx=1), user.get_uid())
         for auth in reversed(self.일반사용자_auths):
-            self.assertTrue(user.check_get_auth(auth))
+            self.assertTrue(auth.target_range in user.check_policy(auth.policy))
 
-        self.assertFalse(
-            user.check_get_auth(
+        self.assertEqual(
+            [],
+            user.check_policy(
                 Auth(
                     Policy.UserAuthUnlockOfPostCreateAndUpdatePolicy,
-                    TargetRange.All,
+                    TargetScope.All,
                 )
-            )
+            ),
         )
 
     def test_count_post_num_same_day(self):
@@ -248,14 +265,6 @@ class test_user(unittest.TestCase):
 
     def test_simple_user(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        auths = [
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.Own),
-            Auth(Policy.PostPrivateAblePolicy, TargetRange.Own),
-            Auth(Policy.UserAuthLockOfPostPublicPolicy, TargetRange.Own),
-            Auth(Policy.UserAuthUnlockOfPostPublicPolicy, TargetRange.Own),
-            Auth(Policy.UserDataReadAblePolicy, TargetRange.Own),
-            Auth(Policy.UserDataDeleteAblePolicy, TargetRange.Own),
-        ]
         now = datetime.now()
         user = SimpleUser(
             user_id=UserId("taks123"),
@@ -264,8 +273,6 @@ class test_user(unittest.TestCase):
             auth=AuthArchives(auths=self.공유일기관리자_auths),
             post_count=PostCounter(UpdateableTime(now)),
         )
-        for auth in reversed(auths):
-            self.assertTrue(user.check_get_auth(auth))
 
         now = datetime.now()
         user = SimpleUser(

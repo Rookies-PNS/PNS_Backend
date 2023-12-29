@@ -10,7 +10,8 @@ from Commons import (
     AuthArchives,
     LoginData,
     PostCounter,
-    Auth,
+    Policy,
+    TargetScope,
 )
 
 
@@ -50,16 +51,17 @@ class CommonUserAction:
         """
         return self.post_count.get_post_num()
 
-    def check_get_auth(self, auth: Auth) -> bool:
-        """
-        auth(인자)권한을 소유하고 있는지를 반환한다.
+    def check_policy(self, policy: Policy) -> List[TargetScope]:
+        """_summary_
+        정책(policy)을 소유여 부를 확인하고, 유효범위(TargetRange)를 반환한다.
+
         Args:
-            auth (Auth):확인하고 싶은 권한을 넣는다.
+            policy (Policy): 알고자 하는 정책
 
         Returns:
-            bool: True(해당 권한을 가짐), False(권한 없음)
+            List[TargetRange]: 정책이 같은 모든 유효범위 반환(TargetScope), 없으면 empty list 반환
         """
-        return self.auth.check_get_auth(auth)
+        return self.auth.check_policy(policy)
 
 
 @dataclass(frozen=True)
