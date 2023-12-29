@@ -1,7 +1,10 @@
 import __init__
 
 from Applications.Usecases import LoginUser
-from Applications.Repositories.Interfaces import IUserRepository, IPostRepository
+from Applications.Repositories.Interfaces import (
+    IUserWriteableRepository,
+    IPostWriteableRepository,
+)
 
 from Infrastructures.Interfaces import IStorageFactory
 
@@ -46,11 +49,11 @@ ValueError  > Possible inputs are 'mysql'
             )
 
 
-def get_user_storage() -> IUserRepository:
+def get_user_storage() -> IUserWriteableRepository:
     f = get_strage_factory()
     return f.get_user_strage()
 
-def get_post_storage() -> IPostRepository:
+
+def get_post_storage() -> IPostWriteableRepository:
     f = get_strage_factory()
     return f.get_post_strage()
-    

@@ -5,15 +5,18 @@ from datetime import datetime
 
 from Commons import Uid, UserId, PostId, TimeVO, UpdateableTime, Content
 from Domains.Entities import PostVO, Post, SimplePost, SimpleUser
-from Applications.Repositories.Interfaces import IPostRepository, IUserRepository
+from Applications.Repositories.Interfaces import (
+    IPostWriteableRepository,
+    IUserWriteableRepository,
+)
 from Applications.Results import Result, Fail
 
 from icecream import ic
 import pymysql
 
 
-class MySqlPostStorage(IPostRepository):
-    def __init__(self, user_repo: IUserRepository, name_padding: str = "log_"):
+class MySqlPostStorage(IPostWriteableRepository):
+    def __init__(self, user_repo: IUserWriteableRepository, name_padding: str = "log_"):
         self.name_padding = name_padding
         self.user_repo = user_repo
 
@@ -80,7 +83,7 @@ class MySqlPostStorage(IPostRepository):
 
         return result is not None
 
-    def save(self, post: Post) -> Result[SimplePost]:
+    def save_post(self, post: Post) -> Result[SimplePost]:
         connection = self.connect()
         table_name = self.get_padding_name("post")
         try:

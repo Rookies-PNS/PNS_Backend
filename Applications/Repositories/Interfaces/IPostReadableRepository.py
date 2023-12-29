@@ -8,8 +8,8 @@ from Domains.Entities import PostVO, SimplePost
 from Applications.Results import Result
 
 
-class IPostVORepository(metaclass=ABCMeta):
-    @abstractmethod
+class IPostReadableRepository(metaclass=ABCMeta):
+    @abstractclassmethod
     def check_exist_pid(self, post_id: PostId) -> bool:
         """_summary_
         일기의 존재여부를 확인한다.
@@ -22,7 +22,7 @@ class IPostVORepository(metaclass=ABCMeta):
         """
         pass
 
-    @abstractmethod
+    @abstractclassmethod
     def get_num_of_public_post(self) -> int:
         """_summary_
         공유 일기의 개수를 확인한다.
@@ -32,7 +32,7 @@ class IPostVORepository(metaclass=ABCMeta):
         """
         pass
 
-    @abstractmethod
+    @abstractclassmethod
     def get_public_post_list(
         self,
         page: int = 0,
@@ -50,7 +50,7 @@ class IPostVORepository(metaclass=ABCMeta):
         """
         pass
 
-    @abstractmethod
+    @abstractclassmethod
     def search_by_pid(self, post_id: PostId) -> Optional[PostVO]:
         """_summary_
         pid를 기준으로 일기를 검색한다.
@@ -63,7 +63,7 @@ class IPostVORepository(metaclass=ABCMeta):
         """
         pass
 
-    @abstractmethod
+    @abstractclassmethod
     def get_num_of_post_search_by_available_uid(self, user_id: Uid) -> int:
         """_summary_
         uid가 보유중인 사용가능한 일기의 개수를 가져온다.
@@ -76,7 +76,7 @@ class IPostVORepository(metaclass=ABCMeta):
         """
         pass
 
-    @abstractmethod
+    @abstractclassmethod
     def search_by_available_uid(
         self,
         user_id: Uid,
@@ -97,7 +97,7 @@ class IPostVORepository(metaclass=ABCMeta):
         """
         pass
 
-    @abstractmethod
+    @abstractclassmethod
     def search_by_uid(
         self,
         user_id: Uid,

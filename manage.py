@@ -74,7 +74,7 @@ def init_user():
     from Domains.Entities.User import SimpleUser
     from Infrastructures.IOC import get_strage_factory
     from Infrastructures.Interfaces import IStorageFactory
-    from Applications.Repositories.Interfaces import IUserRepository
+    from Applications.Repositories.Interfaces import IUserWriteableRepository
 
     admin = {
         "id": "admin",
@@ -100,7 +100,10 @@ def init_post():
     from Domains.Entities import SimplePost
     from Infrastructures.IOC import get_post_storage, get_user_storage
     from Infrastructures.Interfaces import IStorageFactory
-    from Applications.Repositories.Interfaces import IUserRepository, IPostRepository
+    from Applications.Repositories.Interfaces import (
+        IUserWriteableRepository,
+        IPostWriteableRepository,
+    )
     from datetime import datetime, timedelta
 
     now = datetime.now()

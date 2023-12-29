@@ -1,6 +1,9 @@
 import __init__
 
-from Applications.Repositories.Interfaces import IPostRepository, IUserRepository
+from Applications.Repositories.Interfaces import (
+    IPostWriteableRepository,
+    IUserWriteableRepository,
+)
 
 from Infrastructures.Interfaces import IStorageFactory, IMigrations
 
@@ -14,12 +17,12 @@ class MySqlFactory(IStorageFactory):
 
         return MySqlMigrations(self.padding)
 
-    def get_user_strage(self) -> IUserRepository:
+    def get_user_strage(self) -> IUserWriteableRepository:
         from Infrastructures.MySQL.Storages.MySqlUserStorage import MySqlUserStorage
 
         return MySqlUserStorage(self.padding)
 
-    def get_post_strage(self) -> IPostRepository:
+    def get_post_strage(self) -> IPostWriteableRepository:
         from Infrastructures.MySQL.Storages.MySqlPostStorage import MySqlPostStorage
 
         return MySqlPostStorage(self.get_user_strage(), self.padding)

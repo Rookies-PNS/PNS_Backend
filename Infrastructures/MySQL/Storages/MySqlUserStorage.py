@@ -4,12 +4,12 @@ from typing import Optional
 from Commons import Uid, UserId, Password
 from Domains.Entities import User, UserVO, SimpleUser
 from Applications.Results import Result, Fail, Fail_CreateUser_IDAlreadyExists
-from Applications.Repositories.Interfaces import IUserRepository
+from Applications.Repositories.Interfaces import IUserWriteableRepository
 
 import pymysql
 
 
-class MySqlUserStorage(IUserRepository):
+class MySqlUserStorage(IUserWriteableRepository):
     def __init__(self, name_padding: str = "log_"):
         self.name_padding = name_padding
 
@@ -50,7 +50,7 @@ class MySqlUserStorage(IUserRepository):
             connection.close()
             return ret
 
-    def save(self, user: User) -> Result[SimpleUser]:
+    def save_user(self, user: User) -> Result[SimpleUser]:
         connection = self.connect()
         table_name = self.get_padding_name("user")
         try:

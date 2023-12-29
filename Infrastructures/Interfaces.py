@@ -3,8 +3,8 @@ from collections.abc import Collection
 
 from Domains.Entities import UserVO, PostVO
 from Applications.Repositories.Interfaces import (
-    IPostRepository,
-    IUserRepository,
+    IPostWriteableRepository,
+    IUserWriteableRepository,
     IMigrations,
 )
 
@@ -15,9 +15,9 @@ class IStorageFactory(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_user_strage(self) -> IUserRepository:
+    def get_user_strage(self) -> IUserWriteableRepository:
         pass
 
     @abstractmethod
-    def get_post_strage(self) -> IPostRepository:
+    def get_post_strage(self) -> IPostWriteableRepository:
         pass

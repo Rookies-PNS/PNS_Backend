@@ -3,7 +3,7 @@ from typing import Optional, List
 
 from Commons import UserId, Uid
 from Domains.Entities import UserVO, User
-from Applications.Repositories.Interfaces import IUserRepository
+from Applications.Repositories.Interfaces import IUserWriteableRepository
 from Applications.Results import (
     Result,
     Fail,
@@ -12,7 +12,7 @@ from Applications.Results import (
 )
 
 
-class TestUserRepositoryList(IUserRepository):
+class TestUserRepositoryList(IUserWriteableRepository):
     def __init__(self, arr: List[UserVO]):
         self.arr = arr
         self.count = 0
@@ -23,7 +23,7 @@ class TestUserRepositoryList(IUserRepository):
                 return True
         return False
 
-    def save(self, user: User) -> Result[UserVO]:
+    def save_user(self, user: User) -> Result[UserVO]:
         user_id = self.check_exist_userid(user.user_id)
         self.count += 1
         user_vo = UserVO(user.user_id, user.name, user.password, Uid(idx=self.count))
