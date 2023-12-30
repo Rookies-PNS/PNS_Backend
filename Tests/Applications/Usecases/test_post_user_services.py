@@ -1,11 +1,10 @@
-from Commons.Types.ID import PostId
 import __init__
 import unittest
 import sys
 from typing import List
 from datetime import datetime, timezone
 
-from Commons import UserId, Uid, Password
+from Commons import UserId, Uid, Password, PostId
 from Domains.Entities import UserVO, User, Post, PostVO, SimplePost, SimpleUser
 from Applications.Usecases import CreateUser, LoginUser
 from Applications.Usecases import (

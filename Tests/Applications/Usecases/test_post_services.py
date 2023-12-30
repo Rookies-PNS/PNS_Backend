@@ -1,19 +1,18 @@
-from Commons.Types.ID import PostId
 import __init__
 import unittest
 import sys
 from typing import List
 from datetime import datetime, timezone
 
-from Commons import UserId, Uid, Password
+from Commons import UserId, Uid, Password, PostId
 from Domains.Entities import SimpleUser
-from Applications.Usecases import CreateUser, LoginUser
-from Applications.Usecases import (
+from Applications.Usecases.UserServices import CreateUserService, LoginService
+from Applications.Usecases.PostServices import (
     CreatePost,
     DeletePost,
-    GetPost,
-    GetPostList,
-    UpdatePost,
+    GetPublicPostService,
+    GetPrivatePostService,
+    UpdatePostService,
 )
 from Applications.Results import (
     Result,

@@ -5,8 +5,11 @@ from typing import List
 
 from Commons import UserId, Uid, Password
 from Domains.Entities import UserVO, User
-from Applications.Usecases import CreateUser, LoginUser
-from Applications.Usecases.AppUsecaseExtention import convert_to_Password_with_hashing
+from Applications.Usecases.UserServices import CreateUserService, LoginService
+from Applications.Usecases.UserServices.UsecaseUserExtention import (
+    convert_to_Password_with_hashing,
+    get_padding_adder,
+)
 from Applications.Results import (
     Fail,
     Fail_CheckUser_IDNotFound,
@@ -40,20 +43,20 @@ class test_user_services(unittest.TestCase):
         migrate.create_user()
 
         # 기본세팅
-        repo = test_selector.get_user_storage(factory)
-        create_user = CreateUser(repo)
-        login_user = LoginUser(repo)
+        repoW, repoR = test_selector.get_user_storage(factory)
+        create_user_service = CreateUserService(repoW)
+        login_service = LoginService(repoR)
 
         users = []
-        u = create_user.create("taks123", "1Q2w3e4r!@$", "takgyun Lee")
+        u = create_user_service.create("taks123", "1Q2w3e4r!@$", "takgyun Lee", "Taks")
         users.append(u)
-        u = create_user.create("hahahoho119", "1B2n3m4!@", "Ho Han")
+        u = create_user_service.create("hahahoho119", "1B2n3m4!@", "Ho Han", "Hans")
         users.append(u)
-        u = create_user.create("mygun7749", "$1Awb5$123", "Guna Yoo")
+        u = create_user_service.create("mygun7749", "$1Awb5$123", "Guna Yoo", "YoYo")
         users.append(u)
 
-        self.create_user = CreateUser(repo)
-        self.login_user = LoginUser(repo)
+        self.create_user_service = CreateUserService(repoW)
+        self.login_service = LoginService(repoR)
 
     def tearDown(self):
         "Hook method for deconstructing the test fixture after testing it."
@@ -69,14 +72,14 @@ class test_user_services(unittest.TestCase):
     def test_login_user_로그인_안_되는거_확인(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
 
-        user: UserVO = self.login_user.login("tak123", "1Q2w3e4r!@$")
+        user: UserVO = self.login_service.login("tak123", "1Q2w3e4r!@$")
 
         self.assertDictEqual(
             {"type": "IDNotFound"},
             user.__dict__,
         )
 
-        user = self.login_user.login("hahahoho119", "2N3m4!@")
+        user = self.login_service.login("hahahoho119", "2N3m4!@")
 
         self.assertDictEqual(
             {"type": "PasswardNotCorrect"},
@@ -86,7 +89,7 @@ class test_user_services(unittest.TestCase):
     def test_login_user_잘_로그인_되는거_확인(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
 
-        user = self.login_user.login("taks123", "1Q2w3e4r!@$")
+        user = self.login_service.login("taks123", "1Q2w3e4r!@$")
         match user:
             case _ if isinstance(user, Fail):
                 self.assertTrue(False)
@@ -102,7 +105,7 @@ class test_user_services(unittest.TestCase):
             user.__dict__,
         )
 
-        user = self.login_user.login("hahahoho119", "1B2n3m4!@")
+        user = self.login_service.login("hahahoho119", "1B2n3m4!@")
 
         self.assertDictEqual(
             {
@@ -113,7 +116,7 @@ class test_user_services(unittest.TestCase):
             user.__dict__,
         )
 
-        user = self.login_user.login("mygun7749", "$1Awb5$123")
+        user = self.login_service.login("mygun7749", "$1Awb5$123")
 
         self.assertDictEqual(
             {
@@ -140,7 +143,7 @@ class test_user_services(unittest.TestCase):
 
     def test_start_data(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        user = self.login_user.login("taks123", "1Q2w3e4r!@$")
+        user = self.login_service.login("taks123", "1Q2w3e4r!@$")
 
         self.assertDictEqual(
             {
@@ -151,7 +154,7 @@ class test_user_services(unittest.TestCase):
             user.__dict__,
         )
 
-        user = self.login_user.login("hahahoho119", "1B2n3m4!@")
+        user = self.login_service.login("hahahoho119", "1B2n3m4!@")
 
         self.assertDictEqual(
             {
@@ -162,7 +165,7 @@ class test_user_services(unittest.TestCase):
             user.__dict__,
         )
 
-        user = self.login_user.login("mygun7749", "$1Awb5$123")
+        user = self.login_service.login("mygun7749", "$1Awb5$123")
 
         self.assertDictEqual(
             {
@@ -177,7 +180,7 @@ class test_user_services(unittest.TestCase):
         print("\t\t", sys._getframe(0).f_code.co_name)
 
         # 중복 아이디
-        ret = self.create_user.create("taks123", "1Q2w3e4r!@$", "takgyun Lee")
+        ret = self.create_user_service.create("taks123", "1Q2w3e4r!@$", "takgyun Lee")
         match ret:
             case _ if isinstance(ret, Fail):
                 self.assertTrue(True)

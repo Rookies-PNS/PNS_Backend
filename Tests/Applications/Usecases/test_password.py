@@ -2,7 +2,12 @@ import __init__
 import unittest
 import sys
 from icecream import ic
-from Applications.Usecases.AppUsecaseExtention import *
+from Applications.Usecases.AppUsecaseExtention import validate_user_input
+from Applications.Usecases.UserServices.UsecaseUserExtention import (
+    convert_to_Password_with_hashing,
+    check_valid_password,
+    get_padding_adder,
+)
 
 
 class test_user_services(unittest.TestCase):
@@ -28,10 +33,11 @@ class test_user_services(unittest.TestCase):
         "Hook method for deconstructing the test fixture after testing it."
         print("\t", sys._getframe(0).f_code.co_name)
         pw = "Asdfas12!@"
-        hash = convert_to_Password_with_hashing(pw)
+        adder = get_padding_adder("name", "taks")
+        hash = convert_to_Password_with_hashing(pw, adder)
         pw_list = []
         for i in range(10):
-            pw_list.append(convert_to_Password_with_hashing(pw))
+            pw_list.append(convert_to_Password_with_hashing(pw, adder))
         for i in pw_list:
             self.assertEqual(hash, i)
 
