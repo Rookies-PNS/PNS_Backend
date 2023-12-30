@@ -42,7 +42,7 @@ class test_models(unittest.TestCase):
             Auth(Policy.UserDataReadAblePolicy, TargetScope.All),  # 모든 유저 정보 열람가
             Auth(Policy.UserDataDeleteAblePolicy, TargetScope.Own),  # 자기 계정 삭제가능
         ]
-        print(sys._getframe(0).f_code.co_name, f"({type(cls)})")
+        print(sys._getframe(0).f_code.co_name, f"(test_post)")
 
     @classmethod
     def tearDownClass(cls):

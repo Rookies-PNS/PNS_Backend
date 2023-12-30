@@ -20,6 +20,7 @@ def parse_opt():
         "--test_file",
         nargs="*",
         default=[
+            r"Tests\Domains\test_auth.py",
             r"Tests\Domains\test_user.py",
             r"Tests\Domains\test_post.py",
             r"Tests\Applications\Usecases\test_user_services.py",
