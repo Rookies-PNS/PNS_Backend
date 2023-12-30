@@ -31,7 +31,7 @@ class MySqlFactory(IStorageFactory):
         return MySqlUserWriteStorage(self.padding)
 
     def get_user_read_storage(self) -> IUserReadableRepository:
-        from Infrastructures.MySQL.Storages.MySqlUserWriteStorage import (
+        from Infrastructures.MySQL.Storages.MySqlUserReadStorage import (
             MySqlUserReadStorage,
         )
 

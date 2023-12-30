@@ -20,6 +20,9 @@ from Applications.Usecases.UserServices.UsecaseUserExtention import (
     check_valid_password,
     convert_to_Password_with_hashing,
     get_padding_adder,
+    validate_account,
+    validate_name,
+    validate_nickname,
     account_len,
     name_len,
     nickname_len,
@@ -59,43 +62,30 @@ class CreateUserService:
         ],
     ) -> Optional[Fail]:
         # chece validate id
-        match validate_user_input(account, self.account_len):
-            # invalide user input
-            case Fail(type=type):
-                return Fail(type=f"{type}_in_CreateUser_from_account")
-            # check user id
-            case str(valide_account) if not self.repository.check_exist_userid(
-                valide_account
-            ):
-                if self.repository.check_exist_userid(valide_account):
-                    return Fail_CreateUser_IDAlreadyExists()
-                user_account = UserId(account=valide_account)
-            case _:
-                return Fail(type=f"Fail_type_error_CreateUser_from_account")
+        if not validate_account(account):
+            return Fail(type=f"Fail_in_CreateUser_InvalidateUserInput_from_account")
+
+        if self.repository.check_exist_userid(account):
+            return Fail_CreateUser_IDAlreadyExists()
+        user_account = UserId(account=account)
 
         # check validate name
-        match validate_user_input(name, self.name_len):
-            case Fail(type=type):
-                return Fail(type=f"{type}_in_CreateUser_from_name")
-            case valide_name if isinstance(valide_name, str):
-                checked_name = valide_name
-            case _:
-                return Fail(type="Fail_type_error_CreateUser_from_name")
+        if validate_name(name):
+            checked_name = name
+        else:
+            return Fail(type=f"Fail_in_CreateUser_InvalidateUserInput_from_name")
+
         # check validate nickname
-        match validate_user_input(nickname, self.nickname_len):
-            case Fail(type=type):
-                return Fail(type=f"{type}_in_CreateUser_from_nickname")
-            case valide_name if isinstance(valide_name, str):
-                checked_nickname = valide_name
-            case _:
-                return Fail(type="Fail_type_error_CreateUser_from_nickname")
+        if validate_nickname(nickname):
+            checked_nickname = nickname
+        else:
+            return Fail(type=f"Fail_in_CreateUser_InvalidateUserInput_from_nickname")
+
         # check passward
         if not check_valid_password(passwd):
             return Fail("Fail_CreateUser_Invalid_Password")
 
-        match convert_to_Password_with_hashing(
-            passwd, get_padding_adder(account, nickname)
-        ):
+        match convert_to_Password_with_hashing(passwd, get_padding_adder(account)):
             case hash_pw if isinstance(hash_pw, Password):
                 password = hash_pw
             case _:
@@ -104,7 +94,7 @@ class CreateUserService:
         match auths:
             case []:
                 return Fail(type="Fail_CreateUser_NoAuth")
-            case auth if isinstance(auth, List[Auth]):
+            case auth if isinstance(auth, list):
                 archives = AuthArchives(auths=auths)
             case _:
                 return Fail(type="Fail_CreateUser_Typeerror_in_auth")

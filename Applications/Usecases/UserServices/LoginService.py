@@ -7,6 +7,7 @@ from Applications.Usecases.UserServices.UsecaseUserExtention import (
     check_valid_password,
     convert_to_Password_with_hashing,
     get_padding_adder,
+    validate_account,
     account_len,
     name_len,
     nickname_len,
@@ -25,29 +26,20 @@ class LoginService:
         self.repository = repository
 
     def login(self, id: str, pw: str) -> Result[SimpleUser]:
-        match validate_user_input(id, account_len):
-            # invalide user input
-            case Fail(type=type):
-                return Fail(type=f"{type}_in_LoginUser_invalide_input_id")
-            case account if isinstance(account, str):
-                checked_id = account
-            case _:
-                return Fail(type="Fail_LoginUser_Logic_error")
+        # chece validate id
+        if not validate_account(id):
+            return Fail(type=f"Fail_in_LoginUser_InvalidateUserInput_from_account")
 
         # check passward
         if not check_valid_password(pw):
             return Fail("Fail_LoginUser_Invalide_input_pw")
 
-        user = self.repository.search_by_userid(UserId(account=checked_id))
+        user = self.repository.search_by_userid(UserId(account=id))
         # get user
         match user:
-            case SimpleUser(user_id=UserId(account=account), nickname=nickname):
-                if self.repository.compare_pw(
-                    checked_id,
-                    convert_to_Password_with_hashing(
-                        pw, get_padding_adder(account, nickname)
-                    ),
-                ):
+            case SimpleUser(user_id=account, nickname=nickname):
+                hash_pw = convert_to_Password_with_hashing(pw, get_padding_adder(id))
+                if self.repository.compare_pw(account, hash_pw):
                     return user
             case none if none is None:
                 return Fail_CheckUser_IDNotFound()

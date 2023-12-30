@@ -71,24 +71,20 @@ def flask(debug=True):
 
 
 def init_user():
-    from Applications.Usecases import CreateUser
+    from Applications.Usecases.UserServices import CreateUserService
     from Domains.Entities.User import SimpleUser
     from Infrastructures.IOC import get_strage_factory
     from Infrastructures.Interfaces import IStorageFactory
     from Applications.Repositories.Interfaces import IUserWriteableRepository
 
-    admin = {
-        "id": "admin",
-        "pw": "Admin123!@",
-        "name": "관리자",
-    }
+    admin = {"id": "admin", "pw": "Admin123!@", "name": "관리자", "nick": "admini"}
     users = [
         admin,
     ]
-    create = CreateUser(get_strage_factory().get_user_strage())
+    service = CreateUserService(get_strage_factory().get_user_write_storage())
 
     for user in users:
-        ret = create.create(user["id"], user["pw"], user["name"])
+        ret = service.create(user["id"], user["pw"], user["name"], user["nick"])
         match ret:
             case _ if isinstance(ret, SimpleUser):
                 ic(ret)
