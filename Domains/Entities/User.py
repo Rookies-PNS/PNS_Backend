@@ -20,7 +20,6 @@ class CommonUserAction:
     nickname: str
     uid: Uid
     auth: AuthArchives
-    login_data: LoginData
     post_count: PostCounter
 
     def get_account(self) -> str:
@@ -86,11 +85,11 @@ class SecurityUesrAction(CommonUserAction):
     def get_due_to_of_login_lock(self) -> datetime:
         return self.login_data.get_due_to_of_login_lock()
 
-    def check_login_able(self) -> bool:
+    def check_login_able(self, block_minute: int) -> bool:
         """
         로그인 가능 여부를 확인하는 함수
         """
-        return self.login_data.check_login_able()
+        return self.login_data.check_login_able(block_minute)
 
     def fail_login(self):
         return self.login_data.fail_login()
@@ -98,8 +97,8 @@ class SecurityUesrAction(CommonUserAction):
     def success_login(self):
         return self.login_data.success_login()
 
-    def lock_login(self, time_minute: int):
-        return self.login_data.lock_login(time_minute)
+    def lock_login(self):
+        return self.login_data.lock_login()
 
 
 @dataclass(frozen=True)

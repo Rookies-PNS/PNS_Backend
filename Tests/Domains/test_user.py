@@ -85,14 +85,14 @@ class test_user(unittest.TestCase):
             uid=Uid(idx=1),
             auth=AuthArchives(auths=self.일반사용자_auths),
             login_data=LoginData(
-                lock_time=UpdateableTime(before),
+                time_of_try_login=UpdateableTime(before),
                 lock_flag=True,
                 count_of_login_fail=3,
             ),
             post_count=PostCounter(UpdateableTime(before)),
         )
         # 로그인이 가능한 상태 확인 (잠긴 상태가 해제됨)
-        self.assertTrue(user.check_login_able())
+        self.assertTrue(user.check_login_able(4))
         self.assertEqual(3, user.get_count_of_login_fail())
 
         # 로그인 성공
@@ -114,18 +114,18 @@ class test_user(unittest.TestCase):
         )
         # 잠긴 상태로 설정하고, 잠긴 시간을 현재 시간에서 5분 전으로 설정
         # 로그인이 가능한 상태 확인 (잠긴 상태가 해제됨)
-        self.assertTrue(user.check_login_able())
+        self.assertTrue(user.check_login_able(4))
         self.assertEqual(0, user.get_count_of_login_fail())
         # 로그인 성공
         user.success_login()
 
         # lock
-        user.lock_login(5)
-        self.assertFalse(user.check_login_able())
+        user.lock_login()
+        self.assertFalse(user.check_login_able(5))
         self.assertEqual(0, user.get_count_of_login_fail())
         # 로그인 성공
         user.success_login()
-        self.assertTrue(user.check_login_able())
+        self.assertTrue(user.check_login_able(5))
 
     def test_auth_1(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
@@ -303,14 +303,14 @@ class test_user(unittest.TestCase):
             uid=Uid(idx=1),
             auth=AuthArchives(auths=self.일반사용자_auths),
             login_data=LoginData(
-                lock_time=UpdateableTime(before),
+                time_of_try_login=UpdateableTime(before),
                 lock_flag=True,
                 count_of_login_fail=3,
             ),
             post_count=PostCounter(UpdateableTime(before)),
         )
         # 로그인이 가능한 상태 확인 (잠긴 상태가 해제됨)
-        self.assertTrue(user.check_login_able())
+        self.assertTrue(user.check_login_able(4))
         self.assertEqual(3, user.get_count_of_login_fail())
 
         # 로그인 성공
@@ -327,18 +327,18 @@ class test_user(unittest.TestCase):
         )
         # 잠긴 상태로 설정하고, 잠긴 시간을 현재 시간에서 5분 전으로 설정
         # 로그인이 가능한 상태 확인 (잠긴 상태가 해제됨)
-        self.assertTrue(user.check_login_able())
+        self.assertTrue(user.check_login_able(4))
         self.assertEqual(0, user.get_count_of_login_fail())
         # 로그인 성공
         user.success_login()
 
         # lock
-        user.lock_login(5)
-        self.assertFalse(user.check_login_able())
+        user.lock_login()
+        self.assertFalse(user.check_login_able(5))
         self.assertEqual(0, user.get_count_of_login_fail())
         # 로그인 성공
         user.success_login()
-        self.assertTrue(user.check_login_able())
+        self.assertTrue(user.check_login_able(1))
 
 
 def main():
