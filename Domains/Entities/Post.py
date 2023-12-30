@@ -19,8 +19,8 @@ class CommonPostAction:
     post_id: PostId
     owner: SimpleUser
     target_time: SelectTime
-    share_flag: bool
-    img_key: Optional[ImageKey]
+    share_flag: bool = False
+    img_key: Optional[ImageKey] = None
 
     def get_account(self) -> str:
         match self.owner:
@@ -32,12 +32,15 @@ class CommonPostAction:
     def get_title(self) -> str:
         return self.title
 
-    def get_uid(self) -> Optional[Uid]:
+    def get_post_id(self) -> PostId:
+        return self.post_id
+
+    def get_uid(self) -> Uid:
         match self.owner:
             case user if isinstance(user, SimpleUser):
                 return user.get_uid()
             case _:
-                return None
+                raise ValueError()
 
     def get_owner_nickname(self) -> str:
         match self.owner:
@@ -53,8 +56,8 @@ class SimplePost(CommonPostAction):
     post_id: PostId
     owner: SimpleUser
     target_time: SelectTime
-    img_key: Optional[ImageKey]
-    share_flag: bool
+    share_flag: bool = False
+    img_key: Optional[ImageKey] = None
 
     def get_uid(self) -> Uid:
         match self.owner:
@@ -68,14 +71,14 @@ class SimplePost(CommonPostAction):
 
 class FullPostAction(CommonPostAction):
     title: str
-    content: str
     post_id: PostId
     owner: SimpleUser
     target_time: SelectTime
-    img_key: Optional[ImageKey]
-    share_flag: bool
+    content: str
     create_time: TimeVO
     update_time: UpdateableTime
+    share_flag: bool = False
+    img_key: Optional[ImageKey] = None
 
     def set_update_time(self):
         self.update_time.set_now()
@@ -90,18 +93,14 @@ class Post(FullPostAction):
     content: str
     owner: SimpleUser
     target_time: SelectTime
-    img_key: Optional[ImageKey]
-    share_flag: bool
     create_time: TimeVO
     update_time: UpdateableTime
-    post_id: Optional[PostId]
+    post_id: Optional[PostId] = None
+    share_flag: bool = False
+    img_key: Optional[ImageKey] = None
 
-    def get_uid(self) -> Optional[Uid]:
-        match self.user:
-            case user if isinstance(user, SimpleUser):
-                return user.get_uid()
-            case _:
-                return None
+    def get_post_id(self) -> Optional[PostId]:
+        return self.post_id
 
 
 @dataclass(frozen=True)
@@ -110,19 +109,20 @@ class PostVO(FullPostAction):
     content: str
     owner: SimpleUser
     target_time: SelectTime
-    share_flag: bool
-    img_key: Optional[ImageKey]
     create_time: TimeVO
     update_time: UpdateableTime
-    post_id: Optional[PostId]
+    post_id: PostId
+    share_flag: bool = False
+    img_key: Optional[ImageKey] = None
 
     def get_simple_post(self) -> SimplePost:
         return SimplePost(
             title=self.title,
             post_id=self.post_id,
-            create_time=self.create_time,
-            update_time=self.update_time,
-            user=self.user,
+            owner=self.owner,
+            target_time=self.target_time,
+            share_flag=self.share_flag,
+            img_key=self.img_key,
         )
 
 

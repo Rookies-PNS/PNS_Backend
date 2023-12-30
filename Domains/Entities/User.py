@@ -165,6 +165,7 @@ class UserVO(FullUesrAction):
             nickname=self.nickname,
             uid=self.uid,
             auth=self.auth,
+            post_count=self.post_count,
         )
 
     def get_security_simple_user(self):
@@ -173,5 +174,6 @@ class UserVO(FullUesrAction):
             nickname=self.nickname,
             uid=self.uid,
             auth=self.auth,
+            post_count=self.post_count,
             login_data=self.login_data,
         )
