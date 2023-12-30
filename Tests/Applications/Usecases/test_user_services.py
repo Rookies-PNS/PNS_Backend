@@ -1,7 +1,7 @@
 import __init__
 import unittest
 import sys
-from typing import List
+from typing import List, Tuple
 
 from Commons import UserId, Uid, Password
 from Domains.Entities import UserVO, User
@@ -17,6 +17,7 @@ from Applications.Results import (
 )
 
 import Tests.Applications.Usecases.storage_selecter as test_selector
+from icecream import ic
 
 
 class test_user_services(unittest.TestCase):
@@ -47,16 +48,29 @@ class test_user_services(unittest.TestCase):
         create_user_service = CreateUserService(repoW)
         login_service = LoginService(repoR)
 
-        users = []
-        u = create_user_service.create("taks123", "1Q2w3e4r!@$", "takgyun Lee", "Taks")
-        users.append(u)
-        u = create_user_service.create("hahahoho119", "1B2n3m4!@", "Ho Han", "Hans")
-        users.append(u)
-        u = create_user_service.create("mygun7749", "$1Awb5$123", "Guna Yoo", "YoYo")
-        users.append(u)
+        users: List[Tuple[str, str, str, str]] = [
+            ("taks123", "1Q2w3e4r!@$", "takgyun Lee", "Taks"),
+            ("hahahoho119", "1B2n3m4!@", "Ho Han", "Hans"),
+            ("mygun7749", "$1Awb5$123", "Guna Yoo", "YoYo"),
+        ]
+        for id, pw, name, nick in users:
+            ret = create_user_service.create(
+                account=id,
+                passwd=pw,
+                name=name,
+                nickname=nick,
+            )
+            ic(login_service.login(id, pw))
 
-        self.create_user_service = CreateUserService(repoW)
-        self.login_service = LoginService(repoR)
+        # u = create_user_service.create("taks123", "1Q2w3e4r!@$", "takgyun Lee", "Taks")
+        # users.append(u)
+        # u = create_user_service.create("hahahoho119", "1B2n3m4!@", "Ho Han", "Hans")
+        # users.append(u)
+        # u = create_user_service.create("mygun7749", "$1Awb5$123", "Guna Yoo", "YoYo")
+        # users.append(u)
+
+        self.create_user_service = create_user_service
+        self.login_service = login_service
 
     def tearDown(self):
         "Hook method for deconstructing the test fixture after testing it."
@@ -79,7 +93,7 @@ class test_user_services(unittest.TestCase):
             user.__dict__,
         )
 
-        user = self.login_service.login("hahahoho119", "2N3m4!@")
+        user = self.login_service.login("hahahoho119", "2N3maa4!@")
 
         self.assertDictEqual(
             {"type": "PasswardNotCorrect"},
@@ -180,7 +194,9 @@ class test_user_services(unittest.TestCase):
         print("\t\t", sys._getframe(0).f_code.co_name)
 
         # 중복 아이디
-        ret = self.create_user_service.create("taks123", "1Q2w3e4r!@$", "takgyun Lee")
+        ret = self.create_user_service.create(
+            "taks123", "1Q2w3e4r!@$", "takgyun Lee", "Taks"
+        )
         match ret:
             case _ if isinstance(ret, Fail):
                 self.assertTrue(True)

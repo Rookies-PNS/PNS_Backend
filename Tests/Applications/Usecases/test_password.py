@@ -33,7 +33,7 @@ class test_user_services(unittest.TestCase):
         "Hook method for deconstructing the test fixture after testing it."
         print("\t", sys._getframe(0).f_code.co_name)
         pw = "Asdfas12!@"
-        adder = get_padding_adder("name", "taks")
+        adder = get_padding_adder("name")
         hash = convert_to_Password_with_hashing(pw, adder)
         pw_list = []
         for i in range(10):

@@ -24,9 +24,9 @@ from Applications.Repositories.Interfaces.IMigrations import IMigrations
 from Applications.Repositories.Interfaces.IImageSaveableRepository import (
     IImageSaveableRepository,
 )
-from Applications.Repositories.Interfaces.IImageDataReadableRepository import (
-    IImageDataReadableRepository,
-)
 from Applications.Repositories.Interfaces.IImageDeleteableRepository import (
     IImageDeleteableRepository,
+)
+from Applications.Repositories.Interfaces.IImageDataReadableRepository import (
+    IImageDataReadableRepository,
 )
