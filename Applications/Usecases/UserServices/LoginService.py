@@ -20,7 +20,7 @@ from Applications.Results import (
 )
 
 
-class LoginUserService:
+class LoginService:
     def __init__(self, repository: IUserReadableRepository):
         self.repository = repository
 

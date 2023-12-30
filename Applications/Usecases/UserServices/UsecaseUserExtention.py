@@ -3,7 +3,7 @@ from typing import Optional, Callable, Final
 from Commons import Password
 
 account_len: Final = 10
-name_len: Final = 10
+name_len: Final = 15
 nickname_len: Final = 10
 
 
@@ -56,7 +56,7 @@ def convert_to_Password_with_hashing(
     import hashlib
 
     match add_sult_pepper:
-        case func if isinstance(func, function):
+        case func if isinstance(func, Callable):
             padding_pw = add_sult_pepper(password)
         case _:
             return None
