@@ -8,8 +8,8 @@ from Commons import UserId, Uid, Password, PostId
 from Domains.Entities import SimpleUser
 from Applications.Usecases.UserServices import CreateUserService, LoginService
 from Applications.Usecases.PostServices import (
-    CreatePost,
-    DeletePost,
+    CreatePostService,
+    DeletePostService,
     GetPublicPostService,
     GetPrivatePostService,
     UpdatePostService,
@@ -80,10 +80,10 @@ class test_post_services(unittest.TestCase):
         user_repo = test_selector.get_user_storage(self.factory)
 
         self.get_post_list = GetPostList(post_repo)
-        self.create_post = CreatePost(post_repo, user_repo)
+        self.create_post = CreatePostService(post_repo, user_repo)
         self.get_post = GetPost(post_repo)
         self.update_post = UpdatePost(post_repo, user_repo)
-        self.delete_post = DeletePost(post_repo, user_repo)
+        self.delete_post = DeletePostService(post_repo, user_repo)
 
         post1 = self.create_post.create("Post 1", "Content 1", self.origin_users[0])
         post2 = self.create_post.create("Post 2", "Content 2", self.origin_users[1])

@@ -7,8 +7,10 @@ root_path = now_path.parent.parent.parent
 if not (str(root_path) in sys.path):
     sys.path.append(str(root_path))
 
-from Applications.Usecases.PostServices.CreatePostService import CreatePost
-from Applications.Usecases.PostServices.DeletePostService import DeletePost
-from Applications.Usecases.PostServices.GetPrivatePostService import GetPostDetail
-from Applications.Usecases.PostServices.GetPublicPostService import GetPostDetail
+from Applications.Usecases.PostServices.CreatePostService import CreatePostService
+from Applications.Usecases.PostServices.DeletePostService import DeletePostService
+from Applications.Usecases.PostServices.GetPrivatePostService import (
+    GetPrivatePostService,
+)
+from Applications.Usecases.PostServices.GetPublicPostService import GetPublicPostService
 from Applications.Usecases.PostServices.UpdatePostService import UpdateableTime
