@@ -104,7 +104,7 @@ class CreateUserService:
         # create User
         user = User(
             pw=password,
-            user_id=user_account,
+            user_account=user_account,
             name=checked_name,
             nickname=checked_nickname,
             auth=archives,

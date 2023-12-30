@@ -19,14 +19,16 @@ class TestUserRepositoryList(IUserWriteableRepository):
 
     def check_exist_userid(self, userid: str) -> bool:
         for user in self.arr:
-            if userid == user.user_id.account:
+            if userid == user.user_account.account:
                 return True
         return False
 
     def save_user(self, user: User) -> Result[UserVO]:
-        user_id = self.check_exist_userid(user.user_id)
+        user_id = self.check_exist_userid(user.user_account)
         self.count += 1
-        user_vo = UserVO(user.user_id, user.name, user.password, Uid(idx=self.count))
+        user_vo = UserVO(
+            user.user_account, user.name, user.password, Uid(idx=self.count)
+        )
         self.arr.append(user_vo)
         return user_vo
 
@@ -38,7 +40,7 @@ class TestUserRepositoryList(IUserWriteableRepository):
 
     def search_by_userid(self, userid: UserId) -> Optional[UserVO]:
         for user in self.arr:
-            if userid == user.user_id:
+            if userid == user.user_account:
                 return user
         return None
 

@@ -80,7 +80,7 @@ class MySqlUserReadStorage(IUserReadableRepository):
 
                 if result:
                     ret = UserVO(
-                        user_id=UserId(account=result[2]),
+                        user_account=UserId(account=result[2]),
                         name=result[3],
                         password=Password(pw=result[1]),
                         uid=Uid(idx=result[0]),
@@ -110,7 +110,7 @@ class MySqlUserReadStorage(IUserReadableRepository):
 
                 if result:
                     ret = SimpleUser(
-                        user_id=UserId(account=result["account"]),
+                        user_account=UserId(account=result["account"]),
                         nickname=result["name"],
                         uid=Uid(idx=result["id"]),
                         auth=AuthArchives([]),

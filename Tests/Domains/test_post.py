@@ -53,7 +53,7 @@ class test_models(unittest.TestCase):
         "Hook method for setting up the test fixture before exercising it."
         print("\t", sys._getframe(0).f_code.co_name)
         self.user = UserVO(
-            user_id=UserId("taks123"),
+            user_account=UserId("taks123"),
             name="takgyun",
             nickname="일반사용자",
             uid=Uid(idx=1),
