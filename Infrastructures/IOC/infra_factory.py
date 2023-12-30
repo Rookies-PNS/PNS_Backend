@@ -1,9 +1,11 @@
 import __init__
+from typing import Tuple
 
-from Applications.Usecases import LoginUser
 from Applications.Repositories.Interfaces import (
-    IUserWriteableRepository,
     IPostWriteableRepository,
+    IPostReadableRepository,
+    IUserWriteableRepository,
+    IUserReadableRepository,
 )
 
 from Infrastructures.Interfaces import IStorageFactory
@@ -49,11 +51,11 @@ ValueError  > Possible inputs are 'mysql'
             )
 
 
-def get_user_storage() -> IUserWriteableRepository:
+def get_user_storage() -> Tuple[IUserWriteableRepository, IUserReadableRepository]:
     f = get_strage_factory()
-    return f.get_user_strage()
+    return f.get_user_write_storage, f.get_user_read_storage
 
 
-def get_post_storage() -> IPostWriteableRepository:
+def get_post_storage() -> Tuple[IPostWriteableRepository, IPostReadableRepository]:
     f = get_strage_factory()
-    return f.get_post_strage()
+    return f.get_post_write_storage(), f.get_post_read_storage()

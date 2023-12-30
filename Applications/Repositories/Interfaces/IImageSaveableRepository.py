@@ -15,3 +15,7 @@ class IImageSaveableRepository(metaclass=ABCMeta):
     @abstractclassmethod
     def save_image(self, post: PostVO, img) -> Result[ImageData]:
         pass
+
+    @abstractclassmethod
+    def check_exist_image(self, key: ImageKey) -> bool:
+        pass

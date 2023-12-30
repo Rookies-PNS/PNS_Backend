@@ -2,7 +2,13 @@ import __init__
 
 from Applications.Repositories.Interfaces import (
     IPostWriteableRepository,
+    IPostReadableRepository,
     IUserWriteableRepository,
+    IUserReadableRepository,
+    IMigrations,
+    IImageDataReadableRepository,
+    IImageDeleteableRepository,
+    IImageSaveableRepository,
 )
 
 from Infrastructures.Interfaces import IStorageFactory, IMigrations
@@ -17,12 +23,39 @@ class MySqlFactory(IStorageFactory):
 
         return MySqlMigrations(self.padding)
 
-    def get_user_strage(self) -> IUserWriteableRepository:
-        from Infrastructures.MySQL.Storages.MySqlUserStorage import MySqlUserStorage
+    def get_user_write_storage(self) -> IUserWriteableRepository:
+        from Infrastructures.MySQL.Storages.MySqlUserWriteStorage import (
+            MySqlUserWriteStorage,
+        )
 
-        return MySqlUserStorage(self.padding)
+        return MySqlUserWriteStorage(self.padding)
 
-    def get_post_strage(self) -> IPostWriteableRepository:
-        from Infrastructures.MySQL.Storages.MySqlPostStorage import MySqlPostStorage
+    def get_user_read_storage(self) -> IUserReadableRepository:
+        from Infrastructures.MySQL.Storages.MySqlUserWriteStorage import (
+            MySqlUserReadStorage,
+        )
 
-        return MySqlPostStorage(self.get_user_strage(), self.padding)
+        return MySqlUserReadStorage(self.padding)
+
+    def get_post_write_storage(self) -> IPostWriteableRepository:
+        from Infrastructures.MySQL.Storages.MySqlPostWriteStorage import (
+            MySqlPostWriteStorage,
+        )
+
+        return MySqlPostWriteStorage(self.get_user_read_storage(), self.padding)
+
+    def get_post_read_storage(self) -> IPostReadableRepository:
+        from Infrastructures.MySQL.Storages.MySqlPostWriteStorage import (
+            MySqlPostReadStorage,
+        )
+
+        return MySqlPostReadStorage(self.get_user_read_storage(), self.padding)
+
+    def get_image_data_read_storage(self) -> IImageDataReadableRepository:
+        raise NotImplementedError()
+
+    def get_image_save_storage(self) -> IImageDeleteableRepository:
+        raise NotImplementedError()
+
+    def get_image_delete_storage(self) -> IImageSaveableRepository:
+        raise NotImplementedError()

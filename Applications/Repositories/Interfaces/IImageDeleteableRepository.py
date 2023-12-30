@@ -3,7 +3,6 @@ from abc import *
 from typing import Optional
 
 from Commons import ImageKey
-from Domains.Entities import ImageData
 from Applications.Results import Result, Fail
 
 
@@ -14,4 +13,8 @@ class IImageDeleteableRepository(metaclass=ABCMeta):
 
     @abstractclassmethod
     def delete_image_data(self, key: ImageKey) -> Optional[Fail]:
+        pass
+
+    @abstractclassmethod
+    def check_exist_image(self, key: ImageKey) -> bool:
         pass
