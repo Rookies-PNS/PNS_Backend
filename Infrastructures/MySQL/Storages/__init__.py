@@ -9,5 +9,5 @@ if not (str(root_path) in sys.path):
 
 
 from Infrastructures.MySQL.Storages.MySqlMigrations import MySqlMigrations
-from Infrastructures.MySQL.Storages.MySqlPostStorage import MySqlPostStorage
-from Infrastructures.MySQL.Storages.MySqlUserStorage import MySqlUserStorage
+from Infrastructures.MySQL.Storages.MySqlPostWriteStorage import MySqlPostWriteStorage
+from Infrastructures.MySQL.Storages.MySqlUserWriteStorage import MySqlUserWriteStorage
