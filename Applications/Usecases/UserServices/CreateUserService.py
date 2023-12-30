@@ -41,7 +41,9 @@ class CreateUserService:
         self.account_len = account_len
         self.name_len = name_len
         self.nickname_len = nickname_len
-        self.basic_login_data = LoginData(lock_time=UpdateableTime(datetime.now()))
+        self.basic_login_data = LoginData(
+            time_of_try_login=UpdateableTime(datetime.now())
+        )
         self.basic_post_counter = PostCounter(UpdateableTime(datetime.now()))
 
     def create(

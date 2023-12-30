@@ -46,7 +46,7 @@ class test_user_services(unittest.TestCase):
         # 기본세팅
         repoW, repoR = test_selector.get_user_storage(factory)
         create_user_service = CreateUserService(repoW)
-        login_service = LoginService(repoR)
+        login_service = LoginService(repoR, repoW)
 
         users: List[Tuple[str, str, str, str]] = [
             ("taks123", "1Q2w3e4r!@$", "takgyun Lee", "Taks"),
