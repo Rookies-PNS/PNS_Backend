@@ -48,13 +48,14 @@ class test_user(unittest.TestCase):
         cls.계정관리자_auths = [
             Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
             Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(Policy.PostDeleteAblePolicy, TargetScope.All),  # All 일기 삭제가능
             Auth(
                 Policy.UserAuthLockOfPostCreateAndUpdatePolicy, TargetScope.All
             ),  # 일기 쓰기 권한정지 권한
             Auth(
                 Policy.UserAuthUnlockOfPostCreateAndUpdatePolicy, TargetScope.All
             ),  # 일기 쓰기 권한정기 해제 권한
-            Auth(Policy.UserDataReadAblePolicy, TargetScope.All),  # 모든 유저 정보 열람가
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.All),  # 모든 유저 정보 열람가능
             Auth(Policy.UserDataDeleteAblePolicy, TargetScope.All),  # 모든 계정 삭제가능
         ]
 
@@ -71,6 +72,33 @@ class test_user(unittest.TestCase):
         "Hook method for deconstructing the test fixture after testing it."
         print("\t", sys._getframe(0).f_code.co_name)
 
+    def test_계정관리자_delete_user_policy(self):
+        print("\t\t", sys._getframe(0).f_code.co_name)
+        계정관리자_archives = AuthArchives(self.계정관리자_auths)
+        require_policy = IntersectionPolicy(
+            policies=[
+                Policy.PostDeleteAblePolicy,
+                Policy.UserDataDeleteAblePolicy,
+            ]
+        )
+
+        # 소유 계정 삭제
+        self.assertTrue(
+            require_policy.chcek_auth(
+                actor_auth_Archives=계정관리자_archives,
+                actor_uid=Uid(idx=1),
+                target_owner_id=Uid(idx=1),
+            )
+        )
+        # 타인 계정 삭제
+        self.assertTrue(
+            require_policy.chcek_auth(
+                actor_auth_Archives=계정관리자_archives,
+                actor_uid=Uid(idx=1),
+                target_owner_id=Uid(idx=2),
+            )
+        )
+
     def test_일반사용자_delete_user_policy(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
         일반사용자_archives = AuthArchives(self.일반사용자_auths)
@@ -81,42 +109,20 @@ class test_user(unittest.TestCase):
             ]
         )
 
-        # 비공개 소유 일기 삭제
+        # 소유 계정 삭제
         self.assertTrue(
             require_policy.chcek_auth(
                 actor_auth_Archives=일반사용자_archives,
                 actor_uid=Uid(idx=1),
                 target_owner_id=Uid(idx=1),
-                taget_allow_flag=False,
             )
         )
-        # 비공개 타인 일기 삭제
+        # 타인 계정 삭제
         self.assertFalse(
             require_policy.chcek_auth(
                 actor_auth_Archives=일반사용자_archives,
                 actor_uid=Uid(idx=1),
                 target_owner_id=Uid(idx=2),
-                taget_allow_flag=False,
-            )
-        )
-
-        # 공개 소유 일기 삭제
-        self.assertTrue(
-            require_policy.chcek_auth(
-                actor_auth_Archives=일반사용자_archives,
-                actor_uid=Uid(idx=1),
-                target_owner_id=Uid(idx=1),
-                taget_allow_flag=True,
-            )
-        )
-
-        # 공개 타인 일기 삭제
-        self.assertFalse(
-            require_policy.chcek_auth(
-                actor_auth_Archives=일반사용자_archives,
-                actor_uid=Uid(idx=1),
-                target_owner_id=Uid(idx=4),
-                taget_allow_flag=True,
             )
         )
 

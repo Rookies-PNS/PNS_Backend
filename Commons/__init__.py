@@ -7,7 +7,7 @@ root_path = now_path.parent
 if not (str(root_path) in sys.path):
     sys.path.append(str(root_path))
 
-from Commons.Types.ID import Id, Uid, UserId, PostId, ImageKey
+from Commons.Types.ID import Uid, UserId, PostId, ImageKey
 from Commons.Types.Content import Content
 from Commons.Types.Password import Password
 from Commons.Types.Time import TimeVO, UpdateableTime, SelectTime, get_current_time
