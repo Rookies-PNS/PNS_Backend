@@ -91,13 +91,11 @@ class LoginService:
                 lock_flag = False if block_time == 0 else True
             case _:
                 return Fail_CheckUser_IDNotFound()
-
         # get user
         user = self.repo_r.search_by_userid(id)
 
         # check passward
         if not check_valid_password(pw):
-            ic()
             self.repo_w.update_to_fail_login(user, lock_flag)
             return Fail("Fail_LoginUser_Invalide_input_pw")
         # get user

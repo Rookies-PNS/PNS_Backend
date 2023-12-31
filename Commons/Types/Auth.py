@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from abc import *
-from enum import Enum, auto
+from enum import IntEnum, auto
 from typing import List
 
 from Commons import Uid
@@ -8,7 +8,7 @@ from Commons import Uid
 from icecream import ic
 
 
-class Policy(Enum):
+class Policy(IntEnum):
     none = auto()
     PostCreateAndUpdateAblePolicy = auto()
     PostReadAblePolicy = auto()
@@ -24,7 +24,7 @@ class Policy(Enum):
     UserDataDeleteAblePolicy = auto()
 
 
-class TargetScope(Enum):
+class TargetScope(IntEnum):
     """_summary_
 
     Args:

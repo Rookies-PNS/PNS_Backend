@@ -51,8 +51,9 @@ def login():
         service = LoginService(repoR, repoW)  # DB 미구현
         match service.login(form.userid.data, form.password.data):
             case user if isinstance(user, SimpleUser):
+                ic(user)
                 session.clear()
-                session["user"] = user
+                session["user"] = user.get_uid().idx
                 return redirect(url_for("main.index"))
             case Fail(type=type) if type == Fail_CheckUser_IDNotFound.type:
                 flash("존재하지 않는 사용자입니다.")

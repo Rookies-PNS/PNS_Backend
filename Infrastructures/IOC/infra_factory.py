@@ -53,7 +53,7 @@ ValueError  > Possible inputs are 'mysql'
 
 def get_user_storage() -> Tuple[IUserWriteableRepository, IUserReadableRepository]:
     f = get_strage_factory()
-    return f.get_user_write_storage, f.get_user_read_storage
+    return f.get_user_write_storage(), f.get_user_read_storage()
 
 
 def get_post_storage() -> Tuple[IPostWriteableRepository, IPostReadableRepository]:
