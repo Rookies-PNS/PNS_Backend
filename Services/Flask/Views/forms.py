@@ -13,8 +13,6 @@ class PostForm(FlaskForm):
         FileAllowed(['jpg', 'png'], 'JPG와 PNG 이미지만 업로드 가능합니다.')])
 
 # 계정생성을 위한 폼
-
-
 class UserCreateForm(FlaskForm):
     userid = StringField('아이디', validators=[
         DataRequired(), Length(min=5, max=20)])  # 길이 5~20

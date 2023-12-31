@@ -62,7 +62,7 @@ def login():
 def change_password():
     form = PasswordChangeForm()
     # 비밀번호 변경 코드 필요
-    # 폼 처리, 유효성 검사 등
+    # 성공시 메시지 반환
     pass
     return render_template('auth/change_password.html',form=form)
 

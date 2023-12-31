@@ -15,7 +15,8 @@
     <div class="col-md-3 text-end">
       {% if "user" in session %}
         <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-primary me-2">Logout</button>
-        <a>{{session["user"].name}}님</a>
+          <a href="{{url_for('auth.change_password')}}" class="btn btn-outline-primary me-2">비밀번호 변경</a>
+          <a>{{session["user"].name}}님</a>
       {% else %}
         <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary me-2">Login</button>
         <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">Sign-up</a>
