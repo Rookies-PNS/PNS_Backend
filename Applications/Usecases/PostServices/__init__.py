@@ -13,4 +13,4 @@ from Applications.Usecases.PostServices.GetPrivatePostService import (
     GetPrivatePostService,
 )
 from Applications.Usecases.PostServices.GetPublicPostService import GetPublicPostService
-from Applications.Usecases.PostServices.UpdatePostService import UpdateableTime
+from Applications.Usecases.PostServices.UpdatePostService import UpdatePostService
