@@ -82,8 +82,8 @@ class SecurityUesrAction(CommonUserAction):
     def get_count_of_login_fail(self) -> int:
         return self.login_data.get_count_of_login_fail()
 
-    def get_due_to_of_login_lock(self) -> datetime:
-        return self.login_data.get_due_to_of_login_lock()
+    def get_time_of_try_login(self) -> datetime:
+        return self.login_data.get_time_of_try_login()
 
     def check_login_able(self, block_minute: int) -> bool:
         """
@@ -99,6 +99,9 @@ class SecurityUesrAction(CommonUserAction):
 
     def lock_login(self):
         return self.login_data.lock_login()
+
+    def get_lock_flag(self) -> bool:
+        return self.login_data.lock_flag
 
 
 @dataclass(frozen=True)

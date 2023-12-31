@@ -4,15 +4,7 @@ from collections.abc import Collection
 
 # from datetime import datetime
 
-from Commons import (
-    Uid,
-    UserId,
-    Password,
-    LoginData,
-    AuthArchives,
-    PostCounter,
-    UpdateableTime,
-)
+from Commons import *
 from Domains.Entities import User, UserVO, SimpleUser, SecuritySimpleUser
 from Applications.Results import Result, Fail, Fail_CreateUser_IDAlreadyExists
 from Applications.Repositories.Interfaces import IUserReadableRepository
@@ -93,30 +85,53 @@ class MySqlUserReadStorage(IUserReadableRepository):
             connection.close()
             return ret
 
-    def search_by_userid(self, userid: UserId) -> Optional[SimpleUser]:
+    def search_by_userid(self, userid: str) -> Optional[SimpleUser]:
         connection = self.connect()
-        table_name = self.get_padding_name("user")
+        user_table_name = self.get_padding_name("user")
+        auth_table_name = self.get_padding_name("user_auth")
         ret: Optional[UserVO] = None
         try:
             # 커서 생성
             with connection.cursor() as cursor:
                 # 계정 검색 쿼리
-                select_query = f"SELECT * FROM {table_name} WHERE account = %s;"
+                select_query = f"""
+SELECT account, nickname, id, post_last_update_date, post_num FROM {user_table_name} WHERE account = %s;"""
 
-                cursor.execute(select_query, (userid.account,))
+                cursor.execute(select_query, (userid,))
 
                 # 결과 가져오기
-                result = cursor.fetchone()
+                user_result = cursor.fetchone()
 
-                if result:
-                    ret = SimpleUser(
-                        user_account=UserId(account=result["account"]),
-                        nickname=result["name"],
-                        uid=Uid(idx=result["id"]),
-                        auth=AuthArchives([]),
-                        post_count=PostCounter(UpdateableTime(None)),
+                # 계정 검색 쿼리
+                select_query = (
+                    f"SELECT policy, scope FROM {auth_table_name} WHERE account = %s;"
+                )
+
+                cursor.execute(select_query, (userid,))
+
+                # 결과 가져오기
+                auth_result = cursor.fetchall()
+                auths = [
+                    Auth(
+                        policy=Policy[auth["policy"]], scope=TargetScope[auth["scope"]]
                     )
-        except Exception as ex:
+                    for auth in auth_result
+                ]
+
+                if user_result:
+                    ret = SimpleUser(
+                        user_account=UserId(account=user_result["account"]),
+                        nickname=user_result["nickname"],
+                        uid=Uid(idx=user_result["id"]),
+                        auth=AuthArchives(auths=auths),
+                        post_count=PostCounter(
+                            last_update_date=UpdateableTime(
+                                user_result["post_last_update_date"]
+                            ),
+                            post_num=user_result["post_num"],
+                        ),
+                    )
+        except:
             connection.rollback()
 
         finally:
@@ -136,7 +151,7 @@ class MySqlUserReadStorage(IUserReadableRepository):
         self,
         page: int = 0,
         posts_per_page: Optional[int] = None,
-    ) -> Result[Collection[SecuritySimpleUser]]:
+    ) -> Optional[Collection[SecuritySimpleUser]]:
         """_summary_
         Args:
             user_id (Uid): _description_
@@ -144,23 +159,48 @@ class MySqlUserReadStorage(IUserReadableRepository):
             posts_per_page (Optional[int], optional): 한번에 가져올 일기의 개수 정의, None은 모든 요소를 가져온다. Defaults to None.
 
         Returns:
-            Result[Collection[SimplePost]]: _description_
+            Optional[Collection[SimplePost]]: _description_
         """
         raise NotImplementedError()
 
-    def get_login_data(self, user_id: UserId) -> Result[LoginData]:
+    def get_login_data(self, user_id: str) -> Optional[LoginData]:
         """_summary_
         사용자의 로그인 실패 현황을 받아온다.
 
         Args:
-            user_id (UserId): _description_
+            user_id (str): _description_
 
         Returns:
-            Result[LoginData]: _description_
+            Optional[LoginData]: _description_
         """
-        raise NotImplementedError()
+        connection = self.connect()
+        table_name = self.get_padding_name("user")
+        ret: Optional[LoginData] = None
+        try:
+            # 커서 생성
+            with connection.cursor() as cursor:
+                # 계정 검색 쿼리
+                select_query = f"SELECT time_of_try_login, lock_flag, count_of_login_fail  FROM {table_name} WHERE account = %s;"
+                cursor.execute(select_query, (user_id,))
 
-    def compare_pw(self, user_id: UserId, pw: Password) -> bool:
+                # 결과 가져오기
+                result = cursor.fetchone()
+
+                if result:
+                    ret = LoginData(
+                        time_of_try_login=UpdateableTime(result["time_of_try_login"]),
+                        lock_flag=result["lock_flag"],
+                        count_of_login_fail=result["count_of_login_fail"],
+                    )
+        except Exception as ex:
+            connection.rollback()
+
+        finally:
+            # 연결 닫기
+            connection.close()
+            return ret
+
+    def compare_pw(self, user_id: str, pw: Password) -> bool:
         """_summary_
         유저의 패스워드를 비교해서 결과를 반환해 준다.
 
@@ -181,11 +221,10 @@ class MySqlUserReadStorage(IUserReadableRepository):
                 select_query = (
                     f"SELECT 1 FROM {table_name} WHERE account = %s AND pw = %s;"
                 )
-                cursor.execute(select_query, (user_id.account, pw.pw))
+                cursor.execute(select_query, (user_id, pw.pw))
 
                 # 결과 가져오기
                 result = cursor.fetchone()
-
                 if result:
                     ret = True
         except:

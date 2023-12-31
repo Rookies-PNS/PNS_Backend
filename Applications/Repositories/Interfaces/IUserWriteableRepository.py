@@ -76,12 +76,14 @@ class IUserWriteableRepository(metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
-    def update_to_fail_login(self, user: SimpleUser) -> Result[int]:
+    def update_to_fail_login(self, user: SimpleUser, lock_flag: bool) -> Result[int]:
         """_summary_
         로그인을 실패한 것으로 업데이트 한다.
 
         Args:
             user (SimpleUser): _description_
+            lock_flag (bool): _description_
+
 
         Returns:
             Result[int]: 로그인 실패 횟수

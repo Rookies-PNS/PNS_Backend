@@ -13,7 +13,7 @@ class LoginData:
     def get_count_of_login_fail(self) -> int:
         return self.count_of_login_fail
 
-    def get_due_to_of_login_lock(self) -> datetime:
+    def get_time_of_try_login(self) -> datetime:
         return self.time_of_try_login.get_time()
 
     def check_login_able(self, block_minute: int) -> bool:

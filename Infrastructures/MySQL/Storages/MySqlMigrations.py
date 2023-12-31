@@ -39,13 +39,13 @@ class MySqlMigrations(IMigrations):
 CREATE TABLE IF NOT EXISTS {user_table_name} (
     id INT AUTO_INCREMENT PRIMARY KEY,
     pw VARCHAR(511) NOT NULL,
-    account VARCHAR(50) NOT NULL,
+    account VARCHAR(50) UNIQUE,
     name VARCHAR(100) NOT NULL,
     nickname VARCHAR(50),
     time_of_try_login TIMESTAMP,
     lock_flag BOOLEAN,
     count_of_login_fail INT,
-    post_last_update_date DATETIME,
+    post_last_update_date TIMESTAMP,
     post_num INT
 );
                 """
@@ -63,8 +63,8 @@ CREATE TABLE IF NOT EXISTS {auth_table_name} (
     id INT AUTO_INCREMENT PRIMARY KEY,
     policy ENUM({policy}) NOT NULL,
     scope ENUM({scope}) NOT NULL,
-    user_id INT,
-    FOREIGN KEY (user_id) REFERENCES {user_table_name}(id)
+    account VARCHAR(50) NOT NULL,
+    FOREIGN KEY (account) REFERENCES {user_table_name}(account)
 );
 """
                 # UserAuth 테이블 생성
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS {auth_table_name} (
 
         except Exception as ex:
             # 트랜잭션 롤백
-            cursor.execute("ROLLBACK;")
+            connection.rollback()
             raise ex
 
         finally:
