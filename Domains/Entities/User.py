@@ -16,14 +16,14 @@ from Commons import (
 
 
 class CommonUserAction:
-    user_id: UserId
+    user_account: UserId
     nickname: str
     uid: Uid
     auth: AuthArchives
     post_count: PostCounter
 
     def get_account(self) -> str:
-        return self.user_id.account
+        return self.user_account.account
 
     def check_equal_uid(self, uid: Optional[Uid]) -> bool:
         match uid:

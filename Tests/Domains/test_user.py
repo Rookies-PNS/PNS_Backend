@@ -149,7 +149,7 @@ class test_user(unittest.TestCase):
             post_count=PostCounter(UpdateableTime(now)),
         )
         for auth in reversed(auths):
-            self.assertTrue(auth.target_range, user.check_policy(auth.policy))
+            self.assertTrue(auth.scope, user.check_policy(auth.policy))
 
     def test_User_1(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
@@ -189,7 +189,7 @@ class test_user(unittest.TestCase):
         self.assertEqual("1qaz2wsx!@", user.get_passwd())
         self.assertEqual(Uid(idx=1), user.get_uid())
         for auth in reversed(self.일반사용자_auths):
-            self.assertTrue(auth.target_range in user.check_policy(auth.policy))
+            self.assertTrue(auth.scope in user.check_policy(auth.policy))
 
         self.assertEqual(
             [],

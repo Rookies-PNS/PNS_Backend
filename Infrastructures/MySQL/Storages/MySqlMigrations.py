@@ -1,6 +1,7 @@
 import __init__
 from collections.abc import Collection
 
+from Commons import Policy, TargetScope
 from Applications.Repositories.Interfaces import IMigrations
 from Domains.Entities import UserVO, PostVO
 
@@ -28,28 +29,49 @@ class MySqlMigrations(IMigrations):
 
     def create_user(self):
         connection = self.connect()
-        table_name = self.get_padding_name("user")
+        user_table_name = self.get_padding_name("user")
+        auth_table_name = self.get_padding_name("user_auth")
+
         try:
             # 커서 생성
             with connection.cursor() as cursor:
+                # 트랜잭션 시작
+                cursor.execute("START TRANSACTION;")
+
                 # "users" 테이블 생성 쿼리
                 create_table_query = f"""
-CREATE TABLE IF NOT EXISTS {table_name} (
+CREATE TABLE IF NOT EXISTS {user_table_name} (
     id INT AUTO_INCREMENT PRIMARY KEY,
     pw VARCHAR(511) NOT NULL,
     account VARCHAR(50) NOT NULL,
     name VARCHAR(100) NOT NULL
     nickname VARCHAR(50),
-    auths JSON,
     time_of_try_login DATETIME,
     lock_flag BOOLEAN,
     count_of_login_fail INT,
     post_last_update_date DATETIME,
     post_num INT
-    
 );
                 """
+                # user 생성
                 cursor.execute(create_table_query)
+
+                policy = ", ".join(
+                    list(map(lambda x: f"'{x}'", Policy.__members__.keys()))
+                )
+                scope = ", ".join(
+                    list(map(lambda x: f"'{x}'", TargetScope.__members__.keys()))
+                )
+                # UserAuth 테이블 생성 쿼리
+                create_auth_table_query = f"""
+CREATE TABLE IF NOT EXISTS {auth_table_name} (
+    auth_id INT AUTO_INCREMENT PRIMARY KEY,
+    policy ENUM({policy}) NOT NULL,
+    scope ENUM({scope})) NOT NULL,
+    user_account VARCHAR(50),
+    FOREIGN KEY (user_account) REFERENCES users(user_account)
+);
+"""
 
             # 변경 사항을 커밋
             connection.commit()

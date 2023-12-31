@@ -40,7 +40,7 @@ class TargetScope(Enum):
 @dataclass(frozen=True)
 class Auth:
     policy: Policy
-    target_range: TargetScope
+    scope: TargetScope
 
 
 @dataclass
@@ -60,7 +60,7 @@ class AuthArchives:
         scopes: List[TargetScope] = []
         for auth in self.auths:
             if auth.policy == policy:
-                scopes.append(auth.target_range)
+                scopes.append(auth.scope)
 
         return scopes
 
