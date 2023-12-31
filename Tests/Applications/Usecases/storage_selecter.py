@@ -8,6 +8,7 @@ from Applications.Repositories.Interfaces import (
     IPostReadableRepository,
     IUserWriteableRepository,
     IUserReadableRepository,
+    SessionRepository,
 )
 
 
@@ -31,3 +32,7 @@ def get_user_storage(
     factory: IStorageFactory,
 ) -> Tuple[IUserWriteableRepository, IUserReadableRepository]:
     return factory.get_user_write_storage(), factory.get_user_read_storage()
+
+
+def get_session_storage(factory: IStorageFactory) -> SessionRepository:
+    return factory.get_session_storage()
