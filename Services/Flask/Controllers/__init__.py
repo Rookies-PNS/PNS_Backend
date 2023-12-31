@@ -10,5 +10,4 @@ if not (str(root_path) in sys.path):
 from Services.Flask.Controllers import (
     AuthController, 
     PostController,
-    # CommentController, 
 )

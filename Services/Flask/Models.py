@@ -9,8 +9,8 @@ from Commons import UserId, Uid
 
 def dict_to_user(user: Dict[str, Union[Dict[str, any], str]]) -> SimpleUser:
     return SimpleUser(
-        user_account=UserId(account=user["user_id"]["account"]),
-        name=user["name"],
+        user_id=UserId(account=user["user_id"]["account"]),
+        nickname=user["name"],
         uid=Uid(idx=int(user["uid"]["idx"])),
     )
 
@@ -18,29 +18,32 @@ def dict_to_user(user: Dict[str, Union[Dict[str, any], str]]) -> SimpleUser:
 def user_to_dict(user: SimpleUser) -> Dict[str, str]:
     return {
         "id": str(user.uid.idx),
-        "account": user.user_account.account,
-        "name": user.name,
+        "account": user.get_account(),
+        "name": user.get_user_nickname(),
     }
 
 
 def simple_post_to_dict(post: SimplePost) -> Dict[str, str]:
     return {
         "id": str(post.post_id.idx),
+        "img_key": str("없음"),
         "title": post.title,
-        "user_name": post.get_username(),
-        "create_time": post.create_time.get_time().strftime("%m/%d-%H:%M"),
-        "update_time": post.update_time.get_time().strftime("%m/%d-%H:%M"),
+        "target_time": post.target_time.get_time().strftime("%m/%d-%H:%M"),
+        "share_flag": post.share_flag,
+        "owner": post.get_owner_nickname(),
     }
 
 
 def post_to_dict(post: PostVO) -> Dict[str, str]:
     return {
-        "id": str(post.post_id.idx),
         "title": post.title,
         "content": post.get_content(),
-        "user_name": post.get_username(),
+        "owner": post.get_owner_nickname(),
         "create_time": post.create_time.get_time().strftime("%m/%d-%H:%M"),
         "update_time": post.update_time.get_time().strftime("%m/%d-%H:%M"),
+        "post_id": str(post.post_id.idx),
+        "share_flag": post.share_flag,
+        "img_key": str("없음"),
     }
 
 

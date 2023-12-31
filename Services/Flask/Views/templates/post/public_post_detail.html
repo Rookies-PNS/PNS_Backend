@@ -1,0 +1,47 @@
+﻿{% extends 'base.html' %}
+{% block content %}
+<div class="container my-3">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" href="{{ url_for('post.private_list', page=1) }}">나의 일기</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('post.public_list', page=1) }}">우리의 일기</a>
+        </li>
+    </ul>
+    <!-- 게시글 -->
+    <h2 class="border-bottom py-2">{{ post["title"] }}</h2>
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="card-text" style="white-space: pre-line;">{{ post["content"] }}</div>
+            <div class="d-flex justify-content-end">
+                <div class="badge bg-light text-dark p-2">
+                    {{ post["user_name"] }}
+                </div>
+                <div class="badge bg-light text-dark p-2">
+                    {{ post["create_time"] }}
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-2">
+            {% if delete_auth %}
+            <a href="{{ url_for('post.delete', post_id=post["post_id"]) }}" class="btn btn-outline-primary me-2">삭제하기</button></a>
+            {% endif %}
+        </div>
+        <div class="col-2">
+            {% if update_auth %}
+            <a href="{{ url_for('post.public_update', post_id=post["post_id"]) }}" class="btn btn-primary">수정하기</button></a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% for message in get_flashed_messages() %}
+<div class="alert alert-danger" role="alert">
+    {{ message }}
+</div>
+{% endfor %}
+{% endblock %}

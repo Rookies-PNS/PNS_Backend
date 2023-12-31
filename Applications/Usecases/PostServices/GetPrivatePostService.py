@@ -1,8 +1,8 @@
 import __init__
 from typing import List, Optional
 from collections.abc import Collection
-
-from Commons import PostId
+from datetime import datetime, timedelta
+from Commons import *
 from Domains.Entities import (
     SimplePost,
     SimpleUser,
@@ -11,8 +11,8 @@ from Domains.Entities import (
     PostVO_to_Post,
 )
 from Applications.Repositories.Interfaces import (
-    IPostWriteableRepository,
     IUserWriteableRepository,
+    IPostReadableRepository,
 )
 
 from Applications.Results import (
@@ -23,11 +23,11 @@ from icecream import ic
 
 
 class GetPrivatePostService:
-    def __init__(self, repository: IPostWriteableRepository):
+    def __init__(self, repository: IPostReadableRepository):
         self.repository = repository
 
     def get_list_no_filter(
-        self, page: int = 0, posts_per_page: Optional[int] = None
+        self, acter: SimpleUser, page: int = 0, posts_per_page: Optional[int] = None
     ) -> Collection[SimplePost]:
         """_summary_
         생성 날짜 오름차순으로 post list를 반환해 주는 함수
@@ -40,18 +40,80 @@ class GetPrivatePostService:
         Returns:
             Collection[SimplePost]: _description_
         """
-        return self.repository.get_post_per_page_list(
-            page=page, posts_per_page=posts_per_page
+        return [
+            SimplePost(
+                title="First Post Title",
+                post_id=PostId(1),
+                owner=SimpleUser(
+                    user_id=UserId(account="a"),
+                    nickname="test",
+                    uid=Uid(idx=1),
+                    auth=AuthArchives(auths=[]),
+                    post_count=PostCounter(
+                        last_update_date=UpdateableTime(datetime.now())
+                    ),
+                ),
+                target_time=SelectTime(datetime.now()),
+                share_flag=True,
+                img_key=ImageKey("image1.jpg"),
+            ),
+            SimplePost(
+                title="Second Post Title",
+                post_id=PostId(2),
+                owner=SimpleUser(
+                    user_id=UserId(account="a"),
+                    nickname="test",
+                    uid=Uid(idx=1),
+                    auth=AuthArchives(auths=[]),
+                    post_count=PostCounter(
+                        last_update_date=UpdateableTime(datetime.now())
+                    ),
+                ),
+                target_time=SelectTime(datetime.now()),
+                share_flag=False,
+                img_key=ImageKey("image2.jpg"),
+            ),
+            SimplePost(
+                title="Third Post Title",
+                post_id=PostId(3),
+                owner=SimpleUser(
+                    user_id=UserId(account="a"),
+                    nickname="test",
+                    uid=Uid(idx=1),
+                    auth=AuthArchives(auths=[]),
+                    post_count=PostCounter(
+                        last_update_date=UpdateableTime(datetime.now())
+                    ),
+                ),
+                target_time=SelectTime(datetime.now()),
+                share_flag=True,
+                img_key=None,
+            ),
+        ]
+        return self.repository.search_by_available_uid(
+            user_id=acter.get_uid(), page=page, posts_per_page=posts_per_page
         )
-
-
-class GetPrivatePostService:
-    def __init__(self, repository: IPostWriteableRepository):
-        self.repository = repository
 
     def check_auth(self, user: SimpleUser) -> bool:
         return True
 
     def get_post_from_post_id(self, post_id: int) -> Optional[PostVO]:
+        return PostVO(
+            title="First Post Title",
+            content="Test View",
+            owner=SimpleUser(
+                user_id=UserId(account="a"),
+                nickname="test",
+                uid=Uid(idx=1),
+                auth=AuthArchives(auths=[]),
+                post_count=PostCounter(last_update_date=UpdateableTime(datetime.now())),
+            ),
+            target_time=SelectTime(datetime.now()),
+            create_time=TimeVO(datetime.now()),
+            update_time=UpdateableTime(datetime.now()),
+            post_id=PostId(1),
+            share_flag=True,
+            img_key=ImageKey("image1.jpg"),
+        )
         post_id = PostId(idx=post_id)
         return self.repository.search_by_pid(post_id)

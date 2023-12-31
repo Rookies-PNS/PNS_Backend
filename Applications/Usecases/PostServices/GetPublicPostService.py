@@ -1,8 +1,9 @@
 import __init__
 from typing import List, Optional
 from collections.abc import Collection
+from datetime import datetime
 
-from Commons import PostId, TimeVO, UpdateableTime, Content
+from Commons import *
 from Domains.Entities import SimplePost, SimpleUser, PostVO
 from Applications.Repositories.Interfaces import (
     IPostWriteableRepository,
@@ -26,12 +27,7 @@ class GetPublicPostService:
     def get_post_from_post_id(self, post_id: int) -> Optional[PostVO]:
         post_id = PostId(idx=post_id)
         return self.repository.search_by_pid(post_id)
-
-
-class GetPostList:
-    def __init__(self, repository: IPostWriteableRepository):
-        self.repository = repository
-
+    
     def get_list_no_filter(
         self, page: int = 0, posts_per_page: Optional[int] = None
     ) -> Collection[SimplePost]:
@@ -46,6 +42,21 @@ class GetPostList:
         Returns:
             Collection[SimplePost]: _description_
         """
+        return [
+            SimplePost (
+                title='test',
+                post_id=PostId(1),
+                owner=SimpleUser(
+                    user_id=UserId(account='a'),
+                    nickname='test',
+                    uid=Uid(idx=1),
+                    auth=AuthArchives(auths=[]),
+                    post_count=PostCounter(last_update_date=UpdateableTime(datetime.now())),
+                ),
+                target_time=SelectTime(datetime.now()),
+            )
+        ]
+    
         return self.repository.get_post_per_page_list(
             page=page, posts_per_page=posts_per_page
         )
