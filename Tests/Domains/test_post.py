@@ -9,7 +9,6 @@ from Commons import (
     UserId,
     PostId,
     Password,
-    Content,
     ImageKey,
     SelectTime,
     TimeVO,
@@ -113,7 +112,7 @@ class test_models(unittest.TestCase):
         now = datetime.now()
         post = Post(
             title="test",
-            content=Content(content="test 입니다."),
+            content="test 입니다.",
             owner=self.user.get_simple_user(),
             target_time=SelectTime(now),
             create_time=TimeVO(now),
@@ -144,7 +143,7 @@ class test_models(unittest.TestCase):
         now = datetime.now()
         post = PostVO(
             title="test",
-            content=Content(content="test 입니다."),
+            content="test 입니다.",
             owner=self.user.get_simple_user(),
             target_time=SelectTime(now),
             create_time=TimeVO(now),

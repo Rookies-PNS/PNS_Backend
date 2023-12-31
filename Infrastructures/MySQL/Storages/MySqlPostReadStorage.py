@@ -3,7 +3,8 @@ from typing import Optional
 from collections.abc import Collection
 from datetime import datetime
 
-from Commons import Uid, UserId, PostId, TimeVO, UpdateableTime, Content
+
+from Commons import Uid, PostId, TimeVO, UpdateableTime
 from Domains.Entities import PostVO, Post, SimplePost, SimpleUser
 from Applications.Repositories.Interfaces import (
     IPostWriteableRepository,

@@ -2,8 +2,8 @@ import __init__
 import unittest
 import sys
 
-from Domains.Entities import User, Post
-from Commons import Uid, UserId, PostId, Password, Content
+# from Domains.Entities import User, Post
+# from Commons import Uid, UserId, PostId, Password
 
 
 class test_(unittest.TestCase):

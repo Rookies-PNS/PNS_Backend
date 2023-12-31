@@ -13,6 +13,8 @@ class test_migrate(unittest.TestCase):
         print(sys._getframe(0).f_code.co_name)
         ## 썼으면 삭제
         migrate = test_selector.get_storage_migration()
+        if migrate.check_exist_img_data():
+            migrate.delete_img_data()
         if migrate.check_exist_post():
             migrate.delete_post()
         if migrate.check_exist_user():
@@ -31,11 +33,14 @@ class test_migrate(unittest.TestCase):
         ## 테이블이 없는지 확인
         self.assertFalse(migrate.check_exist_user())
         self.assertFalse(migrate.check_exist_post())
+        self.assertFalse(migrate.check_exist_img_data())
 
     def tearDown(self):
         "Hook method for deconstructing the test fixture after testing it."
         print("\t", sys._getframe(0).f_code.co_name)
         ## 썼으면 삭제
+        if self.migrate.check_exist_img_data():
+            self.migrate.delete_img_data()
         if self.migrate.check_exist_post():
             self.migrate.delete_post()
         if self.migrate.check_exist_user():
@@ -56,6 +61,14 @@ class test_migrate(unittest.TestCase):
         self.migrate.create_user()
         self.migrate.create_post()
         self.assertTrue(self.migrate.check_exist_post())
+
+    def test_create_img_data(self):
+        "Hook method for deconstructing the test fixture after testing it."
+        print("\t\t", sys._getframe(0).f_code.co_name)
+        self.migrate.create_user()
+        self.migrate.create_post()
+        self.migrate.create_img_data()
+        self.assertTrue(self.migrate.check_exist_img_data())
 
 
 def main():

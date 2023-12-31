@@ -2,7 +2,6 @@ from typing import Optional
 from dataclasses import dataclass
 
 from Commons import (
-    Content,
     PostId,
     TimeVO,
     UpdateableTime,
@@ -84,7 +83,7 @@ class FullPostAction(CommonPostAction):
         self.update_time.set_now()
 
     def get_content(self) -> str:
-        return self.content.content
+        return self.content
 
 
 @dataclass
