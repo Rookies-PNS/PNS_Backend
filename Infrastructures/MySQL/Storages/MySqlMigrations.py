@@ -39,6 +39,14 @@ CREATE TABLE IF NOT EXISTS {table_name} (
     pw VARCHAR(511) NOT NULL,
     account VARCHAR(50) NOT NULL,
     name VARCHAR(100) NOT NULL
+    nickname VARCHAR(50),
+    auths JSON,
+    time_of_try_login DATETIME,
+    lock_flag BOOLEAN,
+    count_of_login_fail INT,
+    post_last_update_date DATETIME,
+    post_num INT
+    
 );
                 """
                 cursor.execute(create_table_query)
@@ -113,7 +121,7 @@ CREATE TABLE IF NOT EXISTS {table_name} (
 
             # 변경 사항을 커밋
             connection.commit()
-        except :
+        except:
             connection.rollback()
         finally:
             # 연결 닫기
