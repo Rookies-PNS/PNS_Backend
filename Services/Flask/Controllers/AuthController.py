@@ -10,7 +10,7 @@ from Applications.Results import(
 )
 
 from Services.Flask.Models import user_to_dict
-from Services.Flask.Views.forms import UserCreateForm, UserLoginForm
+from Services.Flask.Views.forms import UserCreateForm, UserLoginForm,PasswordChangeForm
 from icecream import ic
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -57,6 +57,14 @@ def login():
             case _:
                 pass
     return render_template('auth/login.html', form=form)
+
+@bp.route('/change_password/', methods=['GET', 'POST'])
+def change_password():
+    form = PasswordChangeForm()
+    # 비밀번호 변경 코드 필요
+    # 폼 처리, 유효성 검사 등
+    pass
+    return render_template('auth/change_password.html',form=form)
 
 @bp.route('/logout/')
 def logout():
