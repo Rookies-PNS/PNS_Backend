@@ -23,7 +23,7 @@ from Applications.Results import (
 )
 
 
-class UpdatePost:
+class UpdatePostService:
     def __init__(
         self, post_repo: IPostWriteableRepository, user_repo: IUserWriteableRepository
     ):

@@ -15,7 +15,7 @@
                 <thead class="thead-light">
                     <tr>
                         <th>No.</th>
-                        <th>섬네일</th>
+                        <th>썸네일</th>
                         <th>제목</th>
                         <th>날짜</th>
                         <th>공개</th>
@@ -36,9 +36,6 @@
                     {% endfor %}
                 </tbody>
             </table>
-            {% if create_auth %}
-            <a href="{{ url_for('post.private_create') }}" class="btn btn-primary">게시글 등록하기</a>
-        {% endif %}
         </div>
     </div>
 </div>
@@ -53,8 +50,12 @@
                 <a href="{{ url_for('post.private_list', page=page+1) }}" class="btn btn-secondary ms-2">Next</a>
             {% endif %}
         </div>
-    <div class=col-sm-2>
+        <div class=col-sm-2>
+        {% if create_auth %}
+       
         <a class="btn btn-primary" href="{{ url_for('post.private_create') }}">일기 쓰기</a>
+        
+        {% endif %}
     </div>
 </div>
 
