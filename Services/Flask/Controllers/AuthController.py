@@ -47,7 +47,8 @@ def signup():
 def login():
     form = UserLoginForm()
     if request.method == "POST" and form.validate_on_submit():
-        service = LoginService(None)  # DB 미구현
+        (repoW, repoR) = get_user_storage()
+        service = LoginService(repoR, repoW)  # DB 미구현
         match service.login(form.userid.data, form.password.data):
             case user if isinstance(user, SimpleUser):
                 session.clear()

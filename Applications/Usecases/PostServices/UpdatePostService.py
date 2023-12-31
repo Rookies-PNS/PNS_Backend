@@ -3,7 +3,7 @@ from typing import List, Optional
 from collections.abc import Collection
 from datetime import datetime
 
-from Commons import PostId, TimeVO, UpdateableTime, Content
+from Commons import PostId, TimeVO, UpdateableTime
 from Domains.Entities import (
     SimpleUser,
     Post,
@@ -23,7 +23,7 @@ from Applications.Results import (
 )
 
 
-class UpdatePost:
+class UpdatePostService:
     def __init__(
         self, post_repo: IPostWriteableRepository, user_repo: IUserWriteableRepository
     ):
