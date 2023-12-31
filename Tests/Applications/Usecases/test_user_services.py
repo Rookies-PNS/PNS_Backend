@@ -3,8 +3,8 @@ import unittest
 import sys
 from typing import List, Tuple
 
-from Commons import UserId, Uid, Password
-from Domains.Entities import UserVO, User
+from Commons import *
+from Domains.Entities import UserVO, SimpleUser
 from Applications.Usecases.UserServices import CreateUserService, LoginService
 from Applications.Usecases.UserServices.UsecaseUserExtention import (
     convert_to_Password_with_hashing,
@@ -25,6 +25,42 @@ class test_user_services(unittest.TestCase):
     def setUpClass(cls):
         cls.driver = "test"
         print(sys._getframe(0).f_code.co_name)
+        cls.일반사용자_auths = [
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.Own),  # 자기 계정 삭제가능
+            Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
+            Auth(Policy.PostReadAblePolicy, TargetScope.Own),  # 자기 일기 읽기 가능
+            Auth(Policy.PostDeleteAblePolicy, TargetScope.Own),  # 자기 일기 삭제가능
+            Auth(Policy.PostCreateAndUpdateAblePolicy, TargetScope.Own),  # 자기 일기 수정가능
+            Auth(Policy.PostPublicAblePolicy, TargetScope.Own),  # 자기 일기 공개가능
+            Auth(Policy.PostPrivateAblePolicy, TargetScope.Own),  # 자기 일기 비공개가능
+        ]
+        cls.공유일기관리자_auths = [
+            Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(Policy.PostPrivateAblePolicy, TargetScope.All),  # 모든 일기 비공개가능
+            Auth(
+                Policy.UserAuthLockOfPostPublicPolicy, TargetScope.All
+            ),  # 모든 유저 일기공개 권한정지 권한
+            Auth(
+                Policy.UserAuthUnlockOfPostPublicPolicy, TargetScope.All
+            ),  # 모든 유저 일기공개 권한정지 해제 권한
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.All),  # 모든 유저 정보 열람가
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.Own),  # 자기 계정 삭제가능
+        ]
+        cls.계정관리자_auths = [
+            Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(Policy.PostDeleteAblePolicy, TargetScope.All),  # All 일기 삭제가능
+            Auth(
+                Policy.UserAuthLockOfPostCreateAndUpdatePolicy, TargetScope.All
+            ),  # 일기 쓰기 권한정지 권한
+            Auth(
+                Policy.UserAuthUnlockOfPostCreateAndUpdatePolicy, TargetScope.All
+            ),  # 일기 쓰기 권한정기 해제 권한
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.All),  # 모든 유저 정보 열람가능
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.All),  # 모든 계정 삭제가능
+        ]
 
     @classmethod
     def tearDownClass(cls):
@@ -59,8 +95,25 @@ class test_user_services(unittest.TestCase):
                 passwd=pw,
                 name=name,
                 nickname=nick,
+                auths=[  # Nomal User Auth List
+                    Auth(
+                        Policy.UserDataReadAblePolicy, TargetScope.Own
+                    ),  # 자신의 유저 정보 열람가능
+                    Auth(
+                        Policy.UserDataDeleteAblePolicy, TargetScope.Own
+                    ),  # 자기 계정 삭제가능
+                    Auth(
+                        Policy.PostReadAblePolicy, TargetScope.Allowed
+                    ),  # 공개된 일기 읽기 가능
+                    Auth(Policy.PostReadAblePolicy, TargetScope.Own),  # 자기 일기 읽기 가능
+                    Auth(Policy.PostDeleteAblePolicy, TargetScope.Own),  # 자기 일기 삭제가능
+                    Auth(
+                        Policy.PostCreateAndUpdateAblePolicy, TargetScope.Own
+                    ),  # 자기 일기 수정가능
+                    Auth(Policy.PostPublicAblePolicy, TargetScope.Own),  # 자기 일기 공개가능
+                    Auth(Policy.PostPrivateAblePolicy, TargetScope.Own),  # 자기 일기 비공개가능
+                ],
             )
-            ic(login_service.login(id, pw))
 
         # u = create_user_service.create("taks123", "1Q2w3e4r!@$", "takgyun Lee", "Taks")
         # users.append(u)
@@ -105,41 +158,45 @@ class test_user_services(unittest.TestCase):
 
         user = self.login_service.login("taks123", "1Q2w3e4r!@$")
         match user:
-            case _ if isinstance(user, Fail):
-                self.assertTrue(False)
+            case _user if isinstance(_user, SimpleUser):
+                user = _user
             case _:
-                pass
+                self.assertTrue(False)
+                return
 
-        self.assertDictEqual(
-            {
-                "user_id": UserId(account="taks123"),
-                "name": "takgyun Lee",
-                "uid": Uid(idx=1),
-            },
-            user.__dict__,
-        )
+        self.assertEqual(user.get_account(), "taks123")
+        self.assertEqual(user.get_user_nickname(), "Taks")
+        self.assertEqual(user.get_uid().idx, 1)
+        self.assertEqual(user.auth.auths, self.일반사용자_auths)
+        self.assertEqual(user.get_post_num(), 0)
 
         user = self.login_service.login("hahahoho119", "1B2n3m4!@")
+        match user:
+            case _user if isinstance(_user, SimpleUser):
+                user = _user
+            case _:
+                self.assertTrue(False)
+                return
 
-        self.assertDictEqual(
-            {
-                "user_id": UserId(account="hahahoho119"),
-                "name": "Ho Han",
-                "uid": Uid(idx=2),
-            },
-            user.__dict__,
-        )
+        self.assertEqual(user.get_account(), "hahahoho119")
+        self.assertEqual(user.get_user_nickname(), "Hans")
+        self.assertEqual(user.get_uid().idx, 2)
+        self.assertEqual(user.auth.auths, self.일반사용자_auths)
+        self.assertEqual(user.get_post_num(), 0)
 
         user = self.login_service.login("mygun7749", "$1Awb5$123")
 
-        self.assertDictEqual(
-            {
-                "user_id": UserId(account="mygun7749"),
-                "name": "Guna Yoo",
-                "uid": Uid(idx=3),
-            },
-            user.__dict__,
-        )
+        match user:
+            case _user if isinstance(_user, SimpleUser):
+                user = _user
+            case _:
+                self.assertTrue(False)
+                return
+        self.assertEqual(user.get_account(), "mygun7749")
+        self.assertEqual(user.get_user_nickname(), "YoYo")
+        self.assertEqual(user.get_uid().idx, 3)
+        self.assertEqual(user.auth.auths, self.일반사용자_auths)
+        self.assertEqual(user.get_post_num(), 0)
 
     def test_result(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
@@ -158,37 +215,47 @@ class test_user_services(unittest.TestCase):
     def test_start_data(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
         user = self.login_service.login("taks123", "1Q2w3e4r!@$")
+        match user:
+            case _user if isinstance(_user, SimpleUser):
+                user = _user
+            case _:
+                self.assertTrue(False)
+                return
 
-        self.assertDictEqual(
-            {
-                "user_id": UserId(account="taks123"),
-                "name": "takgyun Lee",
-                "uid": Uid(idx=1),
-            },
-            user.__dict__,
-        )
+        self.assertEqual(user.get_account(), "taks123")
+        self.assertEqual(user.get_user_nickname(), "Taks")
+        self.assertEqual(user.get_uid().idx, 1)
+        self.assertEqual(user.auth.auths, self.일반사용자_auths)
+        self.assertEqual(user.get_post_num(), 0)
 
         user = self.login_service.login("hahahoho119", "1B2n3m4!@")
+        match user:
+            case _user if isinstance(_user, SimpleUser):
+                user = _user
+            case _:
+                self.assertTrue(False)
+                return
 
-        self.assertDictEqual(
-            {
-                "user_id": UserId(account="hahahoho119"),
-                "name": "Ho Han",
-                "uid": Uid(idx=2),
-            },
-            user.__dict__,
-        )
+        self.assertEqual(user.get_account(), "hahahoho119")
+        self.assertEqual(user.get_user_nickname(), "Hans")
+        self.assertEqual(user.get_uid().idx, 2)
+        self.assertEqual(user.auth.auths, self.일반사용자_auths)
+        self.assertEqual(user.get_post_num(), 0)
 
         user = self.login_service.login("mygun7749", "$1Awb5$123")
 
-        self.assertDictEqual(
-            {
-                "user_id": UserId(account="mygun7749"),
-                "name": "Guna Yoo",
-                "uid": Uid(idx=3),
-            },
-            user.__dict__,
-        )
+        match user:
+            case _user if isinstance(_user, SimpleUser):
+                user = _user
+            case _:
+                self.assertTrue(False)
+                return
+
+        self.assertEqual(user.get_account(), "mygun7749")
+        self.assertEqual(user.get_user_nickname(), "YoYo")
+        self.assertEqual(user.get_uid().idx, 3)
+        self.assertEqual(user.auth.auths, self.일반사용자_auths)
+        self.assertEqual(user.get_post_num(), 0)
 
     def test_중복_아이디_생성하는지_확인(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
