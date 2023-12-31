@@ -6,13 +6,13 @@ from datetime import datetime, timezone
 
 from Commons import UserId, Uid, Password, PostId
 from Domains.Entities import UserVO, User, Post, PostVO, SimplePost, SimpleUser
-from Applications.Usecases import CreateUser, LoginUser
-from Applications.Usecases import (
-    CreatePost,
-    DeletePost,
-    GetPost,
-    GetPostList,
-    UpdatePost,
+from Applications.Usecases.UserServices import CreateUserService, LoginService
+from Applications.Usecases.PostServices import (
+    CreatePostService,
+    DeletePostService,
+    GetPrivatePostService,
+    GetPublicPostService,
+    UpdatePostService,
 )
 from Applications.Results import (
     Result,
@@ -42,8 +42,8 @@ class test_post_user_services(unittest.TestCase):
 
         # 기본세팅
         repo = test_selector.get_user_storage(cls.factory)
-        create_user = CreateUser(repo)
-        login_user = LoginUser(repo)
+        create_user = CreateUserService(repo)
+        login_user = LoginService(repo)
 
         users: List[SimpleUser] = []
         u = create_user.create("taks123", "1Q2w3e4r!@$", "takgyun Lee")
@@ -54,8 +54,8 @@ class test_post_user_services(unittest.TestCase):
         users.append(u)
 
         cls.origin_users = users
-        cls.create_user = CreateUser(repo)
-        cls.login_user = LoginUser(repo)
+        cls.create_user = CreateUserService(repo)
+        cls.login_user = LoginService(repo)
 
     @classmethod
     def tearDownClass(cls):

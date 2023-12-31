@@ -71,29 +71,92 @@ def flask(debug=True):
 
 
 def init_user():
+    from Commons import Auth, Policy, TargetScope
     from Applications.Usecases.UserServices import CreateUserService
     from Domains.Entities.User import SimpleUser
     from Infrastructures.IOC import get_strage_factory
     from Infrastructures.Interfaces import IStorageFactory
     from Applications.Repositories.Interfaces import IUserWriteableRepository
 
-    admin = {"id": "admin", "pw": "Admin123!@", "name": "관리자", "nick": "admini"}
+    user_admin = {
+        "id": "UserAdmin",
+        "pw": "Admin123!@",
+        "name": "UserAdmin",
+        "nick": "user_admini",
+        "auth": [
+            Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(Policy.PostDeleteAblePolicy, TargetScope.All),  # All 일기 삭제가능
+            Auth(
+                Policy.UserAuthLockOfPostCreateAndUpdatePolicy, TargetScope.All
+            ),  # 일기 쓰기 권한정지 권한
+            Auth(
+                Policy.UserAuthUnlockOfPostCreateAndUpdatePolicy, TargetScope.All
+            ),  # 일기 쓰기 권한정기 해제 권한
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.All),  # 모든 유저 정보 열람가능
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.All),  # 모든 계정 삭제가능
+        ],
+    }
+    post_admin = {
+        "id": "PostAdmin",
+        "pw": "Admin123!@",
+        "name": "PostAdmin",
+        "nick": "post_admini",
+        "auth": [
+            Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(Policy.PostPrivateAblePolicy, TargetScope.All),  # 모든 일기 비공개가능
+            Auth(
+                Policy.UserAuthLockOfPostPublicPolicy, TargetScope.All
+            ),  # 모든 유저 일기공개 권한정지 권한
+            Auth(
+                Policy.UserAuthUnlockOfPostPublicPolicy, TargetScope.All
+            ),  # 모든 유저 일기공개 권한정지 해제 권한
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.All),  # 모든 유저 정보 열람가
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.Own),  # 자기 계정 삭제가능
+        ],
+    }
+    nomal_user = {
+        "id": "nomal_id",
+        "pw": "1qaz2wsx!@QW",
+        "name": "nomaluser",
+        "nick": "nomals",
+        "auth": [
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.Own),  # 자기 계정 삭제가능
+            Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
+            Auth(Policy.PostReadAblePolicy, TargetScope.Own),  # 자기 일기 읽기 가능
+            Auth(Policy.PostDeleteAblePolicy, TargetScope.Own),  # 자기 일기 삭제가능
+            Auth(Policy.PostCreateAndUpdateAblePolicy, TargetScope.Own),  # 자기 일기 수정가능
+            Auth(Policy.PostPublicAblePolicy, TargetScope.Own),  # 자기 일기 공개가능
+            Auth(Policy.PostPrivateAblePolicy, TargetScope.Own),  # 자기 일기 비공개가능
+        ],
+    }
     users = [
-        admin,
+        user_admin,
+        post_admin,
+        nomal_user,
     ]
     service = CreateUserService(get_strage_factory().get_user_write_storage())
 
     for user in users:
-        ret = service.create(user["id"], user["pw"], user["name"], user["nick"])
+        ret = service.create(
+            account=user["id"],
+            passwd=user["pw"],
+            name=user["name"],
+            nickname=user["nick"],
+            auths=user["auth"],
+        )
         match ret:
-            case _ if isinstance(ret, SimpleUser):
-                ic(ret)
+            case none if none is None:
+                ic("Succuss")
             case _:
                 ic("Fail", ret)
 
 
 def init_post():
-    from Applications.Usecases import CreatePost, LoginUser
+    from Applications.Usecases.UserServices import LoginService
+    from Applications.Usecases.PostServices import CreatePostService
     from Domains.Entities import SimplePost
     from Infrastructures.IOC import get_post_storage, get_user_storage
     from Infrastructures.Interfaces import IStorageFactory
@@ -106,9 +169,10 @@ def init_post():
     now = datetime.now()
     now = now.replace(microsecond=0)
 
-    login = LoginUser(get_user_storage())
+    (repoW, repoR) = get_user_storage()
+    login = LoginService(repoR, repoW)
     admin = login.login("admin", "Admin123!@")
-    create = CreatePost(get_post_storage(), get_user_storage())
+    create = CreatePostService(get_post_storage()[0], repoW)
 
     start = {
         "title": "사이트의 시작을 알립니다.",

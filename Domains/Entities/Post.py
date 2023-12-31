@@ -2,7 +2,6 @@ from typing import Optional
 from dataclasses import dataclass
 
 from Commons import (
-    Content,
     PostId,
     TimeVO,
     UpdateableTime,

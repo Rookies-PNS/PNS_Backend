@@ -9,7 +9,6 @@ from Commons import (
     UserId,
     PostId,
     Password,
-    Content,
     ImageKey,
     SelectTime,
     TimeVO,
@@ -53,7 +52,7 @@ class test_models(unittest.TestCase):
         "Hook method for setting up the test fixture before exercising it."
         print("\t", sys._getframe(0).f_code.co_name)
         self.user = UserVO(
-            user_id=UserId("taks123"),
+            user_account=UserId("taks123"),
             name="takgyun",
             nickname="일반사용자",
             uid=Uid(idx=1),
@@ -113,7 +112,7 @@ class test_models(unittest.TestCase):
         now = datetime.now()
         post = Post(
             title="test",
-            content=Content(content="test 입니다."),
+            content="test 입니다.",
             owner=self.user.get_simple_user(),
             target_time=SelectTime(now),
             create_time=TimeVO(now),
@@ -144,7 +143,7 @@ class test_models(unittest.TestCase):
         now = datetime.now()
         post = PostVO(
             title="test",
-            content=Content(content="test 입니다."),
+            content="test 입니다.",
             owner=self.user.get_simple_user(),
             target_time=SelectTime(now),
             create_time=TimeVO(now),

@@ -78,7 +78,7 @@ class test_user(unittest.TestCase):
         # 잠긴 상태로 설정하고, 잠긴 시간을 현재 시간에서 5분 전으로 설정
         before = datetime.now() - timedelta(minutes=5)
         user = User(
-            user_id=UserId("taks123"),
+            user_account=UserId("taks123"),
             name="takgyun",
             nickname="일반사용자",
             pw=Password(pw="1qaz2wsx!@"),
@@ -103,7 +103,7 @@ class test_user(unittest.TestCase):
         print("\t\t", sys._getframe(0).f_code.co_name)
         before = datetime.now() - timedelta(minutes=5)
         user = User(
-            user_id=UserId("taks123"),
+            user_account=UserId("taks123"),
             name="takgyun",
             nickname="일반사용자",
             pw=Password(pw="1qaz2wsx!@"),
@@ -139,7 +139,7 @@ class test_user(unittest.TestCase):
         ]
         now = datetime.now()
         user = User(
-            user_id=UserId("taks123"),
+            user_account=UserId("taks123"),
             name="takgyun",
             nickname="일반사용자",
             pw=Password(pw="1qaz2wsx!@"),
@@ -149,13 +149,13 @@ class test_user(unittest.TestCase):
             post_count=PostCounter(UpdateableTime(now)),
         )
         for auth in reversed(auths):
-            self.assertTrue(auth.target_range, user.check_policy(auth.policy))
+            self.assertTrue(auth.scope, user.check_policy(auth.policy))
 
     def test_User_1(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
         now = datetime.now()
         user = User(
-            user_id=UserId("taks123"),
+            user_account=UserId("taks123"),
             name="takgyun",
             nickname="일반사용자",
             pw=Password(pw="1qaz2wsx!@"),
@@ -189,7 +189,7 @@ class test_user(unittest.TestCase):
         self.assertEqual("1qaz2wsx!@", user.get_passwd())
         self.assertEqual(Uid(idx=1), user.get_uid())
         for auth in reversed(self.일반사용자_auths):
-            self.assertTrue(auth.target_range in user.check_policy(auth.policy))
+            self.assertTrue(auth.scope in user.check_policy(auth.policy))
 
         self.assertEqual(
             [],
@@ -205,7 +205,7 @@ class test_user(unittest.TestCase):
         print("\t\t", sys._getframe(0).f_code.co_name)
         now = datetime.now()
         user = User(
-            user_id=UserId("taks123"),
+            user_account=UserId("taks123"),
             name="takgyun",
             nickname="일반사용자",
             pw=Password(pw="1qaz2wsx!@"),
@@ -226,7 +226,7 @@ class test_user(unittest.TestCase):
         print("\t\t", sys._getframe(0).f_code.co_name)
         now = datetime.now()
         user = User(
-            user_id=UserId("taks123"),
+            user_account=UserId("taks123"),
             name="takgyun",
             nickname="일반사용자",
             pw=Password(pw="1qaz2wsx!@"),
@@ -247,7 +247,7 @@ class test_user(unittest.TestCase):
         print("\t\t", sys._getframe(0).f_code.co_name)
         now = datetime.now()
         user = User(
-            user_id=UserId("taks123"),
+            user_account=UserId("taks123"),
             name="takgyun",
             nickname="일반사용자",
             pw=Password(pw="1qaz2wsx!@"),
@@ -267,7 +267,7 @@ class test_user(unittest.TestCase):
         print("\t\t", sys._getframe(0).f_code.co_name)
         now = datetime.now()
         user = SimpleUser(
-            user_id=UserId("taks123"),
+            user_account=UserId("taks123"),
             nickname="일반사용자",
             uid=Uid(idx=1),
             auth=AuthArchives(auths=self.공유일기관리자_auths),
@@ -276,7 +276,7 @@ class test_user(unittest.TestCase):
 
         now = datetime.now()
         user = SimpleUser(
-            user_id=UserId("taks123"),
+            user_account=UserId("taks123"),
             nickname="일반사용자",
             uid=Uid(idx=1),
             auth=AuthArchives(auths=self.공유일기관리자_auths),
@@ -298,7 +298,7 @@ class test_user(unittest.TestCase):
         # 잠긴 상태로 설정하고, 잠긴 시간을 현재 시간에서 5분 전으로 설정
         before = datetime.now() - timedelta(minutes=5)
         user = SecuritySimpleUser(
-            user_id=UserId("taks123"),
+            user_account=UserId("taks123"),
             nickname="일반사용자",
             uid=Uid(idx=1),
             auth=AuthArchives(auths=self.일반사용자_auths),
@@ -318,7 +318,7 @@ class test_user(unittest.TestCase):
         self.assertEqual(0, user.get_count_of_login_fail())
         before = datetime.now() - timedelta(minutes=5)
         user = SecuritySimpleUser(
-            user_id=UserId("taks123"),
+            user_account=UserId("taks123"),
             nickname="일반사용자",
             uid=Uid(idx=1),
             auth=AuthArchives(auths=self.일반사용자_auths),

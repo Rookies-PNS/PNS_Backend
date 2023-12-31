@@ -16,14 +16,14 @@ from Commons import (
 
 
 class CommonUserAction:
-    user_id: UserId
+    user_account: UserId
     nickname: str
     uid: Uid
     auth: AuthArchives
     post_count: PostCounter
 
     def get_account(self) -> str:
-        return self.user_id.account
+        return self.user_account.account
 
     def check_equal_uid(self, uid: Optional[Uid]) -> bool:
         match uid:
@@ -69,7 +69,7 @@ class SimpleUser(CommonUserAction):
     가장 기본적인 유저 데이터
     """
 
-    user_id: UserId
+    user_account: UserId
     nickname: str
     uid: Uid
     auth: AuthArchives
@@ -82,8 +82,8 @@ class SecurityUesrAction(CommonUserAction):
     def get_count_of_login_fail(self) -> int:
         return self.login_data.get_count_of_login_fail()
 
-    def get_due_to_of_login_lock(self) -> datetime:
-        return self.login_data.get_due_to_of_login_lock()
+    def get_time_of_try_login(self) -> datetime:
+        return self.login_data.get_time_of_try_login()
 
     def check_login_able(self, block_minute: int) -> bool:
         """
@@ -100,6 +100,9 @@ class SecurityUesrAction(CommonUserAction):
     def lock_login(self):
         return self.login_data.lock_login()
 
+    def get_lock_flag(self) -> bool:
+        return self.login_data.lock_flag
+
 
 @dataclass(frozen=True)
 class SecuritySimpleUser(SecurityUesrAction):
@@ -107,7 +110,7 @@ class SecuritySimpleUser(SecurityUesrAction):
     차후 관리자가 사용하게 될 유저 데이터
     """
 
-    user_id: UserId
+    user_account: UserId
     nickname: str
     uid: Uid
     auth: AuthArchives
@@ -116,7 +119,7 @@ class SecuritySimpleUser(SecurityUesrAction):
 
     def get_simple_user(self):
         return SimpleUser(
-            user_id=self.user_id,
+            user_account=self.user_account,
             nickname=self.nickname,
             uid=self.uid,
             auth=self.auth,
@@ -133,7 +136,7 @@ class FullUesrAction(SecurityUesrAction):
 @dataclass
 class User(FullUesrAction):
     pw: Password
-    user_id: UserId
+    user_account: UserId
     name: str
     nickname: str
     auth: AuthArchives
@@ -150,7 +153,7 @@ class User(FullUesrAction):
 
 @dataclass(frozen=True)
 class UserVO(FullUesrAction):
-    user_id: UserId
+    user_account: UserId
     name: str
     nickname: str
     uid: Uid
@@ -160,7 +163,7 @@ class UserVO(FullUesrAction):
 
     def get_simple_user(self):
         return SimpleUser(
-            user_id=self.user_id,
+            user_account=self.user_account,
             nickname=self.nickname,
             uid=self.uid,
             auth=self.auth,
@@ -169,7 +172,7 @@ class UserVO(FullUesrAction):
 
     def get_security_simple_user(self):
         return SecuritySimpleUser(
-            user_id=self.user_id,
+            user_account=self.user_account,
             nickname=self.nickname,
             uid=self.uid,
             auth=self.auth,

@@ -28,3 +28,15 @@ class IMigrations(metaclass=ABCMeta):
     @abstractmethod
     def check_exist_post(self) -> bool:
         ...
+
+    @abstractmethod
+    def create_img_data(self):
+        ...
+
+    @abstractmethod
+    def delete_img_data(self):
+        ...
+
+    @abstractmethod
+    def check_exist_img_data(self) -> bool:
+        ...

@@ -36,12 +36,12 @@ class IUserReadableRepository(metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
-    def search_by_userid(self, userid: UserId) -> Optional[SimpleUser]:
+    def search_by_userid(self, userid: str) -> Optional[SimpleUser]:
         """_summary_
         계정을 통해 유저를 조회한다.
 
         Args:
-            userid (UserId): _description_
+            userid (str): _description_
 
         Returns:
             Optional[SimpleUser]: _description_
@@ -62,40 +62,39 @@ class IUserReadableRepository(metaclass=ABCMeta):
         self,
         page: int = 0,
         posts_per_page: Optional[int] = None,
-    ) -> Result[Collection[SecuritySimpleUser]]:
+    ) -> Optional[Collection[SecuritySimpleUser]]:
         """_summary_
 
 
         Args:
-            user_id (Uid): _description_
             page (int, optional): _description_. Defaults to 0.
             posts_per_page (Optional[int], optional): 한번에 가져올 일기의 개수 정의, None은 모든 요소를 가져온다. Defaults to None.
 
         Returns:
-            Result[Collection[SimplePost]]: _description_
+            Optional[Collection[SimplePost]]: _description_
         """
         pass
 
     @abstractclassmethod
-    def get_login_data(self, user_id: UserId) -> Result[LoginData]:
+    def get_login_data(self, user_id: str) -> Optional[LoginData]:
         """_summary_
         사용자의 로그인 실패 현황을 받아온다.
 
         Args:
-            user_id (UserId): _description_
+            user_id (str): _description_
 
         Returns:
-            Result[LoginData]: _description_
+            Optional[LoginData]: _description_
         """
         pass
 
     @abstractclassmethod
-    def compare_pw(self, user_id: UserId, pw: Password) -> bool:
+    def compare_pw(self, user_id: str, pw: Password) -> bool:
         """_summary_
         유저의 패스워드를 비교해서 결과를 반환해 준다.
 
         Args:
-            user (SimpleUser): _description_
+            user_id (str): _description_
             pw (Password): _description_
 
         Returns:

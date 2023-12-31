@@ -47,11 +47,13 @@ def signup():
 def login():
     form = UserLoginForm()
     if request.method == "POST" and form.validate_on_submit():
-        service = LoginService(None)  # DB 미구현
+        (repoW, repoR) = get_user_storage()
+        service = LoginService(repoR, repoW)  # DB 미구현
         match service.login(form.userid.data, form.password.data):
             case user if isinstance(user, SimpleUser):
+                ic(user)
                 session.clear()
-                session["user"] = user
+                session["user"] = user.get_uid().idx
                 return redirect(url_for("main.index"))
             case Fail(type=type) if type == Fail_CheckUser_IDNotFound.type:
                 flash("존재하지 않는 사용자입니다.")

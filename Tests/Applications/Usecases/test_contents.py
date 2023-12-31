@@ -2,7 +2,11 @@ import __init__
 import unittest
 import sys
 from icecream import ic
-from Applications.Usecases.AppUsecaseExtention import *
+from Applications.Usecases.UserServices.UsecaseUserExtention import (
+    validate_account,
+    validate_name,
+    validate_nickname,
+)
 
 
 class test_user_services(unittest.TestCase):
@@ -24,9 +28,36 @@ class test_user_services(unittest.TestCase):
         "Hook method for deconstructing the test fixture after testing it."
         print("\t", sys._getframe(0).f_code.co_name)
 
+    def test_valid_input_of_CreateUser(self):
+        "Hook method for deconstructing the test fixture after testing it."
+        print("\t\t", sys._getframe(0).f_code.co_name)
+        valid_nickname_with_space = "닉네임 테스트"
+        valid_nickname_without_space = "Nick!Name"
+        invalid_nickname = " Nick!Name"  # 처음에 띄어쓰기가 포함되어 있음
+        too_short_nickname = ""  # 5자 미만
+        too_long_nickname = "VeryLongNicknameThatExceedsTheLimit123123123"  # 20자 초과
+
+        self.assertTrue(validate_nickname(valid_nickname_with_space))  # True
+        self.assertTrue(validate_nickname(valid_nickname_without_space))  # True
+        self.assertFalse(validate_nickname(invalid_nickname))  # False
+        self.assertFalse(validate_nickname(too_short_nickname))  # True
+        self.assertFalse(validate_nickname(too_long_nickname))  # False
+
+        valid_name_with_space = "홍 길 동"
+        valid_name_without_space = "John Doe"
+        invalid_name = " John Doe"  # 처음에 띄어쓰기가 포함되어 있음
+        too_short_name = "A"  # 2자 미만
+        too_long_name = "VeryLongNameThatExceedsTheLimit1"  # 20자 초과
+
+        self.assertFalse(validate_name(valid_name_with_space))  # True
+        self.assertTrue(validate_name(valid_name_without_space))  # True
+        self.assertFalse(validate_name(invalid_name))  # False
+        self.assertFalse(validate_name(too_short_name))  # False
+        self.assertFalse(validate_name(too_long_name))  # False
+
     def test_(self):
         "Hook method for deconstructing the test fixture after testing it."
-        print("\t", sys._getframe(0).f_code.co_name)
+        print("\t\t", sys._getframe(0).f_code.co_name)
 
 
 def main():
