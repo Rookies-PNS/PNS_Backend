@@ -1,15 +1,15 @@
-﻿from flask import Blueprint, redirect, render_template, request, url_for, session, flash
+from flask import Blueprint, redirect, render_template, request, url_for, session, flash
 from werkzeug.utils import redirect
 from werkzeug.datastructures import MultiDict
 from Commons import PostId
 
 from Domains.Entities import Post, PostVO, SimplePost, SimpleUser
-from Applications.Usecases import (
-    GetPostList,
-    GetPost,
-    CreatePost,
-    DeletePost,
-    UpdatePost,
+from Applications.Usecases.PostServices import (
+    CreatePostService,
+    DeletePostService,
+    GetPrivatePostService,
+    GetPublicPostService,
+    UpdatePostService,
 )
 from Applications.Results import Result, Fail
 from Infrastructures.IOC import get_user_storage, get_post_storage
@@ -22,87 +22,66 @@ from icecream import ic
 bp = Blueprint("post", __name__, url_prefix="/post")
 
 
-@bp.route("/list/<int:page>")
-def _list(page):
+@bp.route("/prlist/<int:page>")
+def private_list(page):
     posts_per_page = 10
     page = max(page, 1)
-    serivce = GetPostList(get_post_storage())
+    serivce = GetPrivatePostService(None)  # get_post_storage
     post_list = posts_to_dicts(serivce.get_list_no_filter(page - 1, posts_per_page))
-
     create_auth = False
     if "user" in session:
         user = dict_to_user(session["user"])
-        create_auth = CreatePost(get_post_storage(), get_user_storage()).check_auth(
-            user
-        )
+        create_auth = CreatePostService(
+            get_post_storage(), get_user_storage()
+        ).check_auth(user)
 
-    if page > 1 and len(post_list) == 0:  # 넘치는 페이지를 요청할 경우
-        return redirect(
-            url_for(
-                "post._list", page=page - 1, start_page=(int(page) <= 1), end_page=True
-            )
-        )
-    elif 0 < len(post_list) < posts_per_page:  # 넘치는 페이지를 요청할 경우
-        return render_template(
-            "post/post_list.html",
-            post_list=post_list,
-            page=page,
-            start_page=(int(page) <= 1),
-            end_page=True,
-            create_auth=create_auth,
-        )
-    else:  # 정상 요청
-        return render_template(
-            "post/post_list.html",
-            post_list=post_list,
-            page=page,
-            start_page=(int(page) <= 1),
-            end_page=False,
-            create_auth=create_auth,
-        )
+    return render_template(
+        "post/private_post_list.html",
+        post_list=post_list,
+        page=page,
+    )
 
 
-@bp.route("/detail/<int:post_id>/")
-def detail(post_id):
-    service = GetPost(get_post_storage())
+@bp.route("/prdetail/<int:post_id>/")
+def private_detail(post_id):
+    service = GetPrivatePostService(None)  # get_post_storage()
     match service.get_post_from_post_id(post_id):
         case post if isinstance(post, PostVO):
             auth = post.get_uid() is None
             update_auth, delete_auth = False, False
             if not auth and "user" in session:
                 user = dict_to_user(session["user"])
-                update_auth = DeletePost(
+                update_auth = UpdatePostService(
                     get_post_storage(), get_user_storage()
                 ).check_auth(post, user)
-                delete_auth = UpdatePost(
+                delete_auth = DeletePostService(
                     get_post_storage(), get_user_storage()
                 ).check_auth(post, user)
                 ic(user, delete_auth, update_auth)
             post = post_to_dict(post)
+
             return render_template(
-                "post/post_detail.html",
+                "post/private_post_detail.html",
                 post=post,
                 delete_auth=delete_auth,
                 update_auth=update_auth,
             )
         case _:
-            return redirect(url_for("post._list", page=1))
+            return redirect(url_for("post._prlist", page=1))
 
 
-@bp.route("/create/", methods=("GET", "POST"))
-def create():
+@bp.route("/prcreate/", methods=("GET", "POST"))
+def private_create():
     create_auth = False
     if "user" in session:
         user = dict_to_user(session["user"])
-        create_auth = CreatePost(get_post_storage(), get_user_storage()).check_auth(
-            user
-        )
+        create_auth = (get_post_storage(), get_user_storage()).check_auth(user)
     if not create_auth:
         return redirect(url_for("post._list", page=1))
 
     form = PostForm()
     if request.method == "POST" and form.validate_on_submit():
-        service = CreatePost(get_post_storage(), get_user_storage())
+        service = CreatePostService(get_post_storage(), get_user_storage())
         if "user" in session:
             user = dict_to_user(session["user"])
         else:
@@ -117,7 +96,7 @@ def create():
                 ic()
                 pass
 
-    return render_template("post/post_form.html", form=form)
+    return render_template("post/private_post_form.html", form=form)
 
 
 @bp.route("/delete/<int:post_id>/", methods=["Get", "POST"])
@@ -127,9 +106,9 @@ def delete(post_id):
     else:
         user = None
 
-    match GetPost(get_post_storage()).get_post_from_post_id(post_id):
+    match GetPrivatePostService(get_post_storage()).get_post_from_post_id(post_id):
         case post if isinstance(post, PostVO):
-            service = DeletePost(get_post_storage(), get_user_storage())
+            service = DeletePostService(get_post_storage(), get_user_storage())
             match service.delete(post, user):
                 case id if isinstance(id, PostId):
                     return redirect(url_for("main.index", page=1))
@@ -144,8 +123,8 @@ def delete(post_id):
 
 
 @bp.route("/update/<int:post_id>/", methods=("GET", "POST"))
-def update(post_id):
-    post = GetPost(get_post_storage()).get_post_from_post_id(post_id)
+def private_update(post_id):
+    post = GetPrivatePostService(get_post_storage()).get_post_from_post_id(post_id)
 
     if isinstance(post.user, SimpleUser) and "user" in session:
         user = dict_to_user(session["user"])
@@ -159,7 +138,7 @@ def update(post_id):
 
     form = PostForm()
     if request.method == "POST" and form.validate_on_submit():
-        service = UpdatePost(get_post_storage(), get_user_storage())
+        service = UpdatePostService(get_post_storage(), get_user_storage())
         match service.update(post, form.subject.data, form.content.data, user=user):
             case post if isinstance(post, SimplePost):
                 return redirect(url_for("main.index", post_id=post_id))
@@ -176,3 +155,23 @@ def update(post_id):
     form.content.data = post.get_content()
     # return render_template('post/post_edit.html', form=form, subject=post.get_title(), content=post.get_content())
     return render_template("post/post_edit.html", form=form)
+
+
+@bp.route("/pblist/<int:page>")
+def public_list(page):
+    posts_per_page = 10
+    page = max(page, 1)
+    serivce = GetPublicPostService(None)  # get_post_storage
+    post_list = posts_to_dicts(serivce.get_list_no_filter(page - 1, posts_per_page))
+    create_auth = False
+    if "user" in session:
+        user = dict_to_user(session["user"])
+        create_auth = CreatePostService(
+            get_post_storage(), get_user_storage()
+        ).check_auth(user)
+
+    return render_template(
+        "post/public_post_list.html",
+        post_list=post_list,
+        page=page,
+    )

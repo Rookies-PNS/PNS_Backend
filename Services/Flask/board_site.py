@@ -1,13 +1,12 @@
 import __init__
 
-from flask import Flask, Blueprint, url_for
+from flask import Flask, Blueprint, url_for, session
 from werkzeug.utils import redirect
 from flask_wtf import CSRFProtect
 from Services import get_secrets_key
 from Services.Flask.Controllers import (
     AuthController,
-    PostController
-#     CommentController,
+    PostController,
 )
 
 flask_path = __init__.root_path / "Services" / "Flask"
@@ -25,7 +24,8 @@ main_bp = Blueprint('main', __name__, url_prefix='/')
 
 @main_bp.route('/')
 def index():
-    return redirect(url_for('post._list', page=1))
+    session.clear()
+    return redirect(url_for('auth.login', page=1))
 
 app.register_blueprint(main_bp)
 app.register_blueprint(AuthController.bp)
