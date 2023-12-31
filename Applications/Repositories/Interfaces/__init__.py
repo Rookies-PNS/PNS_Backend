@@ -10,3 +10,4 @@ if not (str(root_path) in sys.path):
 from Applications.Repositories.Interfaces.IPostRepository import IPostRepository
 from Applications.Repositories.Interfaces.IUserRepository import IUserRepository
 from Applications.Repositories.Interfaces.IMigrations import IMigrations
+from Applications.Repositories.Interfaces.SessionRepository import SessionRepository

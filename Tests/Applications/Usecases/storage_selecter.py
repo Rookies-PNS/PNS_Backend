@@ -2,7 +2,7 @@ import __init__
 
 from Infrastructures.IOC import get_strage_factory, select_table_name_padding
 from Infrastructures.Interfaces import IMigrations, IStorageFactory
-from Applications.Repositories.Interfaces import IPostRepository, IUserRepository
+from Applications.Repositories.Interfaces import IPostRepository, IUserRepository, SessionRepository
 
 def get_test_factory(padding: str = "user_service_test_") -> IStorageFactory:
     select_table_name_padding(padding)
@@ -19,3 +19,6 @@ def get_post_storage(factory:IStorageFactory) -> IPostRepository:
 
 def get_user_storage(factory:IStorageFactory) -> IUserRepository:
     return factory.get_user_strage()
+
+def get_session_storage(factory:IStorageFactory) -> SessionRepository:
+    return factory.get_session_storage()
