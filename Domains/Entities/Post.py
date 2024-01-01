@@ -48,6 +48,13 @@ class CommonPostAction:
             case _:
                 return "익명"
 
+    def get_img_key(self) -> Optional[str]:
+        match self.img_key:
+            case key if isinstance(key, ImageKey):
+                return key.access_key
+            case _:
+                return None
+
 
 @dataclass(frozen=True)
 class SimplePost(CommonPostAction):

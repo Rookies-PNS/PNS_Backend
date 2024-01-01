@@ -23,8 +23,6 @@ from Applications.Results import (
     Fail_CheckUser_PasswardNotCorrect,
 )
 
-# from icecream import ic
-
 
 class LoginService:
     def __init__(
@@ -72,6 +70,8 @@ class LoginService:
         return self.repo_r.get_login_data(accout)
 
     def login(self, id: str, pw: str) -> Result[SimpleUser]:
+        # from icecream import ic
+
         # chece validate id
         if not validate_account(id):
             return Fail(type=f"Fail_in_LoginUser_InvalidateUserInput_from_account")
@@ -104,14 +104,18 @@ class LoginService:
                 hash_pw = convert_to_Password_with_hashing(pw, get_padding_adder(id))
                 # success
                 if self.repo_r.compare_pw(id, hash_pw):
-                    self.repo_w.update_to_success_login(user)
-                    return user
+                    match self.repo_w.update_to_success_login(user):
+                        case Fail(type=type):
+                            return Fail(type=type)
+                        case _:
+                            return user
+
             case none if none is None:
                 return Fail_CheckUser_IDNotFound()
             case _:
                 pass
         # fail
-        # ic()
+        ic()
         # ic(lock_flag, fail_num, block_time)
         self.repo_w.update_to_fail_login(user, lock_flag)
         return Fail_CheckUser_PasswardNotCorrect()

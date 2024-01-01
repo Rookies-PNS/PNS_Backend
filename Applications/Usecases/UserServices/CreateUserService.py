@@ -63,6 +63,7 @@ class CreateUserService:
             Auth(Policy.PostPrivateAblePolicy, TargetScope.Own),  # 자기 일기 비공개가능
         ],
     ) -> Optional[Fail]:
+        # from icecream import ic
         # chece validate id
         if not validate_account(account):
             return Fail(type=f"Fail_in_CreateUser_InvalidateUserInput_from_account")

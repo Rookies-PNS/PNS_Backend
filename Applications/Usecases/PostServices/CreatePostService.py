@@ -49,7 +49,7 @@ class CreatePostService:
         target_time: datetime,
         img,
         create_time: Optional[datetime] = None,
-    ) -> Result[SimplePost]:
+    ) -> Optional[Fail]:
         from Applications.Usecases.AppUsecaseExtention import (
             validate_user_input,
         )
@@ -73,7 +73,9 @@ class CreatePostService:
 
         match target_time:
             case time if isinstance(time, datetime):
-                
+                target_time = SelectTime(time)
+            case _:
+                create_time = SelectTime(time=datetime.now())
         match create_time:
             case _ if isinstance(create_time, datetime):
                 create_time = TimeVO(time=create_time)
@@ -85,8 +87,11 @@ class CreatePostService:
         post = Post(
             title=title,
             content=content,
+            owner=user,
             create_time=create_time,
             update_time=update_time,
-            owner=user,
+            target_time=target_time,
+            share_flag=share_flag,
+            img_key=None,
         )
         return self.repository.save_post(post)

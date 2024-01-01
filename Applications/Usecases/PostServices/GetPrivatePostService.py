@@ -1,5 +1,5 @@
 import __init__
-from typing import List, Optional
+from typing import List, Optional, Dict
 from collections.abc import Collection
 from datetime import datetime, timedelta
 from Commons import *
@@ -26,8 +26,25 @@ class GetPrivatePostService:
     def __init__(self, repository: IPostReadableRepository):
         self.repository = repository
 
-    def get_list_no_filter(
-        self, acter: SimpleUser, page: int = 0, posts_per_page: Optional[int] = None
+        # pid , user
+        self.cache: Dict[int, PostVO] = {}
+
+    def _______chece_auth(
+        self, actor: SimpleUser, target: SimpleUser, share_flag: bool
+    ) -> bool:
+        require_policy: IntersectionPolicy = IntersectionPolicy(
+            [Policy.PostReadAblePolicy]
+        )
+
+        return require_policy.chcek_auth(
+            actor_auth_Archives=actor.auth,
+            actor_uid=actor.get_uid(),
+            target_owner_id=target.get_uid(),
+            taget_allow_flag=share_flag,
+        )
+
+    def get_post_list(
+        self, actor: SimpleUser, page: int = 0, posts_per_page: Optional[int] = None
     ) -> Collection[SimplePost]:
         """_summary_
         생성 날짜 오름차순으로 post list를 반환해 주는 함수
@@ -40,80 +57,47 @@ class GetPrivatePostService:
         Returns:
             Collection[SimplePost]: _description_
         """
-        return [
-            SimplePost(
-                title="First Post Title",
-                post_id=PostId(1),
-                owner=SimpleUser(
-                    user_id=UserId(account="a"),
-                    nickname="test",
-                    uid=Uid(idx=1),
-                    auth=AuthArchives(auths=[]),
-                    post_count=PostCounter(
-                        last_update_date=UpdateableTime(datetime.now())
-                    ),
-                ),
-                target_time=SelectTime(datetime.now()),
-                share_flag=True,
-                img_key=ImageKey("image1.jpg"),
-            ),
-            SimplePost(
-                title="Second Post Title",
-                post_id=PostId(2),
-                owner=SimpleUser(
-                    user_id=UserId(account="a"),
-                    nickname="test",
-                    uid=Uid(idx=1),
-                    auth=AuthArchives(auths=[]),
-                    post_count=PostCounter(
-                        last_update_date=UpdateableTime(datetime.now())
-                    ),
-                ),
-                target_time=SelectTime(datetime.now()),
-                share_flag=False,
-                img_key=ImageKey("image2.jpg"),
-            ),
-            SimplePost(
-                title="Third Post Title",
-                post_id=PostId(3),
-                owner=SimpleUser(
-                    user_id=UserId(account="a"),
-                    nickname="test",
-                    uid=Uid(idx=1),
-                    auth=AuthArchives(auths=[]),
-                    post_count=PostCounter(
-                        last_update_date=UpdateableTime(datetime.now())
-                    ),
-                ),
-                target_time=SelectTime(datetime.now()),
-                share_flag=True,
-                img_key=None,
-            ),
-        ]
-        return self.repository.search_by_available_uid(
-            user_id=acter.get_uid(), page=page, posts_per_page=posts_per_page
-        )
 
-    def check_auth(self, user: SimpleUser) -> bool:
-        return True
+        match self.repository.search_by_available_uid(
+            user_id=actor.get_uid(), page=page, posts_per_page=posts_per_page
+        ):
+            case ret if isinstance(ret, list):
+                return ret
+            case fail if isinstance(fail, Fail):
+                ic(fail)
+                return []
+            case _:
+                return []
 
-    def get_post_from_post_id(self, post_id: int) -> Optional[PostVO]:
-        return PostVO(
-            title="First Post Title",
-            content="Test View",
-            owner=SimpleUser(
-                user_id=UserId(account="a"),
-                nickname="test",
-                uid=Uid(idx=1),
-                auth=AuthArchives(auths=[]),
-                post_count=PostCounter(last_update_date=UpdateableTime(datetime.now())),
-            ),
-            target_time=SelectTime(datetime.now()),
-            create_time=TimeVO(datetime.now()),
-            update_time=UpdateableTime(datetime.now()),
-            post_id=PostId(1),
-            share_flag=True,
-            img_key=ImageKey("image1.jpg"),
-        )
-        post_id = PostId(idx=post_id)
-        return self.repository.search_by_pid(post_id)
+    def chece_auth(self, actor: SimpleUser, post_id: int) -> bool:
+        match self._________get_simple_post(post_id):
+            case post if isinstance(post, PostVO):
+                flag = post.share_flag
+                target = post.owner
+            case _:
+                return False
+        return self._______chece_auth(actor, target, flag)
+
+    def _________get_simple_post(self, post_id: int) -> Optional[PostVO]:
+        if post_id in self.cache:
+            ret = self.cache[post_id]
+            del self.cache[post_id]
+            return ret
+
+        match self.repository.search_by_pid(PostId(post_id)):
+            case post if isinstance(post, PostVO):
+                self.cache[post_id] = post
+                return post
+            case fail:
+                ic(fail)
+                return None
+
+    def get_post_detail(self, actor: SimpleUser, post_id: int) -> Result[PostVO]:
+        match self._________get_simple_post(post_id):
+            case post if isinstance(post, PostVO):
+                ret = post
+            case _:
+                return Fail(type="Fail_to_GetPrivatePostService_Not_Found")
+        if self._______chece_auth(actor, ret.owner, ret.share_flag):
+            return ret
+        return Fail(type="Fail_to_GetPrivatePostService_No_Auth")

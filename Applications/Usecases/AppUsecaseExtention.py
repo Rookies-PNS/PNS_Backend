@@ -1,5 +1,4 @@
 import __init__
-from Applications.Results import Result, Fail
 
 
 def validate_user_input(user_input: str, max_len: int = 50) -> bool:
@@ -13,6 +12,3 @@ def validate_user_input(user_input: str, max_len: int = 50) -> bool:
     is_not_too_long = len(user_input) <= max_len
 
     return is_not_empty and is_not_too_long
-
-
-g
