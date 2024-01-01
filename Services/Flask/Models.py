@@ -47,7 +47,7 @@ def post_to_dict(post: PostVO) -> Dict[str, str]:
         "update_time": post.update_time.get_time().strftime("%m/%d-%H:%M"),
         "post_id": str(post.post_id.idx),
         "share_flag": post.share_flag,
-        "img_key": str("없음"),
+        "img_key": post.get_img_key(),
     }
 
 

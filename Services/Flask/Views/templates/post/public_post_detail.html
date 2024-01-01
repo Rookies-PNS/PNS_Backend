@@ -21,10 +21,10 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th scope="col">Post ID</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Owner</th>
-                    <th scope="col">Create Time</th>
+                    <th scope="col">번 호</th>
+                    <th scope="col">제 목</th>
+                    <th scope="col">작 성 자</th>
+                    <th scope="col">작 성 일 자</th>
                 </tr>
             </thead>
             <tbody>
@@ -55,11 +55,11 @@
         <div class="col-sm-2">
             {% if delete_auth %}
             <div id="toast-container"></div>
-
+            {% if admin_auth %}
             <div class="toggle-buttons">
                 <button type="button" onclick="setPostStatus(1, 'private')">비공개</button>
             </div>
-            
+            {% endif %}
             <script>
             // 토스트 메시지를 표시하는 함수
             function showToast(message) {
