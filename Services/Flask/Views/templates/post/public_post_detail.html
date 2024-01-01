@@ -44,7 +44,7 @@
         </style>
     <div class="d-flex post-body flex-equal">
         <div class="post-img ">
-            <img src="{{ url_for('static', filename='images/main.png') }}" alt="Illustration" class="img-fluid img-re">
+            <img src="{{ post['image_key'] }}" alt="Illustration" class="img-fluid img-re">
         </div>
         <div class="post_content"style="border-left: 2px solid #000000;">
             {{ post['content'] }}
