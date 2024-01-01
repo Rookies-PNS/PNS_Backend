@@ -132,10 +132,27 @@ def init_user():
             Auth(Policy.PostPrivateAblePolicy, TargetScope.Own),  # 자기 일기 비공개가능
         ],
     }
+    nomal_user2 = {
+        "id": "nomal_id2",
+        "pw": "1qaz2wsx!@QW",
+        "name": "nomal user",
+        "nick": "동네선배",
+        "auth": [
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.Own),  # 자기 계정 삭제가능
+            Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
+            Auth(Policy.PostReadAblePolicy, TargetScope.Own),  # 자기 일기 읽기 가능
+            Auth(Policy.PostDeleteAblePolicy, TargetScope.Own),  # 자기 일기 삭제가능
+            Auth(Policy.PostCreateAndUpdateAblePolicy, TargetScope.Own),  # 자기 일기 수정가능
+            Auth(Policy.PostPublicAblePolicy, TargetScope.Own),  # 자기 일기 공개가능
+            Auth(Policy.PostPrivateAblePolicy, TargetScope.Own),  # 자기 일기 비공개가능
+        ],
+    }
     users = [
         user_admin,
         post_admin,
         nomal_user,
+        nomal_user2,
     ]
     service = CreateUserService(get_strage_factory().get_user_write_storage())
 
@@ -171,23 +188,26 @@ def init_post():
 
     (repoW, repoR) = get_user_storage()
     login = LoginService(repoR, repoW)
-    admin = login.login("admin", "Admin123!@")
+    nomal = login.login("nomal_id", "1qaz2wsx!@QW")
+    nomal2 = login.login("nomal_id2", "1qaz2wsx!@QW")
     create = CreatePostService(get_post_storage()[0], repoW)
 
     start = {
         "title": "사이트의 시작을 알립니다.",
         "content": f"""이 사이트는 {now.strftime("%Y/%m/%d")}에 시작했습니다.
 이용자 여러분 앞으로 잘 부탁드립니다.""",
-        "user": admin,
+        "user": nomal,
         "time": now,
+        "flag": False,
     }
     now = now + timedelta(minutes=5)
     anony_post = {
         "title": "여기 짱이 누구냐",
         "content": f"""짜잔! 내가 등장했다!!
 이 게시판은 내가 먹도록 하겠다.""",
-        "user": None,
+        "user": nomal2,
         "time": now,
+        "flag": True,
     }
 
     posts = [
@@ -200,6 +220,9 @@ def init_post():
             content=post["content"],
             create_time=post["time"],
             user=post["user"],
+            share_flag=False,
+            target_time=datetime.now(),
+            img=None,
         )
 
 
