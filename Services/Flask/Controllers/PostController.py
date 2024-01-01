@@ -27,7 +27,7 @@ def private_list(page):
     posts_per_page = 10
     page = max(page, 1)
     serivce = GetPrivatePostService(None)  # get_post_storage
-    post_list = posts_to_dicts(serivce.get_list_no_filter(page - 1, posts_per_page))
+    post_list = posts_to_dicts(serivce.get_post_list(page - 1, posts_per_page))
     create_auth = False
     if "user" in session:
         user = dict_to_user(session["user"])
@@ -45,7 +45,7 @@ def private_list(page):
 @bp.route("/prdetail/<int:post_id>/")
 def private_detail(post_id):
     service = GetPrivatePostService(None)  # get_post_storage()
-    match service.get_post_from_post_id(post_id):
+    match service.get_post_detail(post_id):
         case post if isinstance(post, PostVO):
             auth = post.get_uid() is None
             update_auth, delete_auth = False, False
@@ -106,7 +106,7 @@ def delete(post_id):
     else:
         user = None
 
-    match GetPrivatePostService(get_post_storage()).get_post_from_post_id(post_id):
+    match GetPrivatePostService(get_post_storage()).get_post_detail(post_id):
         case post if isinstance(post, PostVO):
             service = DeletePostService(get_post_storage(), get_user_storage())
             match service.delete(post, user):
@@ -124,7 +124,7 @@ def delete(post_id):
 
 @bp.route("/update/<int:post_id>/", methods=("GET", "POST"))
 def private_update(post_id):
-    post = GetPrivatePostService(get_post_storage()).get_post_from_post_id(post_id)
+    post = GetPrivatePostService(get_post_storage()).get_post_detail(post_id)
 
     if isinstance(post.user, SimpleUser) and "user" in session:
         user = dict_to_user(session["user"])

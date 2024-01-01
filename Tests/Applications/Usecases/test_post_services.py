@@ -5,7 +5,7 @@ from typing import List, Tuple
 from datetime import datetime, timezone
 
 from Commons import *
-from Domains.Entities import SimpleUser
+from Domains.Entities import SimpleUser, SimplePost, PostVO
 from Applications.Usecases.UserServices import CreateUserService, LoginService
 from Applications.Usecases.PostServices import (
     CreatePostService,
@@ -82,10 +82,11 @@ class test_post_services(unittest.TestCase):
         login_service = LoginService(repoR, repoW)
 
         users: List[Tuple[str, str, str, str]] = [
-            ("taks123", "1Q2w3e4r!@$", "takgyun Lee", "Taks"),
+            ("taks123", "1Q2w3e4r!@", "takgyun Lee", "Taks"),
             ("hahahoho119", "1B2n3m4!@", "Ho Han", "Hans"),
             ("mygun7749", "$1Awb5$123", "Guna Yoo", "YoYo"),
         ]
+        origin_users: List[SimpleUser] = []
         for id, pw, name, nick in users:
             ret = create_user_service.create(
                 account=id,
@@ -112,7 +113,13 @@ class test_post_services(unittest.TestCase):
                 ],
             )
 
-        cls.origin_users = users
+            match login_service.login(id, pw):
+                case user if isinstance(user, SimpleUser):
+                    origin_users.append(user)
+                case a:
+                    raise ValueError()
+
+        cls.origin_users = origin_users
         cls.create_user_service = create_user_service
         cls.login_user_service = login_service
 
@@ -137,23 +144,38 @@ class test_post_services(unittest.TestCase):
         migrate.create_post()
         self.assertTrue(migrate.check_exist_post())
 
-        post_repoW, post_repoR = test_selector.get_post_storage(self.factory)
-        user_repoW, user_repoR = test_selector.get_user_storage(self.factory)
+        (post_repoW, post_repoR) = test_selector.get_post_storage(self.factory)
+        (user_repoW, user_repoR) = test_selector.get_user_storage(self.factory)
 
         self.create_post_service = CreatePostService(post_repoW, user_repoW)
-        self.get_private_post_service = GetPrivatePostService(post_repoW)
-        self.get_public_post_service = GetPublicPostService(post_repoW)
+        self.get_private_post_service = GetPrivatePostService(post_repoR)
+        self.get_public_post_service = GetPublicPostService(post_repoR)
         self.update_post_service = UpdatePostService(post_repoW, user_repoW)
         self.delete_post_service = DeletePostService(post_repoW, user_repoW)
 
         post1 = self.create_post_service.create(
-            "Post 1", "Content 1", self.origin_users[0]
+            title="Post 1",
+            content="Content 1",
+            user=self.origin_users[0],
+            share_flag=True,
+            target_time=datetime.now(),
+            img=None,
         )
         post2 = self.create_post_service.create(
-            "Post 2", "Content 2", self.origin_users[1]
+            title="Post 2",
+            content="Content 2",
+            user=self.origin_users[1],
+            share_flag=True,
+            target_time=datetime.now(),
+            img=None,
         )
         post3 = self.create_post_service.create(
-            "Post 3", "Content 3", self.origin_users[2]
+            title="Post 3",
+            content="Content 3",
+            user=self.origin_users[2],
+            share_flag=False,
+            target_time=datetime.now(),
+            img=None,
         )
 
     def tearDown(self):
@@ -165,50 +187,75 @@ class test_post_services(unittest.TestCase):
             migrate.delete_post()
         self.assertFalse(migrate.check_exist_post())
 
-    def test_get_post_list(self):
+    def test_get_public_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
         post_list = self.get_public_post_service.get_list_no_filter()
 
+        post = self.get_private_post_service.get_post_detail(1)
+        self.assertEqual("Post 1", post.title)
+        self.assertEqual("Content 1", post.content)
+
+        post_list = self.get_public_post_service.get_list_no_filter()
+        self.assertEqual(len(post_list), 3)
         self.assertEqual(len(post_list), 3)
 
     def test_create_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
         now = datetime.now(tz=timezone.utc)
         now = now.replace(microsecond=0)
+        user = self.origin_users[0]
 
-        new_post = self.create_post_service.create(
-            "New Post", "New Content", self.origin_users[0], now
-        )
-        self.assertEqual("New Post", new_post.title)
+        match self.create_post_service.create(
+            title="New Post",
+            content="New Content",
+            user=user,
+            share_flag=False,
+            target_time=now,
+            create_time=now,
+            img=None,
+        ):
+            case none if none is None:
+                match self.get_private_post_service.get_post_list(
+                    actor=user, page=0, posts_per_page=1
+                ):
+                    case [target] if isinstance(target, SimplePost):
+                        new_post = target
+                    case _:
+                        raise ValueError()
+            case a:
+                self.assertFalse(a)
+
+        self.assertEqual("New Post", new_post.get_title())
+
         self.assertEqual(
             now.strftime("%d/%m/%Y, %H:%M:%S"),
-            new_post.create_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"),
-        )
-        self.assertEqual(
-            now.strftime("%d/%m/%Y, %H:%M:%S"),
-            new_post.update_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"),
+            new_post.target_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"),
         )
 
-        check_post = self.get_private_post_service.get_post_from_post_id(
-            new_post.post_id.idx
-        )
-        self.assertEqual("New Post", check_post.title)
-        self.assertEqual("New Content", check_post.content.content)
+        match self.get_private_post_service.get_post_detail(
+            user, new_post.get_post_id().idx
+        ):
+            case post if isinstance(post, PostVO):
+                check_post = post
+            case fail:
+                ic(fail)
+                raise ValueError
+        self.assertEqual("New Post", check_post.get_title())
+        self.assertEqual("New Content", check_post.get_content())
         self.assertEqual(
             now.strftime("%d/%m/%Y, %H:%M:%S"),
-            check_post.create_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"),
-        )
-        self.assertEqual(
-            now.strftime("%d/%m/%Y, %H:%M:%S"),
-            check_post.update_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"),
+            check_post.target_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"),
         )
 
-        post_list = self.get_public_post_service.get_list_no_filter()
-        self.assertEqual(len(post_list), 4)
+        post_list = self.get_private_post_service.get_post_list(user)
+        self.assertEqual(len(post_list), 2)
 
-    def test_get_post(self):
+    def test_get_private_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post = self.get_private_post_service.get_post_from_post_id(1)
+        post_list = self.get_public_post_service.get_list_no_filter()
+
+        post = self.get_private_post_service.get_post_detail(1)
+        post = self.get_private_post_service.get_post_detail(1)
         self.assertEqual("Post 1", post.title)
         self.assertEqual("Content 1", post.content.content)
 
@@ -220,7 +267,7 @@ class test_post_services(unittest.TestCase):
 
         time.sleep(1)
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post = self.get_private_post_service.get_post_from_post_id(1)
+        post = self.get_private_post_service.get_post_detail(1)
 
         updated_post = self.update_post_service.update(
             post, "Updated Post", "Updated Content", self.origin_users[0]
@@ -242,7 +289,7 @@ class test_post_services(unittest.TestCase):
         post_list = self.get_public_post_service.get_list_no_filter()
         self.assertEqual(len(post_list), 3)
 
-        check_post = self.get_private_post_service.get_post_from_post_id(
+        check_post = self.get_private_post_service.get_post_detail(
             updated_post.post_id.idx
         )
         self.assertEqual(check_post.title, "Updated Post")
@@ -250,9 +297,9 @@ class test_post_services(unittest.TestCase):
 
     def test_delete_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post = self.get_private_post_service.get_post_from_post_id(1)
+        post = self.get_private_post_service.get_post_detail(1)
         self.delete_post_service.delete(post, self.origin_users[0])
-        deleted_post = self.get_private_post_service.get_post_from_post_id(1)
+        deleted_post = self.get_private_post_service.get_post_detail(1)
         self.assertIsNone(deleted_post)
 
         post_list = self.get_public_post_service.get_list_no_filter()
