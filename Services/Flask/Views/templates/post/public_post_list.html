@@ -5,17 +5,17 @@
         <div class="col">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link active" href="{{ url_for('post.private_list') }}">나의 일기</a>
+                    <a class="nav-link " href="{{ url_for('post.private_list', page=1) }}">나의 일기</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('post.public_list') }}">우리의 일기</a>
+                    <a class="nav-link active" href="{{ url_for('post.public_list', page=1) }}">우리의 일기</a>
                 </li>
             </ul>
             <table class="table table-bordered mt-3">
                 <thead class="thead-light">
                     <tr>
                         <th>No.</th>
-                        <th>섬네일</th>
+                        <th>썸네일</th>
                         <th>제목</th>
                         <th>작성자</th>
                         <th>날짜</th>
@@ -36,9 +36,6 @@
                     {% endfor %}
                 </tbody>
             </table>
-            {% if create_auth %}
-            <a href="{{ url_for('post.public_create') }}" class="btn btn-primary">게시글 등록하기</a>
-        {% endif %}
         </div>
     </div>
 </div>

@@ -2,12 +2,10 @@
 {% block content %}
 <!-- 게시글 등록 -->
 <div class="container">
-    <h4 class="my-3 border-bottom pb-2">질문등록</h4>
+    <h4 class="my-3 border-bottom pb-2">나의 일기</h4>
     <form method="post" class="my-3">
 
         {{ form.csrf_token }}
-
-        <!-- class="form-control"으로 bootstrap 적용하기 -->
         <p>
         {{ form.subject.label }}
         {{ form.subject(class="form-control") }}
@@ -16,7 +14,7 @@
         {{ form.content.label }}
         {{ form.content(class="form-control") }}
         </p>
-        <button type="submit" class="btn btn-primary">저장하기</button>
+        <button type="submit" class="btn btn-primary">수정하기</button>
     </form>
 
     <form method="post" class="post-form my-3">

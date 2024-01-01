@@ -6,6 +6,8 @@ from Applications.Repositories.Interfaces import (
     IPostReadableRepository,
     IUserWriteableRepository,
     IUserReadableRepository,
+    IImageReadableRepository,
+    IImageWriteableRepository,
 )
 
 from Infrastructures.Interfaces import IStorageFactory

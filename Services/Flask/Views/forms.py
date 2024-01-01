@@ -2,15 +2,16 @@
 import email
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
-from wtforms import StringField, TextAreaField, PasswordField, FileField
-from flask_wtf.file import FileField, FileAllowed, FileRequired
-from wtforms import StringField, TextAreaField, PasswordField, FileField
+from wtforms import StringField, TextAreaField, PasswordField, FileField, SubmitField
 from wtforms.validators import DataRequired, Length, EqualTo, Email
 
 
 class PostForm(FlaskForm):
-    subject = StringField("제목", validators=[DataRequired()])
-    content = TextAreaField("내용", validators=[DataRequired()])
+    subject = StringField("일기 제목", validators=[DataRequired()])
+    content = TextAreaField("일기 내용", validators=[DataRequired()])
+
+
+class ImageUploadForm(FlaskForm):
     image = FileField(
         "이미지 업로드",
         validators=[
@@ -18,13 +19,7 @@ class PostForm(FlaskForm):
             FileAllowed(["jpg", "png"], "JPG와 PNG 이미지만 업로드 가능합니다."),
         ],
     )
-    image = FileField(
-        "이미지 업로드",
-        validators=[
-            FileRequired(),
-            FileAllowed(["jpg", "png"], "JPG와 PNG 이미지만 업로드 가능합니다."),
-        ],
-    )
+    submit = SubmitField("업로드")
 
 
 # 계정생성을 위한 폼

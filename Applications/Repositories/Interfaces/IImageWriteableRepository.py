@@ -3,6 +3,7 @@ from abc import *
 from typing import Optional
 
 from Commons import ImageKey, Uid
+from Domains.Entities import ImageData, PostVO
 from Applications.Results import Result, Fail
 
 
@@ -12,9 +13,23 @@ class IImageWriteableRepository(metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
-    def save_image(self, uid: Uid, img) -> Result[ImageKey]:
+    def upload_to_s3(file, bucket_name, object_name) -> Optional[Fail]:
         """_summary_
-        이미지를 받아서 저장소에 이미지를 저장한다.
+        s3클라이언트를 생성하고 파일 객체를 s3버킷에
+        업로드 합니다.
+
+        Args:
+            file (_type_): 이미지의 소유권을 나타낸다.
+            bucket_name: 버킷 이름
+            object_name : 버킷에 저장되는 파일 이름
+        Returns:
+            Optional[Fail]: _description_
+        """
+        pass
+
+    @abstractclassmethod
+    def save_image_data(self, uid: Uid, s3_url) -> Result[ImageKey]:
+        """_summary_
         그이후 ImageData를 생성하여 DB에 저장한다.
 
         Args:

@@ -5,7 +5,7 @@
         <div class="col">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link active" href="{{ url_for('post.private_list', page=1) }}">나의 일기</a>
+                    <a class="nav-link active" href="{{ url_for('post.admin_', page=1) }}">나의 일기</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('post.public_list', page=1) }}">우리의 일기</a>
@@ -15,24 +15,16 @@
                 <thead class="thead-light">
                     <tr>
                         <th>No.</th>
-                        <th>썸네일</th>
-                        <th>제목</th>
-                        <th>날짜</th>
-                        <th>공개</th>
+                        <th>닉네임</th>
+                        <th>일기 쓰기 권한</th>
+                        <th>일기 공개 권한</th>
+                        <th>삭제</th>
                     </tr>
                 </thead>
                 <tbody>
                     <!-- 게시글 항목들을 반복하여 표시 -->
                     {% for post in post_list %}
-                    <tr>
-                        <td>{{ post['id']}}</td>
-                        <td>{{ post['img_key'] }}</td>
-                        <td>
-                            <a href="{{ url_for('post.private_detail', post_id=post["id"]) }}">{{ post["title"] }}</a>
-                        </td>
-                        <td>{{ post['target_time'] }}</td>
-                        <td>{{ '공개' if post['share_flag'] else '비공개' }}</td>
-                    </tr>
+
                     {% endfor %}
                 </tbody>
             </table>
@@ -43,19 +35,13 @@
     <div></div>
         <div class="pagination d-flex justify-content-center">
             {% if not start_page %}
-                <a href="{{ url_for('post.private_list', page=page-1) }}" class="btn btn-secondary me-2">Prev</a>
+                <a href="{{ url_for('post.public_list', page=page-1) }}" class="btn btn-secondary me-2">Prev</a>
             {% endif %}
             <span class="fw-bold text-danger">{{ page }}</span>
             {% if not end_page%}
-                <a href="{{ url_for('post.private_list', page=page+1) }}" class="btn btn-secondary ms-2">Next</a>
+                <a href="{{ url_for('post.public_list', page=page+1) }}" class="btn btn-secondary ms-2">Next</a>
             {% endif %}
         </div>
-        <div class=col-sm-2>
-        
-       
-        <a class="btn btn-primary" href="{{ url_for('post.private_create') }}">일기 쓰기</a>
-        
-        
     </div>
 </div>
 

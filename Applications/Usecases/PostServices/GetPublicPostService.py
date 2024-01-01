@@ -25,9 +25,26 @@ class GetPublicPostService:
         return True
 
     def get_post_from_post_id(self, post_id: int) -> Optional[PostVO]:
+        return PostVO(
+            title="First Post Title",
+            content="Test View",
+            owner=SimpleUser(
+                user_account=UserId(account="a"),
+                nickname="test",
+                uid=Uid(idx=1),
+                auth=AuthArchives(auths=[]),
+                post_count=PostCounter(last_update_date=UpdateableTime(datetime.now())),
+            ),
+            target_time=SelectTime(datetime.now()),
+            create_time=TimeVO(datetime.now()),
+            update_time=UpdateableTime(datetime.now()),
+            post_id=PostId(1),
+            share_flag=True,
+            img_key=ImageKey("image1.jpg"),
+        )
         post_id = PostId(idx=post_id)
         return self.repository.search_by_pid(post_id)
-    
+
     def get_list_no_filter(
         self, page: int = 0, posts_per_page: Optional[int] = None
     ) -> Collection[SimplePost]:
@@ -43,20 +60,22 @@ class GetPublicPostService:
             Collection[SimplePost]: _description_
         """
         return [
-            SimplePost (
-                title='test',
+            SimplePost(
+                title="test",
                 post_id=PostId(1),
                 owner=SimpleUser(
-                    user_id=UserId(account='a'),
-                    nickname='test',
+                    user_account=UserId(account="a"),
+                    nickname="test",
                     uid=Uid(idx=1),
                     auth=AuthArchives(auths=[]),
-                    post_count=PostCounter(last_update_date=UpdateableTime(datetime.now())),
+                    post_count=PostCounter(
+                        last_update_date=UpdateableTime(datetime.now())
+                    ),
                 ),
                 target_time=SelectTime(datetime.now()),
             )
         ]
-    
+
         return self.repository.get_post_per_page_list(
             page=page, posts_per_page=posts_per_page
         )

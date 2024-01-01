@@ -10,6 +10,8 @@ from Applications.Repositories.Interfaces import (
     IMigrations,
     IImageReadableRepository,
     IImageWriteableRepository,
+    IImageReadableRepository,
+    IImageWriteableRepository,
 )
 
 
