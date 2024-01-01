@@ -8,9 +8,8 @@ from Applications.Repositories.Interfaces import (
     IUserWriteableRepository,
     IUserReadableRepository,
     IMigrations,
-    IImageDataReadableRepository,
-    IImageDeleteableRepository,
-    IImageSaveableRepository,
+    IImageReadableRepository,
+    IImageWriteableRepository,
 )
 
 
@@ -36,13 +35,13 @@ class IStorageFactory(metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
-    def get_image_data_read_storage(self) -> IImageDataReadableRepository:
+    def get_image_data_read_storage(self) -> IImageReadableRepository:
         pass
 
     @abstractclassmethod
-    def get_image_save_storage(self) -> IImageDeleteableRepository:
+    def get_image_save_storage(self) -> IImageWriteableRepository:
         pass
 
     @abstractclassmethod
-    def get_image_delete_storage(self) -> IImageSaveableRepository:
+    def get_image_delete_storage(self) -> IImageWriteableRepository:
         pass

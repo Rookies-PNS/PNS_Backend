@@ -16,7 +16,7 @@
       {% if "user" in session %}
         <a href="{{url_for('auth.change_password')}}" class="btn btn-outline-primary me-2">비밀번호 변경</a>
         <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-primary me-2">Logout</button>
-        <a>{{session["user"].name}}님</a>
+        <a>{{session["user"]["nickname"]}}님</a>
       {% endif %}
     </div>
   </header>

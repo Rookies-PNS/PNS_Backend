@@ -5,11 +5,15 @@ from icecream import ic
 
 from Domains.Entities import *
 from Commons import UserId, Uid
+from Applications.Usecases.UserServices.LoginService import LoginService
+from Infrastructures.IOC.infra_factory import get_user_storage
 
 
 def dict_to_user(user: Dict[str, Union[Dict[str, any], str]]) -> SimpleUser:
+    w, r = get_user_storage()
+    return LoginService(r, w).login(user["id"], user["password"])
     return SimpleUser(
-        user_id=UserId(account=user["user_id"]["account"]),
+        user_account=UserId(account=user["user_id"]["account"]),
         nickname=user["name"],
         uid=Uid(idx=int(user["uid"]["idx"])),
     )

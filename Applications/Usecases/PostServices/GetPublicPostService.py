@@ -29,7 +29,7 @@ class GetPublicPostService:
             title="First Post Title",
             content="Test View",
             owner=SimpleUser(
-                user_id=UserId(account="a"),
+                user_account=UserId(account="a"),
                 nickname="test",
                 uid=Uid(idx=1),
                 auth=AuthArchives(auths=[]),
@@ -64,7 +64,7 @@ class GetPublicPostService:
                 title="test",
                 post_id=PostId(1),
                 owner=SimpleUser(
-                    user_id=UserId(account="a"),
+                    user_account=UserId(account="a"),
                     nickname="test",
                     uid=Uid(idx=1),
                     auth=AuthArchives(auths=[]),

@@ -12,13 +12,13 @@
                 <div class="form-group row">
                     <label for="userid" class="col-sm-2 col-form-label">ID</label>
                     <div class="col-sm-7">
-                        <input type="text" id="userid" class="form-control" name="userid" placeholder="ID" value="{{ form.userid.data or '' }}" required autofocus>
+                        {{ form.userid(class="form-control", placeholder="ID") }}
                     </div>
                 </div>
                 <div class="form-group row">
                     <label for="password" class="col-sm-2 col-form-label">PW</label>
                     <div class="col-sm-7">
-                        <input type="password" id="password" class="form-control" name="password" placeholder="Password" value="{{ form.password.data or '' }}" required>
+                        {{ form.password(class="form-control", placeholder="Password") }}
                     </div>
                     <div class="col-sm-2">
                         <button type="submit" class="btn btn-primary btn-block" style="width:auto; height: calc(1.5em + .75rem + 2px);">Login</button>

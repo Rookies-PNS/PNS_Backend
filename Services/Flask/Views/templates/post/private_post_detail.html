@@ -52,14 +52,14 @@
     </div>    
     <div class="pagination d-flex justify-content-between">
         <div class="col-sm-2">
-            {% if delete_auth %}
+          
             <a href="{{ url_for('post.private_delete', post_id=post["post_id"]) }}" class="btn btn-outline-primary me-2">삭제하기</button></a>
-            {% endif %}
+           
         </div>
         <div class="col-2">
-            {% if update_auth %}
+            
             <a href="{{ url_for('post.private_update', post_id=post["post_id"]) }}" class="btn btn-primary">수정하기</button></a>
-            {% endif %}
+            
         </div>
         <div id="toast-container col-sm-2"></div>
 
