@@ -44,11 +44,11 @@ class MySqlFactory(IStorageFactory):
         return MySqlPostWriteStorage(self.get_user_read_storage(), self.padding)
 
     def get_post_read_storage(self) -> IPostReadableRepository:
-        from Infrastructures.MySQL.Storages.MySqlPostWriteStorage import (
-            MySqlPostWriteStorage,
+        from Infrastructures.MySQL.Storages.MySqlPostReadStorage import (
+            MySqlPostReadStorage,
         )
 
-        return MySqlPostWriteStorage(self.get_user_read_storage(), self.padding)
+        return MySqlPostReadStorage(self.get_user_read_storage(), self.padding)
 
     def get_image_read_storage(self) -> IImageReadableRepository:
         raise NotImplementedError()

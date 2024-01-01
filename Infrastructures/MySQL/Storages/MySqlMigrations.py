@@ -46,7 +46,8 @@ CREATE TABLE IF NOT EXISTS {user_table_name} (
     lock_flag BOOLEAN,
     count_of_login_fail INT,
     post_last_update_date TIMESTAMP,
-    post_num INT
+    post_num INT,
+    delete_flag BOOLEAN
 );
                 """
                 # user 생성
@@ -64,6 +65,7 @@ CREATE TABLE IF NOT EXISTS {auth_table_name} (
     policy ENUM({policy}) NOT NULL,
     scope ENUM({scope}) NOT NULL,
     account VARCHAR(50) NOT NULL,
+    delete_flag BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (account) REFERENCES {user_table_name}(account)
 );
 """
@@ -140,8 +142,9 @@ CREATE TABLE IF NOT EXISTS {table_name} (
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     share_flag BOOLEAN,
-    img_key_access_key VARCHAR(255),
+    img_access_key VARCHAR(255),
     owner_id INT,
+    delete_flag BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (owner_id) REFERENCES {table_user}(id)
 );
                 """
@@ -206,6 +209,7 @@ CREATE TABLE IF NOT EXISTS {img_table_name} (
     thumbnail_path VARCHAR(255) NOT NULL,
     origin_path VARCHAR(255) NOT NULL,
     owner_id INT,
+    delete_flag BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (owner_id) REFERENCES {user_table_name}(id)
 );
                 """

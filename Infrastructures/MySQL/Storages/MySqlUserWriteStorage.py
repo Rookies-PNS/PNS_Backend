@@ -78,7 +78,7 @@ class MySqlUserWriteStorage(IUserWriteableRepository):
             # 커서 생성
             with connection.cursor() as cursor:
                 # 데이터 삽입 쿼리
-                insert_query = insert_user_query = f"""
+                insert_query = f"""
 INSERT INTO {user_table_name} (
     pw,
     account,

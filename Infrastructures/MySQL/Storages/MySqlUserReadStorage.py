@@ -58,30 +58,58 @@ class MySqlUserReadStorage(IUserReadableRepository):
 
     def search_by_uid(self, uid: Uid) -> Optional[UserVO]:
         connection = self.connect()
-        table_name = self.get_padding_name("user")
+        user_table_name = self.get_padding_name("user")
+        auth_table_name = self.get_padding_name("user_auth")
         ret: Optional[UserVO] = None
         try:
             # 커서 생성
             with connection.cursor() as cursor:
                 # 계정 검색 쿼리
-                select_query = f"SELECT * FROM {table_name} WHERE id = %s;"
+                select_query = f"SELECT * FROM {user_table_name} WHERE id = %s;"
                 cursor.execute(select_query, (uid.idx,))
 
                 # 결과 가져오기
-                result = cursor.fetchone()
+                user_result = cursor.fetchone()
 
-                if result:
-                    ret = UserVO(
-                        user_account=UserId(account=result[2]),
-                        name=result[3],
-                        password=Password(pw=result[1]),
-                        uid=Uid(idx=result[0]),
+                # 계정 검색 쿼리
+                select_query = (
+                    f"SELECT policy, scope FROM {auth_table_name} WHERE account = %s;"
+                )
+
+                cursor.execute(select_query, (uid.idx,))
+
+                # 결과 가져오기
+                auth_result = cursor.fetchall()
+                auths = [
+                    Auth(
+                        policy=Policy[auth["policy"]], scope=TargetScope[auth["scope"]]
                     )
-        except:
-            connection.rollback()
+                    for auth in auth_result
+                ]
+                if user_result:
+                    ret = UserVO(
+                        user_account=UserId(account=user_result["account"]),
+                        name=user_result["name"],
+                        nickname=user_result["nickname"],
+                        uid=Uid(idx=user_result["id"]),
+                        auth=AuthArchives(auths),
+                        login_data=LoginData(
+                            time_of_try_login=UpdateableTime(
+                                user_result["time_of_try_login"]
+                            ),
+                            lock_flag=user_result["lock_flag"],
+                        ),
+                        post_count=PostCounter(
+                            last_update_date=UpdateableTime(
+                                user_result["post_last_update_date"]
+                            ),
+                            post_num=user_result["post_num"],
+                        ),
+                    )
 
+        except Exception as ex:
+            connection.rollback()
         finally:
-            # 연결 닫기
             connection.close()
             return ret
 
