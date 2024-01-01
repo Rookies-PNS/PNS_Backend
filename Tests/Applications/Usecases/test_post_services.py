@@ -28,6 +28,7 @@ class test_post_services(unittest.TestCase):
     def setUpClass(cls):
         cls.driver = "test"
         print(sys._getframe(0).f_code.co_name)
+        cls.start_time = datetime.now()
         cls.factory = test_selector.get_test_factory("post_service_test_")
 
         cls.일반사용자_auths = [
@@ -158,7 +159,7 @@ class test_post_services(unittest.TestCase):
             content="Content 1",
             user=self.origin_users[0],
             share_flag=True,
-            target_time=datetime.now(),
+            target_time=self.start_time,
             img=None,
         )
         post2 = self.create_post_service.create(
@@ -166,7 +167,7 @@ class test_post_services(unittest.TestCase):
             content="Content 2",
             user=self.origin_users[1],
             share_flag=True,
-            target_time=datetime.now(),
+            target_time=self.start_time,
             img=None,
         )
         post3 = self.create_post_service.create(
@@ -174,7 +175,7 @@ class test_post_services(unittest.TestCase):
             content="Content 3",
             user=self.origin_users[2],
             share_flag=False,
-            target_time=datetime.now(),
+            target_time=self.start_time,
             img=None,
         )
 

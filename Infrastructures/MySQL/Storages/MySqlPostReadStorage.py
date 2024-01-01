@@ -198,7 +198,6 @@ LIMIT %s OFFSET %s;
                 if result:
                     return self._convert_to_postvo(result)
         except Exception as ex:
-            ic(ex)
             connection.rollback()
         finally:
             connection.close()
@@ -243,27 +242,19 @@ LIMIT %s OFFSET %s;
 SELECT post_id, title, target_time, share_flag, img_access_key, owner_id
 FROM {table_name}
 WHERE owner_id = %s AND delete_flag = 0 
-ORDER BY target_time DESC{ "" if posts_per_page is None else '''
+ORDER BY target_time ASEN{ "" if posts_per_page is None else '''
 LIMIT %s OFFSET %s;''' }
             """
-                ic()
-                match posts_per_page:
-                    case None:
-                        ic()
-                        cursor.execute(query, (user_id.idx))
-                    case _:
-                        ic()
-                        offset = max(page * posts_per_page, 1)
+                match (posts_per_page, page):
+                    case (per, num) if per > 0 and num >= 0:
+                        offset = (page) * posts_per_page
                         cursor.execute(query, (user_id.idx, posts_per_page, offset))
-                ic()
+                    case (None, any):
+                        cursor.execute(query, (user_id.idx))
                 posts = cursor.fetchall()
-                ic()
-
                 # 조회 결과를 SimplePost 객체로 매핑
                 result_posts: List[SimplePost] = []
-                ic(result_posts)
         except Exception as ex:
-            ic(ex)
             connection.rollback()
             return Fail(type="Fail_Mysql_get_public_post_list_unknown")
         finally:

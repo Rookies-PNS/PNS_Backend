@@ -50,9 +50,7 @@ def private_list(page):
     posts_per_page = 10
     page = max(page, 1)
     serivce = GetPrivatePostService(get_post_storage()[1])  # get_post_storage
-    ic()
     post_list = posts_to_dicts(serivce.get_post_list(user, page - 1, posts_per_page))
-    ic()
     create_auth = False
     if "user" in session:
         user = dict_to_user(session["user"])
