@@ -46,6 +46,7 @@ class MySqlPostReadStorage(IPostReadableRepository):
                 Uid(idx=row["owner_id"])
             ).get_simple_user(),
             img_key=row["img_access_key"],
+            share_flag=True if row["share_flag"] else False,
         )
         return a
 
@@ -97,106 +98,67 @@ class MySqlPostReadStorage(IPostReadableRepository):
             with connection.cursor() as cursor:
                 # Execute the query with the given parameters
                 query = f"""
-SELECT (
-    post_id, title, target_time, share_flag, img_key, owner_id
-)
+SELECT post_id, title, target_time, share_flag, img_access_key, owner_id
 FROM {table_name}
-WHERE delete_flag = 0
-ORDER BY create_time DESC
-LIMIT %s OFFSET %s;
+WHERE share_flag = 1 AND delete_flag = 0 
+ORDER BY target_time ASC{ ";" if posts_per_page is None else '''
+LIMIT %s OFFSET %s;''' }
             """
-                cursor.execute(query, (posts_per_page, page * posts_per_page))
+                match (posts_per_page, page):
+                    case (None, any):
+                        cursor.execute(query)
+                    case (per, num) if per > 0 and num >= 0:
+                        offset = (page) * posts_per_page
+                        cursor.execute(query, (posts_per_page, offset))
                 posts = cursor.fetchall()
-
                 # 조회 결과를 SimplePost 객체로 매핑
                 result_posts: List[SimplePost] = []
-
-                for post in posts:
-                    user = None
-                    result_posts.append(
-                        SimplePost(
-                            post_id=post["post_id"],
-                            title=post["title"],
-                            target_time=post["target_time"],
-                            share_flag=post["share_flag"],
-                            img_key=post["img_key"],
-                            owner=user,
-                        )
-                    )
-                return result_posts
         except Exception as ex:
             connection.rollback()
             return Fail(type="Fail_Mysql_get_public_post_list_unknown")
         finally:
             connection.close()
-
-    def _get_post_per_page_list_all(self) -> Result[Collection[SimplePost]]:
-        connection = self.connect()
-        table_name = self.get_padding_name("post")
-
-        # This query will return a list of post_ids in descending order, limited by posts_per_page and offset by page*posts_per_page
-        select_query = f"SELECT * FROM {table_name} ORDER BY post_id DESC;"
         try:
-            with connection.cursor() as cursor:
-                # Execute the query with the given parameters
-                cursor.execute(select_query)
-                # Fetch all the results of the query
-                results = cursor.fetchall()
-        except Exception as ex:
-            connection.rollback()
-            return Fail(type="Fail_Mysql_LoadPostList_unknown")
-        finally:
-            connection.close()
+            user_dict: Dict[int, SimpleUser] = {}
 
-        return [self._convert_to_postvo(row).get_simple_post() for row in results]
+            for post in posts:
+                own_id = post["owner_id"]
+                if not own_id in user_dict.keys():
+                    match self.user_repo.search_by_uid(Uid(own_id)):
+                        case uservo if isinstance(uservo, UserVO):
+                            user_dict[own_id] = uservo.get_simple_user()
+                        case _:
+                            ic("No User")
+                            continue
 
-    def get_post_per_page_list(
-        self,
-        page: int = 0,
-        posts_per_page: Optional[int] = None,
-    ) -> Result[Collection[SimplePost]]:
-        match posts_per_page:
-            case _ if posts_per_page is not None:
-                pass  # 아래에서 처리
-            case _ if posts_per_page is None:
-                return self._get_post_per_page_list_all()
-            case _ if posts_per_page < 1:
-                raise ValueError(
-                    f"Must posts_per_page >= 1, current value({posts_per_page})"
+                user = user_dict[own_id]
+                share_flag = False if post["share_flag"] == 0 else True
+                simple_post = SimplePost(
+                    post_id=PostId(post["post_id"]),
+                    title=post["title"],
+                    target_time=SelectTime(post["target_time"]),
+                    share_flag=share_flag,
+                    img_key=post["img_access_key"],
+                    owner=user,
                 )
+                result_posts.append(simple_post)
+            return result_posts
+        except:  # Exception as ex:
+            return Fail(type="Fail_Mysql_get_public_post_list_unknown2")
 
+    def search_by_available_pid(self, post_id: PostId) -> Optional[PostVO]:
         connection = self.connect()
         table_name = self.get_padding_name("post")
 
-        # This query will return a list of post_ids in descending order, limited by posts_per_page and offset by page*posts_per_page
-        select_query = (
-            f"SELECT * FROM {table_name} ORDER BY post_id DESC LIMIT %s OFFSET %s;"
-        )
         try:
             with connection.cursor() as cursor:
-                # Execute the query with the given parameters
-                cursor.execute(select_query, (posts_per_page, (page) * posts_per_page))
-                # Fetch all the results of the query
-                results = cursor.fetchall()
-        except Exception as ex:
-            connection.rollback()
-            return Fail(type="Fail_Mysql_LoadPostList_unknown")
-        finally:
-            connection.close()
+                query = f"SELECT * FROM {table_name} WHERE post_id = %s AND delete_flag = 0;"
+                cursor.execute(query, (post_id.idx))
+                posts = cursor.fetchone()
+                # 조회 결과를 SimplePost 객체로 매핑
 
-        return [self._convert_to_postvo(row).get_simple_post() for row in results]
-
-    def search_by_pid(self, post_id: PostId) -> Optional[PostVO]:
-        connection = self.connect()
-        table_name = self.get_padding_name("post")
-        try:
-            with connection.cursor() as cursor:
-                select_query = f"SELECT * FROM {table_name} WHERE post_id = %s;"
-                cursor.execute(select_query, (post_id.idx,))
-                result = cursor.fetchone()
-
-                if result:
-                    return self._convert_to_postvo(result)
+                if posts:
+                    return self._convert_to_postvo(posts)
         except Exception as ex:
             connection.rollback()
         finally:
@@ -245,11 +207,8 @@ WHERE owner_id = %s AND delete_flag = 0
 ORDER BY target_time ASC{ ";" if posts_per_page is None else '''
 LIMIT %s OFFSET %s;''' }
             """
-                ic()
-                print(query)
                 match (posts_per_page, page):
                     case (None, any):
-                        ic()
                         cursor.execute(query, (user_id.idx))
                     case (per, num) if per > 0 and num >= 0:
                         offset = (page) * posts_per_page
@@ -258,9 +217,8 @@ LIMIT %s OFFSET %s;''' }
                 # 조회 결과를 SimplePost 객체로 매핑
                 result_posts: List[SimplePost] = []
         except Exception as ex:
-            ic(ex)
             connection.rollback()
-            return Fail(type="Fail_Mysql_get_public_post_list_unknown")
+            return Fail(type="Fail_Mysql_search_uid_post_list_unknown")
         finally:
             connection.close()
         try:
@@ -288,7 +246,7 @@ LIMIT %s OFFSET %s;''' }
                 result_posts.append(simple_post)
             return result_posts
         except:  # Exception as ex:
-            return Fail(type="Fail_Mysql_get_public_post_list_unknown2")
+            return Fail(type="Fail_Mysql_search_uid_post_list_unknown2")
 
     def search_by_uid(
         self,

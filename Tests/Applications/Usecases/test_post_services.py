@@ -190,15 +190,38 @@ class test_post_services(unittest.TestCase):
 
     def test_get_public_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post_list = self.get_public_post_service.get_list_no_filter()
+        user = self.origin_users[0]
+        post_list = self.get_public_post_service.get_post_list(user)
 
-        post = self.get_private_post_service.get_post_detail(1)
-        self.assertEqual("Post 1", post.title)
-        self.assertEqual("Content 1", post.content)
+        post: SimplePost = post_list[0]
+        self.assertEqual(1, post.get_post_id().idx)
+        self.assertEqual("Post 1", post.get_title())
+        self.assertEqual("Taks", post.get_owner_nickname())
+        self.assertEqual(True, post.share_flag)
 
-        post_list = self.get_public_post_service.get_list_no_filter()
-        self.assertEqual(len(post_list), 3)
-        self.assertEqual(len(post_list), 3)
+        post: SimplePost = post_list[1]
+        self.assertEqual(2, post.get_post_id().idx)
+        self.assertEqual("Post 2", post.get_title())
+        self.assertEqual("Hans", post.get_owner_nickname())
+        self.assertEqual(True, post.share_flag)
+
+        # 공개 일기 조회
+
+        match self.get_public_post_service.get_post_detail(user, 2):
+            case ret if isinstance(ret, PostVO):
+                post = ret
+            case fail:
+                ic(fail)
+                raise ValueError()
+
+        self.assertEqual("Post 2", post.get_title())
+        self.assertEqual("Content 2", post.get_content())
+
+        # 비공개 일기 조회
+
+        self.assertIsInstance(
+            self.get_public_post_service.get_post_detail(user, 3), Fail
+        )
 
     def test_create_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
@@ -253,14 +276,14 @@ class test_post_services(unittest.TestCase):
 
     def test_get_private_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post_list = self.get_public_post_service.get_list_no_filter()
+        post_list = self.get_public_post_service.get_post_list()
 
         post = self.get_private_post_service.get_post_detail(1)
         post = self.get_private_post_service.get_post_detail(1)
         self.assertEqual("Post 1", post.title)
         self.assertEqual("Content 1", post.content.content)
 
-        post_list = self.get_public_post_service.get_list_no_filter()
+        post_list = self.get_public_post_service.get_post_list()
         self.assertEqual(len(post_list), 3)
 
     def test_update_post(self):
@@ -287,7 +310,7 @@ class test_post_services(unittest.TestCase):
             < 0
         )
 
-        post_list = self.get_public_post_service.get_list_no_filter()
+        post_list = self.get_public_post_service.get_post_list()
         self.assertEqual(len(post_list), 3)
 
         check_post = self.get_private_post_service.get_post_detail(
@@ -303,7 +326,7 @@ class test_post_services(unittest.TestCase):
         deleted_post = self.get_private_post_service.get_post_detail(1)
         self.assertIsNone(deleted_post)
 
-        post_list = self.get_public_post_service.get_list_no_filter()
+        post_list = self.get_public_post_service.get_post_list()
         self.assertEqual(len(post_list), 2)
 
     def test_(self):

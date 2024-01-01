@@ -11,7 +11,7 @@ from Applications.Repositories.Interfaces import IUserReadableRepository
 
 import pymysql
 
-# from icecream import ic
+from icecream import ic
 
 
 class MySqlUserReadStorage(IUserReadableRepository):
@@ -72,11 +72,9 @@ class MySqlUserReadStorage(IUserReadableRepository):
                 user_result = cursor.fetchone()
 
                 # 계정 검색 쿼리
-                select_query = (
-                    f"SELECT policy, scope FROM {auth_table_name} WHERE account = %s;"
-                )
+                select_query = f"SELECT * FROM {auth_table_name} WHERE account = %s;"
 
-                cursor.execute(select_query, (uid.idx,))
+                cursor.execute(select_query, (user_result["account"],))
 
                 # 결과 가져오기
                 auth_result = cursor.fetchall()
@@ -108,6 +106,8 @@ class MySqlUserReadStorage(IUserReadableRepository):
                     )
 
         except Exception as ex:
+            ic()
+            ic(ex)
             connection.rollback()
         finally:
             connection.close()

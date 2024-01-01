@@ -51,7 +51,7 @@ class IPostReadableRepository(metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
-    def search_by_pid(self, post_id: PostId) -> Optional[PostVO]:
+    def search_by_available_pid(self, post_id: PostId) -> Optional[PostVO]:
         """_summary_
         pid를 기준으로 일기를 검색한다.
 

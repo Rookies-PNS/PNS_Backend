@@ -94,7 +94,7 @@ def private_detail(post_id):
                 update_auth=update_auth,
             )
         case _:
-            return redirect(url_for("post._prlist", page=1))
+            return redirect(url_for("post.private_list", page=1))
 
 
 @bp.route("/prcreate/", methods=("GET", "POST"))
@@ -253,7 +253,7 @@ def public_list(page):
     posts_per_page = 10
     page = max(page, 1)
     serivce = GetPublicPostService(get_post_storage()[1])  # get_post_storage
-    post_list = posts_to_dicts(serivce.get_list_no_filter(page - 1, posts_per_page))
+    post_list = posts_to_dicts(serivce.get_post_list(page - 1, posts_per_page))
     create_auth = False
     if "user" in session:
         user = dict_to_user(session["user"])
@@ -270,24 +270,31 @@ def public_list(page):
 
 @bp.route("/pbdetail/<int:post_id>/")
 def public_detail(post_id):
-    service = GetPublicPostService(None)  # get_post_storage()
-    match service.get_post_from_post_id(post_id):
+    if "user" in session:
+        user = dict_to_user(session["user"])
+    else:
+        user = None
+        return redirect(url_for("post.public_list", page=1))
+
+    service = GetPublicPostService(get_post_storage()[1])  # get_post_storage()
+
+    match service.get_post_detail(user, post_id):
         case post if isinstance(post, PostVO):
             auth = post.get_uid() is None
             update_auth, delete_auth = False, False
-            if not auth and "user" in session:
-                user = dict_to_user(session["user"])
-                update_auth = UpdatePostService(
-                    # get_post_storage(), get_user_storage()
-                    None,
-                    None,
-                ).check_auth(post, user)
-                delete_auth = DeletePostService(
-                    # get_post_storage(), get_user_storage()
-                    None,
-                    None,
-                ).check_auth(post, user)
-                ic(user, delete_auth, update_auth)
+            # if not auth and "user" in session:
+            #     user = dict_to_user(session["user"])
+            #     update_auth = UpdatePostService(
+            #         # get_post_storage(), get_user_storage()
+            #         None,
+            #         None,
+            #     ).check_auth(post, user)
+            #     delete_auth = DeletePostService(
+            #         # get_post_storage(), get_user_storage()
+            #         None,
+            #         None,
+            #     ).check_auth(post, user)
+            #     ic(user, delete_auth, update_auth)
             post = post_to_dict(post)
             return render_template(
                 "post/public_post_detail.html",

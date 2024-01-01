@@ -127,14 +127,14 @@ CREATE TABLE IF NOT EXISTS {auth_table_name} (
 
     def create_post(self):
         connection = self.connect()
-        table_name = self.get_padding_name("post")
-        table_user = self.get_padding_name("user")
+        post_table_name = self.get_padding_name("post")
+        user_table_name = self.get_padding_name("user")
         try:
             # 커서 생성
             with connection.cursor() as cursor:
                 # "post" 테이블 생성 쿼리
                 create_table_query = f"""
-CREATE TABLE IF NOT EXISTS {table_name} (
+CREATE TABLE IF NOT EXISTS {post_table_name} (
     post_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS {table_name} (
     img_access_key VARCHAR(255),
     owner_id INT,
     delete_flag BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (owner_id) REFERENCES {table_user}(id)
+    FOREIGN KEY (owner_id) REFERENCES {user_table_name}(id)
 );
                 """
                 cursor.execute(create_table_query)
