@@ -23,7 +23,6 @@ bp = Blueprint("auth", __name__, url_prefix="/auth")
 def signup():
     form = UserCreateForm()
     if request.method == "POST" and form.validate_on_submit():
-        ic(form.account.data, form.password1.data, form.name.data, form.nickname.data)
         service = CreateUserService(get_user_storage()[0])
         match service.create(
             form.account.data, form.password1.data, form.name.data, form.nickname.data

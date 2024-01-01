@@ -12,7 +12,6 @@ from flask import (
 from flask_login import current_user
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.datastructures import MultiDict
-from werkzeug.datastructures.file_storage import FileStorage
 from Commons import PostId
 
 from Domains.Entities import Post, PostVO, SimplePost, SimpleUser
