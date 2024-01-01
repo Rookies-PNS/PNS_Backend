@@ -28,6 +28,7 @@ from Infrastructures.MySQL.Storages import MySqlIImageWriteableStorage
 from Services.Flask.Models import post_to_dict, posts_to_dicts, dict_to_user
 from Services.Flask.Views.forms import PostForm, ImageUploadForm
 
+from datetime import datetime
 from icecream import ic
 import os
 
@@ -40,17 +41,24 @@ app.config["UPLOAD_FOLDER"] = os.path.join(
 
 @bp.route("/prlist/<int:page>")
 def private_list(page):
+    if "user" in session:
+        user = dict_to_user(session["user"])
+    else:
+        user = None
+        return redirect(url_for("auth.login"))
+
     posts_per_page = 10
     page = max(page, 1)
-    serivce = GetPrivatePostService(None)  # get_post_storage
-    post_list = posts_to_dicts(serivce.get_post_list(page - 1, posts_per_page))
+    serivce = GetPrivatePostService(get_post_storage()[1])  # get_post_storage
+    ic()
+    post_list = posts_to_dicts(serivce.get_post_list(user, page - 1, posts_per_page))
+    ic()
     create_auth = False
     if "user" in session:
         user = dict_to_user(session["user"])
         create_auth = CreatePostService(
             get_post_storage(), get_user_storage()
         ).check_auth(user)
-
     return render_template(
         "post/private_post_list.html",
         post_list=post_list,
@@ -87,25 +95,33 @@ def private_detail(post_id):
 
 @bp.route("/prcreate/", methods=("GET", "POST"))
 def private_create():
-    create_auth = True
+    create_auth = False
+    post_service = CreatePostService(get_post_storage()[0], get_user_storage()[0])
     if "user" in session:
         user = dict_to_user(session["user"])
-        create_auth = (get_post_storage(), get_user_storage()).check_auth(user)
+        create_auth = post_service.check_auth(user)
     if not create_auth:
         return redirect(url_for("post.private_list", page=1))
 
     form = PostForm()
     form2 = ImageUploadForm()
     if request.method == "POST":
-        if form.validate_on_submit() and form2.validate_on_submit():
-            service = CreatePostService(get_post_storage(), get_user_storage())
+        if form.validate_on_submit():  # and form2.validate_on_submit():
             if "user" in session:
                 user = dict_to_user(session["user"])
             else:
                 user = None
-            match service.create(form.subject.data, form.content.data, user=user):
-                case post if isinstance(post, SimplePost):
-                    return redirect(url_for("main.index"))
+
+            match post_service.create(
+                form.subject.data,
+                form.content.data,
+                user=user,
+                share_flag=False,
+                target_time=datetime.now(),
+                img=None,
+            ):
+                case none if none is None:
+                    return redirect(url_for("post.private_list", page=1))
                 case Fail(type=type):
                     ic()
                     ic(type, "NotImplementedError")
@@ -275,22 +291,29 @@ def public_detail(post_id):
 @bp.route("/pbcreate/", methods=("GET", "POST"))
 def public_create():
     create_auth = False
+    service = CreatePostService(get_post_storage()[0], get_user_storage()[1])
     if "user" in session:
         user = dict_to_user(session["user"])
-        create_auth = (get_post_storage(), get_user_storage()).check_auth(user)
+        create_auth = service.check_auth(user)
     if not create_auth:
         return redirect(url_for("post.public_list", page=1))
 
     form = PostForm()
     if request.method == "POST" and form.validate_on_submit():
-        service = CreatePostService(get_post_storage(), get_user_storage())
         if "user" in session:
             user = dict_to_user(session["user"])
         else:
             user = None
-        match service.create(form.subject.data, form.content.data, user=user):
-            case post if isinstance(post, SimplePost):
-                return redirect(url_for("main.index"))
+        match service.create(
+            form.subject.data,
+            form.content.data,
+            user=user,
+            share_flag=True,
+            target_time=datetime.now(),
+            img=None,
+        ):
+            case none if none is None:
+                return redirect(url_for("post.public_list", page=1))
             case Fail(type=type):
                 ic()
                 ic(type, "NotImplementedError")

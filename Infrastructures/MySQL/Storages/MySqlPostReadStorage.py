@@ -246,17 +246,24 @@ WHERE owner_id = %s AND delete_flag = 0
 ORDER BY target_time DESC{ "" if posts_per_page is None else '''
 LIMIT %s OFFSET %s;''' }
             """
+                ic()
                 match posts_per_page:
                     case None:
+                        ic()
                         cursor.execute(query, (user_id.idx))
                     case _:
+                        ic()
                         offset = max(page * posts_per_page, 1)
                         cursor.execute(query, (user_id.idx, posts_per_page, offset))
+                ic()
                 posts = cursor.fetchall()
+                ic()
 
                 # 조회 결과를 SimplePost 객체로 매핑
                 result_posts: List[SimplePost] = []
+                ic(result_posts)
         except Exception as ex:
+            ic(ex)
             connection.rollback()
             return Fail(type="Fail_Mysql_get_public_post_list_unknown")
         finally:
