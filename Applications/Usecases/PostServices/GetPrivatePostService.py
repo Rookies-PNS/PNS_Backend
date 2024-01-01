@@ -43,6 +43,16 @@ class GetPrivatePostService:
             taget_allow_flag=share_flag,
         )
 
+    def get_post_detail(self, actor: SimpleUser, post_id: int) -> Result[PostVO]:
+        match self._________get_simple_post(post_id):
+            case post if isinstance(post, PostVO):
+                ret = post
+            case _:
+                return Fail(type="Fail_to_GetPrivatePostService_Not_Found")
+        if self._______chece_auth(actor, ret.owner, ret.share_flag):
+            return ret
+        return Fail(type="Fail_to_GetPrivatePostService_No_Auth")
+
     def get_post_list(
         self, actor: SimpleUser, page: int = 0, posts_per_page: Optional[int] = None
     ) -> Collection[SimplePost]:
@@ -58,7 +68,6 @@ class GetPrivatePostService:
             Collection[SimplePost]: _description_
         """
 
-        ic(actor.get_uid(), page, posts_per_page)
         match self.repository.search_by_available_uid(
             user_id=actor.get_uid(), page=page, posts_per_page=posts_per_page
         ):
@@ -85,20 +94,10 @@ class GetPrivatePostService:
             del self.cache[post_id]
             return ret
 
-        match self.repository.search_by_pid(PostId(post_id)):
+        match self.repository.search_by_available_pid(PostId(post_id)):
             case post if isinstance(post, PostVO):
                 self.cache[post_id] = post
                 return post
             case fail:
                 ic(fail)
                 return None
-
-    def get_post_detail(self, actor: SimpleUser, post_id: int) -> Result[PostVO]:
-        match self._________get_simple_post(post_id):
-            case post if isinstance(post, PostVO):
-                ret = post
-            case _:
-                return Fail(type="Fail_to_GetPrivatePostService_Not_Found")
-        if self._______chece_auth(actor, ret.owner, ret.share_flag):
-            return ret
-        return Fail(type="Fail_to_GetPrivatePostService_No_Auth")

@@ -18,7 +18,7 @@ class CommonPostAction:
     post_id: PostId
     owner: SimpleUser
     target_time: SelectTime
-    share_flag: bool = False
+    share_flag: bool
     img_key: Optional[ImageKey] = None
 
     def get_account(self) -> str:
@@ -62,7 +62,7 @@ class SimplePost(CommonPostAction):
     post_id: PostId
     owner: SimpleUser
     target_time: SelectTime
-    share_flag: bool = False
+    share_flag: bool
     img_key: Optional[ImageKey] = None
 
     def get_uid(self) -> Uid:
@@ -118,7 +118,7 @@ class PostVO(FullPostAction):
     create_time: TimeVO
     update_time: UpdateableTime
     post_id: PostId
-    share_flag: bool = False
+    share_flag: bool
     img_key: Optional[ImageKey] = None
 
     def get_simple_post(self) -> SimplePost:
