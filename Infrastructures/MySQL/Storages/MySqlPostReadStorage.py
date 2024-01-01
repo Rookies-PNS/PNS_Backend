@@ -22,7 +22,7 @@ class MySqlPostReadStorage(IPostReadableRepository):
         self.user_repo = user_repo
 
     def connect(self):
-        from get_db_data import get_mysql_dict
+        from get_config_data import get_mysql_dict
 
         sql_config = get_mysql_dict()
         return pymysql.connect(
@@ -242,19 +242,23 @@ LIMIT %s OFFSET %s;
 SELECT post_id, title, target_time, share_flag, img_access_key, owner_id
 FROM {table_name}
 WHERE owner_id = %s AND delete_flag = 0 
-ORDER BY target_time ASEN{ "" if posts_per_page is None else '''
+ORDER BY target_time ASC{ ";" if posts_per_page is None else '''
 LIMIT %s OFFSET %s;''' }
             """
+                ic()
+                print(query)
                 match (posts_per_page, page):
+                    case (None, any):
+                        ic()
+                        cursor.execute(query, (user_id.idx))
                     case (per, num) if per > 0 and num >= 0:
                         offset = (page) * posts_per_page
                         cursor.execute(query, (user_id.idx, posts_per_page, offset))
-                    case (None, any):
-                        cursor.execute(query, (user_id.idx))
                 posts = cursor.fetchall()
                 # 조회 결과를 SimplePost 객체로 매핑
                 result_posts: List[SimplePost] = []
         except Exception as ex:
+            ic(ex)
             connection.rollback()
             return Fail(type="Fail_Mysql_get_public_post_list_unknown")
         finally:

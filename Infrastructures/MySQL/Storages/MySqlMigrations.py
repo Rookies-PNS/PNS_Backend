@@ -12,7 +12,7 @@ class MySqlMigrations(IMigrations):
         self.name_padding = name_padding
 
     def connect(self):
-        from get_db_data import get_mysql_dict
+        from get_config_data import get_mysql_dict
 
         sql_config = get_mysql_dict()
         return pymysql.connect(

@@ -21,7 +21,7 @@ class MySqlPostWriteStorage(IPostWriteableRepository):
         self.user_repo = user_repo
 
     def connect(self):
-        from get_db_data import get_mysql_dict
+        from get_config_data import get_mysql_dict
 
         sql_config = get_mysql_dict()
         return pymysql.connect(

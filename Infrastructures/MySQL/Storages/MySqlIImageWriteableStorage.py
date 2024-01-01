@@ -1,7 +1,7 @@
 import __init__
 from typing import Optional
 from collections.abc import Collection
-from get_db_data import get_boto_data
+from get_config_data import get_boto_data
 import boto3
 from flask import current_app
 from Commons import *
@@ -40,7 +40,7 @@ class MySqlIImageWritableStorage(IImageWriteableRepository):
 
     def save_image_data(user_id, s3_url) -> Result[ImageKey]:
         # 데이터베이스 연결 설정
-        from get_db_data import get_mysql_dict
+        from get_config_data import get_mysql_dict
 
         sql_config = get_mysql_dict()
         connection = pymysql.connect(
