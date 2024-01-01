@@ -248,12 +248,12 @@ LIMIT %s OFFSET %s;''' }
                 ic()
                 print(query)
                 match (posts_per_page, page):
-                    case (per, num) if per > 0 and num >= 0:
-                        offset = (page) * posts_per_page
-                        cursor.execute(query, (user_id.idx, posts_per_page, offset))
                     case (None, any):
                         ic()
                         cursor.execute(query, (user_id.idx))
+                    case (per, num) if per > 0 and num >= 0:
+                        offset = (page) * posts_per_page
+                        cursor.execute(query, (user_id.idx, posts_per_page, offset))
                 posts = cursor.fetchall()
                 # 조회 결과를 SimplePost 객체로 매핑
                 result_posts: List[SimplePost] = []
