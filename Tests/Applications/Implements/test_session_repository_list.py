@@ -1,40 +1,40 @@
 import __init__
 import secrets
 from typing import Optional, List
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 from Commons import UserId, Uid
-from Domains.Entities import User,SimpleUser,Session
-from Applications.Usecases.SessionServices import CreateSession,verifySession
-from Applications.Repositories.Interfaces import SessionRepository
-from Applications.Results import (Result,Fail)
+from Domains.Entities import User, SimpleUser, UserSession
+from Applications.Usecases.SessionServices import PublichSessionService, VerifySession
+from Applications.Repositories.Interfaces import ISessionRepository
+from Applications.Results import Result, Fail
 
 from datetime import datetime
 from typing import Optional, List
 
+
 class TestSessionRepository:
-    def __init__(self, sessions: List[Session] = []):
+    def __init__(self, sessions: List[UserSession] = []):
         self.sessions = sessions
 
-    def publish_Session(self, user: SimpleUser) -> Result[Session]:
-        new_session = Session(
+    def publish_Session(self, user: SimpleUser) -> Result[UserSession]:
+        new_session = UserSession(
             session_key=secrets.token_hex(32),
             user=user,
-            due_to=datetime.now()+timedelta(minutes=10),  
-            is_delete=False
+            due_to=datetime.now() + timedelta(minutes=10),
+            is_delete=False,
         )
         self.sessions.append(new_session)
-        return new_session  
+        return new_session
 
-    def load_session(self, session_key: str) -> Optional[Session]:
-        
+    def load_session(self, session_key: str) -> Optional[UserSession]:
         for session in self.sessions:
-            if session.get_Session_key() == session_key and not session.get_is_delete():
+            if session.get_session_key() == session_key and not session.get_is_delete():
                 return session
-        return None 
+        return None
 
     def verify_Session(self, session_key: str) -> bool:
         for session in self.sessions:
-            if session.get_Session_key() == session_key and not session.get_is_delete():
+            if session.get_session_key() == session_key and not session.get_is_delete():
                 return True
         return False
 
@@ -44,4 +44,3 @@ class TestSessionRepository:
                 session.is_delete = True
                 return None
         return Fail("Session not found for the user")
-

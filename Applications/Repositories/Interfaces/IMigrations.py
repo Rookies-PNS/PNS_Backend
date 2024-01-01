@@ -40,3 +40,15 @@ class IMigrations(metaclass=ABCMeta):
     @abstractmethod
     def check_exist_img_data(self) -> bool:
         ...
+
+    @abstractmethod
+    def create_user_session(self):
+        ...
+
+    @abstractmethod
+    def delete_user_session(self):
+        ...
+
+    @abstractmethod
+    def check_exist_user_session(self) -> bool:
+        ...

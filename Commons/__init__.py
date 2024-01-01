@@ -19,7 +19,7 @@ from Commons.Types.Auth import (
     IntersectionPolicy,
 )
 from Commons.Types.PostCounter import PostCounter
-from Commons.Types.LoginData import LoginData
+from Commons.Types.HendleTimeData import LoginData, SessionData
 
 __all__ = [
     "Uid",
@@ -39,4 +39,5 @@ __all__ = [
     "IntersectionPolicy",
     "PostCounter",
     "LoginData",
+    "SessionData",
 ]

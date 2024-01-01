@@ -15,5 +15,5 @@ from Domains.Entities.Post import (
     PostVO_to_Post,
 )
 from Domains.Entities.User import User, UserVO, SimpleUser, SecuritySimpleUser
-
+from Domains.Entities.UserSession import UserSession
 from Domains.Entities.ImageData import ImageData

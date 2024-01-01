@@ -1,13 +1,16 @@
 import __init__
 import unittest
 import sys
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 
 from Domains.Entities import SimpleUser
 from Applications.Usecases.SessionServices import *
 from Applications.Usecases import CreateUser, LoginUser
-from Tests.Applications.Implements.test_session_repository_list import TestSessionRepository
+from Tests.Applications.Implements.test_session_repository_list import (
+    TestSessionRepository,
+)
 import Tests.Applications.Usecases.storage_selecter as test_selector
+
 
 class test_session_services(unittest.TestCase):
     @classmethod
@@ -36,7 +39,7 @@ class test_session_services(unittest.TestCase):
         repo = test_selector.get_user_storage(factory)
         create_user = CreateUser(repo)
         login_user = LoginUser(repo)
-        session = CreateSession
+        session = PublichSessionService
         users = []
         u = create_user.create("taks123", "1Q2w3e4r!@$", "takgyun Lee")
         users.append(u)
@@ -47,7 +50,7 @@ class test_session_services(unittest.TestCase):
 
         self.create_user = CreateUser(repo)
         self.login_user = LoginUser(repo)
-        self.session = CreateSession
+        self.session = PublichSessionService
 
     def tearDown(self):
         "Hook method for deconstructing the test fixture after testing it."
@@ -59,7 +62,7 @@ class test_session_services(unittest.TestCase):
             migrate.delete_user()
 
         self.assertFalse(migrate.check_exist_user())
-        
+
     def test_login_user_잘_로그인_되는거_확인(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
 
@@ -75,7 +78,7 @@ class test_session_services(unittest.TestCase):
         self.new = TestSessionRepository.publish_Session
         new = self.new
         match new:
-            case _ if isinstance(new,Fail):
+            case _ if isinstance(new, Fail):
                 self.assertTrue(False)
             case _:
                 pass
