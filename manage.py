@@ -17,6 +17,11 @@ def parse_opt():
     parser.add_argument("--not_debug", action="store_true", default=False)
     parser.add_argument("--storage_type", default="mysql")
     parser.add_argument(
+        "--ver",
+        choices=["python", "python3.11"],
+        default="python",
+    )
+    parser.add_argument(
         "--test_file",
         nargs="*",
         default=[
@@ -36,15 +41,15 @@ def parse_opt():
     return opt
 
 
-def test(test_list: list) -> bool:
+def test(test_list: list, py_v="python") -> bool:
     fail = False
 
-    test_exe = "python -m unittest"
+    test_exe = f"{py_v} -m unittest"
     fail_list = []
 
     for test in test_list:
         test_py = f"{test_exe} {test}"
-        print("Test", test)
+        print(test_exe, test)
         ret = subprocess.call(test_py, shell=True)
         if ret == 1:
             fail_list.append(test)
@@ -277,7 +282,7 @@ def main(opt):
     match opt.run:
         case "test":
             ic.enable()
-            test(opt.test_file)
+            test(opt.test_file, opt.ver)
         case "git-push":
             git_push(opt.test_file, opt.branch)
         case "flask":
