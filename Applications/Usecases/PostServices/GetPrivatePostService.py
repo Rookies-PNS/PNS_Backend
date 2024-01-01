@@ -58,6 +58,7 @@ class GetPrivatePostService:
             Collection[SimplePost]: _description_
         """
 
+        ic(actor.get_uid(), page, posts_per_page)
         match self.repository.search_by_available_uid(
             user_id=actor.get_uid(), page=page, posts_per_page=posts_per_page
         ):
