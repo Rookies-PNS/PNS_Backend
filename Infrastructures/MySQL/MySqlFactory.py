@@ -6,9 +6,8 @@ from Applications.Repositories.Interfaces import (
     IUserWriteableRepository,
     IUserReadableRepository,
     IMigrations,
-    IImageDataReadableRepository,
-    IImageDeleteableRepository,
-    IImageSaveableRepository,
+    IImageReadableRepository,
+    IImageWriteableRepository,
 )
 
 from Infrastructures.Interfaces import IStorageFactory, IMigrations
@@ -46,16 +45,13 @@ class MySqlFactory(IStorageFactory):
 
     def get_post_read_storage(self) -> IPostReadableRepository:
         from Infrastructures.MySQL.Storages.MySqlPostWriteStorage import (
-            MySqlPostReadStorage,
+            MySqlPostWriteStorage,
         )
 
-        return MySqlPostReadStorage(self.get_user_read_storage(), self.padding)
+        return MySqlPostWriteStorage(self.get_user_read_storage(), self.padding)
 
-    def get_image_data_read_storage(self) -> IImageDataReadableRepository:
+    def get_image_read_storage(self) -> IImageReadableRepository:
         raise NotImplementedError()
 
-    def get_image_save_storage(self) -> IImageDeleteableRepository:
-        raise NotImplementedError()
-
-    def get_image_delete_storage(self) -> IImageSaveableRepository:
+    def get_image_write_storage(self) -> IImageWriteableRepository:
         raise NotImplementedError()

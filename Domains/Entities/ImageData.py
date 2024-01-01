@@ -17,7 +17,6 @@ class ImageData(ImageKey):
     thumbnail_path: str
     origin_path: str
     owner: Uid
-    post: PostId
 
     def get_image_access_key(self) -> str:
         return self.access_key.get_image_access_key()

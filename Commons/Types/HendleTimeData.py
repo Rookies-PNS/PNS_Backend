@@ -45,3 +45,26 @@ class LoginData:
 
     def lock_login(self):
         self.lock_flag = True
+
+
+@dataclass
+class SessionData:
+    published_time: UpdateableTime
+    is_disuse: bool = False
+
+    def check_avliable(self, session_minute: int) -> bool:
+        """
+        세션 사용 가능 여부를 확인하는 함수
+        """
+        # 파기가 않되고, 발행기한이 지나지 않은 것것
+        if not self.is_disuse and self.published_time.compare_time(
+            datetime.now() - timedelta(minutes=session_minute)
+        ):
+            return True
+        else:
+            self.is_disuse = False
+            return False
+
+    def republish_session(self):
+        self.published_time.set_now()
+        self.is_disuse = True

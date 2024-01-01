@@ -6,9 +6,9 @@ from Infrastructures.Interfaces import IMigrations, IStorageFactory
 from Applications.Repositories.Interfaces import (
     IPostWriteableRepository,
     IPostReadableRepository,
+    ISessionRepository,
     IUserWriteableRepository,
     IUserReadableRepository,
-    SessionRepository,
 )
 
 
@@ -34,5 +34,5 @@ def get_user_storage(
     return factory.get_user_write_storage(), factory.get_user_read_storage()
 
 
-def get_session_storage(factory: IStorageFactory) -> SessionRepository:
+def get_session_storage(factory: IStorageFactory) -> ISessionRepository:
     return factory.get_session_storage()

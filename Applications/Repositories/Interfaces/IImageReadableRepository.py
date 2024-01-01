@@ -3,18 +3,19 @@ from abc import *
 from typing import Optional
 
 from Commons import ImageKey
-from Applications.Results import Result, Fail
+from Domains.Entities import ImageData
+from Applications.Results import Result
 
 
-class IImageDeleteableRepository(metaclass=ABCMeta):
+class IImageReadableRepository(metaclass=ABCMeta):
     @abstractclassmethod
     def check_exist_key(self, key: ImageKey) -> Result[bool]:
         pass
 
     @abstractclassmethod
-    def delete_image_data(self, key: ImageKey) -> Optional[Fail]:
+    def check_exist_image(self, key: ImageKey) -> bool:
         pass
 
     @abstractclassmethod
-    def check_exist_image(self, key: ImageKey) -> bool:
+    def get_image_data(self, key: ImageKey) -> Result[ImageData]:
         pass

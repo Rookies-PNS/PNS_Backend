@@ -26,7 +26,6 @@ class ImageKey:
     """_summary_
     Args:
         access_key : 이미지에 접근할 수 있는 url 키
-        img_path : 실제 이미지가 저장된 장소
     """
 
     access_key: str

@@ -4,7 +4,7 @@ from Applications.Repositories.Interfaces import IMigrations
 
 import pymysql
 
-# from icecream import ic
+from icecream import ic
 
 
 class MySqlMigrations(IMigrations):
@@ -194,7 +194,6 @@ CREATE TABLE IF NOT EXISTS {table_name} (
 
     def create_img_data(self):
         connection = self.connect()
-        post_table_name = self.get_padding_name("post")
         user_table_name = self.get_padding_name("user")
         img_table_name = self.get_padding_name("img_data")
         try:
@@ -207,15 +206,13 @@ CREATE TABLE IF NOT EXISTS {img_table_name} (
     thumbnail_path VARCHAR(255) NOT NULL,
     origin_path VARCHAR(255) NOT NULL,
     owner_id INT,
-    post_id INT,
-    FOREIGN KEY (owner_id) REFERENCES {user_table_name}(id),
-    FOREIGN KEY (post_id) REFERENCES {post_table_name}(post_id)
+    FOREIGN KEY (owner_id) REFERENCES {user_table_name}(id)
 );
                 """
                 cursor.execute(create_table_query)
                 # 변경 사항을 커밋
                 connection.commit()
-        except:
+        except Exception as ex:
             connection.rollback()
         finally:
             # 연결 닫기
@@ -257,3 +254,12 @@ CREATE TABLE IF NOT EXISTS {img_table_name} (
             # 연결 닫기
             connection.close()
             return ret
+
+    def create_user_session(self):
+        return NotImplementedError()
+
+    def delete_user_session(self):
+        return NotImplementedError()
+
+    def check_exist_user_session(self) -> bool:
+        return NotImplementedError()
