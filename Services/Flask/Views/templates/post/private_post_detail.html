@@ -21,10 +21,10 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th scope="col">Post ID</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Owner</th>
-                    <th scope="col">Create Time</th>
+                    <th scope="col">번 호</th>
+                    <th scope="col">제 목</th>
+                    <th scope="col">작 성 자</th>
+                    <th scope="col">작 성 일 자</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,7 +44,7 @@
         </style>
     <div class="d-flex post-body flex-equal">
         <div class="post-img ">
-            <img src="{{ url_for('static', filename='images/main.png') }}" alt="Illustration" class="img-fluid img-re">
+            <img src="{{ post['image_key'] }}" alt="Illustration" class="img-fluid img-re">
         </div>
         <div class="post_content"style="border-left: 2px solid #000000;">
             {{ post['content'] }}

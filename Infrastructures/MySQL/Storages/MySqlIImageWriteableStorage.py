@@ -1,6 +1,7 @@
 import __init__
 from typing import Optional
 from collections.abc import Collection
+from get_db_data import get_boto_data
 import boto3
 from flask import current_app
 from Commons import *
@@ -19,7 +20,7 @@ class MySqlIImageWritableStorage(IImageWriteableRepository):
     def upload_to_s3(file, bucket_name, object_name) -> Optional[Fail]:
         ic(object_name)
         # AWS S3 클라이언트 생성
-        s3 = boto3.client("s3")
+        s3 = get_boto_data()
         try:
             # 파일 객체를 S3 버킷에 업로드
             s3.upload_fileobj(
@@ -34,7 +35,7 @@ class MySqlIImageWritableStorage(IImageWriteableRepository):
             return False
 
     def get_s3_url(bucket_name, object_name):
-        s3_url = f"https://{bucket_name}.s3.amazonaws.com/{object_name}"
+        s3_url = f"https://{bucket_name}.s3.ap-northeast-1.amazonaws.com/{object_name}"
         return s3_url
 
     def save_image_data(user_id, s3_url) -> Result[ImageKey]:

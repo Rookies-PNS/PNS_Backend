@@ -12,6 +12,7 @@ from flask import (
 from flask_login import current_user
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.datastructures import MultiDict
+from werkzeug.datastructures.file_storage import FileStorage
 from Commons import PostId
 
 from Domains.Entities import Post, PostVO, SimplePost, SimpleUser
@@ -24,7 +25,9 @@ from Applications.Usecases.PostServices import (
 )
 from Applications.Results import Result, Fail
 from Infrastructures.IOC import get_user_storage, get_post_storage
-from Infrastructures.MySQL.Storages import MySqlIImageWriteableStorage
+from Infrastructures.MySQL.Storages.MySqlIImageWriteableStorage import (
+    MySqlIImageWritableStorage,
+)
 from Services.Flask.Models import post_to_dict, posts_to_dicts, dict_to_user
 from Services.Flask.Views.forms import PostForm, ImageUploadForm
 
@@ -50,9 +53,7 @@ def private_list(page):
     posts_per_page = 10
     page = max(page, 1)
     serivce = GetPrivatePostService(get_post_storage()[1])  # get_post_storage
-    ic()
     post_list = posts_to_dicts(serivce.get_post_list(user, page - 1, posts_per_page))
-    ic()
     create_auth = False
     if "user" in session:
         user = dict_to_user(session["user"])
@@ -68,8 +69,12 @@ def private_list(page):
 
 @bp.route("/prdetail/<int:post_id>/")
 def private_detail(post_id):
-    service = GetPrivatePostService(None)  # get_post_storage()
-    match service.get_post_detail(post_id):
+    if "user" in session:
+        user = dict_to_user(session["user"])
+    else:
+        return redirect(url_for("post.Private_list", page=1))
+    service = GetPrivatePostService(get_post_storage()[1])  # get_post_storage()
+    match service.get_post_detail(user, post_id):
         case post if isinstance(post, PostVO):
             auth = post.get_uid() is None
             update_auth, delete_auth = False, False
@@ -105,13 +110,36 @@ def private_create():
 
     form = PostForm()
     form2 = ImageUploadForm()
+    ic()
     if request.method == "POST":
-        if form.validate_on_submit():  # and form2.validate_on_submit():
+        ic()
+        if form.validate_on_submit() or form2.validate_on_submit():
+            ic()
             if "user" in session:
                 user = dict_to_user(session["user"])
             else:
                 user = None
+            ic()
+            if form2.validate_on_submit():
+                # 이미지 파일 처리
+                ic()
+                image_file = form2.image.data
+                ic(image_file)
+                filename = secure_filename(image_file.filename)  # 파일 이름 보안 처리
+                object_name = f"Image-logs/{filename}"  # 저장할 경로와 파일 이름 설정
 
+                # S3에 업로드를 위한 스토리지 인스턴스 생성
+                storage = MySqlIImageWritableStorage()
+                if storage.upload_to_s3(image_file, "pns-bucket", object_name):
+                    image_url = storage.get_s3_url("pns-bucket", object_name)
+
+                    # 이미지 URL 데이터베이스에 저장
+                    user_id = current_user.id
+                    if storage.save_image_data(image_url, user_id):
+                        flash("이미지가 업로드되었습니다.", "success")
+                    else:
+                        flash("이미지 저장 실패.", "error")
+                    return redirect(url_for("post.private_create"))
             match post_service.create(
                 form.subject.data,
                 form.content.data,
@@ -128,25 +156,6 @@ def private_create():
                 case _:
                     ic()
                     pass
-
-            if form2.validate_on_submit():
-                # 이미지 파일 처리
-                image_file = form2.image.data
-                filename = secure_filename(image_file.filename)  # 파일 이름 보안 처리
-                object_name = f"Image-logs/{filename}"  # 저장할 경로와 파일 이름 설정
-
-                # S3에 업로드를 위한 스토리지 인스턴스 생성
-                storage = MySqlIImageWriteableStorage()
-                if storage.upload_to_s3(image_file, "pns-bucket", object_name):
-                    image_url = storage.get_s3_url("pns-bucket", object_name)
-
-                    # 이미지 URL 데이터베이스에 저장
-                    user_id = current_user.id
-                    if storage.save_image_data(image_url, user_id):
-                        flash("이미지가 업로드되었습니다.", "success")
-                    else:
-                        flash("이미지 저장 실패.", "error")
-                    return redirect(url_for("post.private_create"))
 
     return render_template("post/private_post_form.html", form=form, form2=form2)
 
@@ -237,17 +246,20 @@ def private_set_private(post_id):
 
 @bp.route("/pblist/<int:page>")
 def public_list(page):
+    if "user" in session:
+        user = dict_to_user(session["user"])
+    else:
+        user = None
+        return redirect(url_for("auth.login"))
     posts_per_page = 10
     page = max(page, 1)
-    serivce = GetPublicPostService(None)  # get_post_storage
+    serivce = GetPublicPostService(get_post_storage()[1])  # get_post_storage
     post_list = posts_to_dicts(serivce.get_list_no_filter(page - 1, posts_per_page))
     create_auth = False
     if "user" in session:
         user = dict_to_user(session["user"])
         create_auth = CreatePostService(
-            # get_post_storage(), get_user_storage()
-            None,
-            None,
+            get_post_storage(), get_user_storage()
         ).check_auth(user)
 
     return render_template(
@@ -370,38 +382,3 @@ def public_set_private(post_id):
     return jsonify(
         {"status": "success", "message": "일기가 비공개상태가 되었습니다.", "post_id": post_id}
     )
-
-
-@app.route("/upload_image", methods=["GET", "POST"])
-def upload_image():
-    form = ImageUploadForm()
-    if form.validate_on_submit():
-        # 이미지 파일 처리
-        image_file = form.image.data
-        filename = secure_filename(image_file.filename)  # 파일 이름 보안 처리
-        object_name = f"Image-logs/{filename}"  # 저장할 경로와 파일 이름 설정
-
-        # S3에 업로드를 위한 스토리지 인스턴스 생성
-        storage = MySqlIImageWriteableStorage()
-        if storage.upload_to_s3(image_file, "pns-bucket", object_name):
-            image_url = storage.get_s3_url("pns-bucket", object_name)
-
-            # 이미지 URL 데이터베이스에 저장
-            user_id = current_user.id
-            if storage.save_image_data(image_url, user_id):
-                flash("이미지가 업로드되었습니다.", "success")
-            else:
-                flash("이미지 저장 실패.", "error")
-            return redirect(url_for("post.private_create"))
-
-    return render_template("upload_image.html", form=form)
-
-
-@app.route("/upload", methods=["GET", "POST"])
-def upload():
-    form = ImageUploadForm()
-    if form.validate_on_submit():
-        # 이미지 처리 로직
-        flash("이미지가 업로드되었습니다.")
-        return redirect(url_for("index"))
-    return render_template("upload.html", form=form)
