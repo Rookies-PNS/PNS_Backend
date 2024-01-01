@@ -15,6 +15,8 @@ def parse_opt():
     )
     parser.add_argument("--branch", default="main")
     parser.add_argument("--not_debug", action="store_true", default=False)
+    parser.add_argument("--host", default="127.0.0.1")
+    parser.add_argument("--port", default=5000)
     parser.add_argument("--storage_type", default="mysql")
     parser.add_argument(
         "--ver",
@@ -69,10 +71,10 @@ def git_push(test_list: list, branch="main"):
         subprocess.call(exe, shell=True)
 
 
-def flask(debug=True):
+def flask(debug=True, host="127.0.0.1", port=5000):
     from Services.Flask.board_site import app
 
-    app.run(debug=debug)
+    app.run(debug=debug, host=host, port=int(port))
 
 
 def init_user():
@@ -286,7 +288,7 @@ def main(opt):
         case "git-push":
             git_push(opt.test_file, opt.branch)
         case "flask":
-            flask(debug)
+            flask(debug, opt.host, opt.port)
         case "migrate":
             migrate()
         case "delete-storage":
