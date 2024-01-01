@@ -1,10 +1,10 @@
 import __init__
 import unittest
 import sys
-from typing import List
+from typing import List, Tuple
 from datetime import datetime, timezone
 
-from Commons import UserId, Uid, Password, PostId
+from Commons import *
 from Domains.Entities import SimpleUser
 from Applications.Usecases.UserServices import CreateUserService, LoginService
 from Applications.Usecases.PostServices import (
@@ -30,6 +30,43 @@ class test_post_services(unittest.TestCase):
         print(sys._getframe(0).f_code.co_name)
         cls.factory = test_selector.get_test_factory("post_service_test_")
 
+        cls.일반사용자_auths = [
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.Own),  # 자기 계정 삭제가능
+            Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
+            Auth(Policy.PostReadAblePolicy, TargetScope.Own),  # 자기 일기 읽기 가능
+            Auth(Policy.PostDeleteAblePolicy, TargetScope.Own),  # 자기 일기 삭제가능
+            Auth(Policy.PostCreateAndUpdateAblePolicy, TargetScope.Own),  # 자기 일기 수정가능
+            Auth(Policy.PostPublicAblePolicy, TargetScope.Own),  # 자기 일기 공개가능
+            Auth(Policy.PostPrivateAblePolicy, TargetScope.Own),  # 자기 일기 비공개가능
+        ]
+        cls.공유일기관리자_auths = [
+            Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(Policy.PostPrivateAblePolicy, TargetScope.All),  # 모든 일기 비공개가능
+            Auth(
+                Policy.UserAuthLockOfPostPublicPolicy, TargetScope.All
+            ),  # 모든 유저 일기공개 권한정지 권한
+            Auth(
+                Policy.UserAuthUnlockOfPostPublicPolicy, TargetScope.All
+            ),  # 모든 유저 일기공개 권한정지 해제 권한
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.All),  # 모든 유저 정보 열람가
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.Own),  # 자기 계정 삭제가능
+        ]
+        cls.계정관리자_auths = [
+            Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(Policy.PostDeleteAblePolicy, TargetScope.All),  # All 일기 삭제가능
+            Auth(
+                Policy.UserAuthLockOfPostCreateAndUpdatePolicy, TargetScope.All
+            ),  # 일기 쓰기 권한정지 권한
+            Auth(
+                Policy.UserAuthUnlockOfPostCreateAndUpdatePolicy, TargetScope.All
+            ),  # 일기 쓰기 권한정기 해제 권한
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.All),  # 모든 유저 정보 열람가능
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.All),  # 모든 계정 삭제가능
+        ]
+
         migrate = test_selector.get_usecase_migration(cls.factory)
         # 깔끔하게 지우고 시작
         if migrate.check_exist_post():
@@ -40,21 +77,44 @@ class test_post_services(unittest.TestCase):
         # 테이블 생성
         migrate.create_user()
 
-        repo = test_selector.get_user_storage(cls.factory)
-        create_user = CreateUser(repo)
-        login_user = LoginUser(repo)
+        repoW, repoR = test_selector.get_user_storage(cls.factory)
+        create_user_service = CreateUserService(repoW)
+        login_service = LoginService(repoR, repoW)
 
-        users: List[SimpleUser] = []
-        u = create_user.create("taks123", "1Q2w3e4r!@$", "takgyun Lee")
-        users.append(u)
-        u = create_user.create("hahahoho119", "1B2n3m4!@", "Ho Han")
-        users.append(u)
-        u = create_user.create("mygun7749", "$1Awb5$123", "Guna Yoo")
-        users.append(u)
+        users: List[Tuple[str, str, str, str]] = [
+            ("taks123", "1Q2w3e4r!@$", "takgyun Lee", "Taks"),
+            ("hahahoho119", "1B2n3m4!@", "Ho Han", "Hans"),
+            ("mygun7749", "$1Awb5$123", "Guna Yoo", "YoYo"),
+        ]
+        for id, pw, name, nick in users:
+            ret = create_user_service.create(
+                account=id,
+                passwd=pw,
+                name=name,
+                nickname=nick,
+                auths=[  # Nomal User Auth List
+                    Auth(
+                        Policy.UserDataReadAblePolicy, TargetScope.Own
+                    ),  # 자신의 유저 정보 열람가능
+                    Auth(
+                        Policy.UserDataDeleteAblePolicy, TargetScope.Own
+                    ),  # 자기 계정 삭제가능
+                    Auth(
+                        Policy.PostReadAblePolicy, TargetScope.Allowed
+                    ),  # 공개된 일기 읽기 가능
+                    Auth(Policy.PostReadAblePolicy, TargetScope.Own),  # 자기 일기 읽기 가능
+                    Auth(Policy.PostDeleteAblePolicy, TargetScope.Own),  # 자기 일기 삭제가능
+                    Auth(
+                        Policy.PostCreateAndUpdateAblePolicy, TargetScope.Own
+                    ),  # 자기 일기 수정가능
+                    Auth(Policy.PostPublicAblePolicy, TargetScope.Own),  # 자기 일기 공개가능
+                    Auth(Policy.PostPrivateAblePolicy, TargetScope.Own),  # 자기 일기 비공개가능
+                ],
+            )
 
         cls.origin_users = users
-        cls.create_user = CreateUser(repo)
-        cls.login_user = LoginUser(repo)
+        cls.create_user_service = create_user_service
+        cls.login_user_service = login_service
 
     @classmethod
     def tearDownClass(cls):
@@ -62,6 +122,7 @@ class test_post_services(unittest.TestCase):
         print(sys._getframe(0).f_code.co_name)
         # 썻으면 삭제
         migrate = test_selector.get_usecase_migration(cls.factory)
+
         if migrate.check_exist_user():
             migrate.delete_user()
         cls.assertFalse(False, migrate.check_exist_user())
@@ -76,18 +137,24 @@ class test_post_services(unittest.TestCase):
         migrate.create_post()
         self.assertTrue(migrate.check_exist_post())
 
-        post_repo = test_selector.get_post_storage(self.factory)
-        user_repo = test_selector.get_user_storage(self.factory)
+        post_repoW, post_repoR = test_selector.get_post_storage(self.factory)
+        user_repoW, user_repoR = test_selector.get_user_storage(self.factory)
 
-        self.get_post_list = GetPostList(post_repo)
-        self.create_post = CreatePostService(post_repo, user_repo)
-        self.get_post = GetPost(post_repo)
-        self.update_post = UpdatePost(post_repo, user_repo)
-        self.delete_post = DeletePostService(post_repo, user_repo)
+        self.create_post_service = CreatePostService(post_repoW, user_repoW)
+        self.get_private_post_service = GetPrivatePostService(post_repoW)
+        self.get_public_post_service = GetPublicPostService(post_repoW)
+        self.update_post_service = UpdatePostService(post_repoW, user_repoW)
+        self.delete_post_service = DeletePostService(post_repoW, user_repoW)
 
-        post1 = self.create_post.create("Post 1", "Content 1", self.origin_users[0])
-        post2 = self.create_post.create("Post 2", "Content 2", self.origin_users[1])
-        post3 = self.create_post.create("Post 3", "Content 3", self.origin_users[2])
+        post1 = self.create_post_service.create(
+            "Post 1", "Content 1", self.origin_users[0]
+        )
+        post2 = self.create_post_service.create(
+            "Post 2", "Content 2", self.origin_users[1]
+        )
+        post3 = self.create_post_service.create(
+            "Post 3", "Content 3", self.origin_users[2]
+        )
 
     def tearDown(self):
         "Hook method for deconstructing the test fixture after testing it."
@@ -100,7 +167,7 @@ class test_post_services(unittest.TestCase):
 
     def test_get_post_list(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post_list = self.get_post_list.get_list_no_filter()
+        post_list = self.get_public_post_service.get_list_no_filter()
 
         self.assertEqual(len(post_list), 3)
 
@@ -109,7 +176,7 @@ class test_post_services(unittest.TestCase):
         now = datetime.now(tz=timezone.utc)
         now = now.replace(microsecond=0)
 
-        new_post = self.create_post.create(
+        new_post = self.create_post_service.create(
             "New Post", "New Content", self.origin_users[0], now
         )
         self.assertEqual("New Post", new_post.title)
@@ -122,7 +189,9 @@ class test_post_services(unittest.TestCase):
             new_post.update_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"),
         )
 
-        check_post = self.get_post.get_post_from_post_id(new_post.post_id.idx)
+        check_post = self.get_private_post_service.get_post_from_post_id(
+            new_post.post_id.idx
+        )
         self.assertEqual("New Post", check_post.title)
         self.assertEqual("New Content", check_post.content.content)
         self.assertEqual(
@@ -134,16 +203,16 @@ class test_post_services(unittest.TestCase):
             check_post.update_time.get_time().strftime("%d/%m/%Y, %H:%M:%S"),
         )
 
-        post_list = self.get_post_list.get_list_no_filter()
+        post_list = self.get_public_post_service.get_list_no_filter()
         self.assertEqual(len(post_list), 4)
 
     def test_get_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post = self.get_post.get_post_from_post_id(1)
+        post = self.get_private_post_service.get_post_from_post_id(1)
         self.assertEqual("Post 1", post.title)
         self.assertEqual("Content 1", post.content.content)
 
-        post_list = self.get_post_list.get_list_no_filter()
+        post_list = self.get_public_post_service.get_list_no_filter()
         self.assertEqual(len(post_list), 3)
 
     def test_update_post(self):
@@ -151,9 +220,9 @@ class test_post_services(unittest.TestCase):
 
         time.sleep(1)
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post = self.get_post.get_post_from_post_id(1)
+        post = self.get_private_post_service.get_post_from_post_id(1)
 
-        updated_post = self.update_post.update(
+        updated_post = self.update_post_service.update(
             post, "Updated Post", "Updated Content", self.origin_users[0]
         )
         self.assertEqual(updated_post.title, "Updated Post")
@@ -170,21 +239,23 @@ class test_post_services(unittest.TestCase):
             < 0
         )
 
-        post_list = self.get_post_list.get_list_no_filter()
+        post_list = self.get_public_post_service.get_list_no_filter()
         self.assertEqual(len(post_list), 3)
 
-        check_post = self.get_post.get_post_from_post_id(updated_post.post_id.idx)
+        check_post = self.get_private_post_service.get_post_from_post_id(
+            updated_post.post_id.idx
+        )
         self.assertEqual(check_post.title, "Updated Post")
         self.assertEqual(check_post.content.content, "Updated Content")
 
     def test_delete_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post = self.get_post.get_post_from_post_id(1)
-        self.delete_post.delete(post, self.origin_users[0])
-        deleted_post = self.get_post.get_post_from_post_id(1)
+        post = self.get_private_post_service.get_post_from_post_id(1)
+        self.delete_post_service.delete(post, self.origin_users[0])
+        deleted_post = self.get_private_post_service.get_post_from_post_id(1)
         self.assertIsNone(deleted_post)
 
-        post_list = self.get_post_list.get_list_no_filter()
+        post_list = self.get_public_post_service.get_list_no_filter()
         self.assertEqual(len(post_list), 2)
 
     def test_(self):

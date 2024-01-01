@@ -21,12 +21,10 @@ from Applications.Repositories.Interfaces.IUserReadableRepository import (
 )
 from Applications.Repositories.Interfaces.IMigrations import IMigrations
 
-from Applications.Repositories.Interfaces.IImageSaveableRepository import (
-    IImageSaveableRepository,
+from Applications.Repositories.Interfaces.IImageWriteableRepository import (
+    IImageWriteableRepository,
 )
-from Applications.Repositories.Interfaces.IImageDeleteableRepository import (
-    IImageDeleteableRepository,
+from Applications.Repositories.Interfaces.IImageReadableRepository import (
+    IImageReadableRepository,
 )
-from Applications.Repositories.Interfaces.IImageDataReadableRepository import (
-    IImageDataReadableRepository,
-)
+from Applications.Repositories.Interfaces.ISessionRepository import ISessionRepository

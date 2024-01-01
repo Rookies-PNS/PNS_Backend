@@ -2,18 +2,7 @@ import __init__
 from typing import Optional, List
 from datetime import datetime
 
-from Commons import (
-    UserId,
-    Password,
-    UpdateableTime,
-    LoginData,
-    PostCounter,
-    Policy,
-    TargetScope,
-    Policy,
-    AuthArchives,
-    IntersectionPolicy,
-)
+from Commons import *
 from Domains.Entities import User, SimpleUser
 from Applications.Usecases.AppUsecaseExtention import validate_user_input
 
@@ -72,4 +61,3 @@ class DeleteUserService:
         actor_passwd: str,
     ):
         pass
-    
