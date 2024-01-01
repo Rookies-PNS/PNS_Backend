@@ -115,7 +115,6 @@ class LoginService:
             case _:
                 pass
         # fail
-        ic()
         # ic(lock_flag, fail_num, block_time)
         self.repo_w.update_to_fail_login(user, lock_flag)
         return Fail_CheckUser_PasswardNotCorrect()
