@@ -152,7 +152,7 @@ class test_post_services(unittest.TestCase):
         self.get_private_post_service = GetPrivatePostService(post_repoR)
         self.get_public_post_service = GetPublicPostService(post_repoR)
         self.update_post_service = UpdatePostService(post_repoW, user_repoW)
-        self.delete_post_service = DeletePostService(post_repoW, user_repoW)
+        self.delete_post_service = DeletePostService(post_repoW, post_repoR, user_repoW)
 
         post1 = self.create_post_service.create(
             title="Post 1",
@@ -240,10 +240,10 @@ class test_post_services(unittest.TestCase):
         ):
             case none if none is None:
                 match self.get_private_post_service.get_post_list(
-                    actor=user, page=0, posts_per_page=1
+                    actor=user, page=0, posts_per_page=10
                 ):
-                    case [target] if isinstance(target, SimplePost):
-                        new_post = target
+                    case _list if isinstance(_list, list):
+                        new_post = _list[-1]
                     case _:
                         raise ValueError()
             case a:
@@ -321,13 +321,19 @@ class test_post_services(unittest.TestCase):
 
     def test_delete_post(self):
         print("\t\t", sys._getframe(0).f_code.co_name)
-        post = self.get_private_post_service.get_post_detail(1)
-        self.delete_post_service.delete(post, self.origin_users[0])
-        deleted_post = self.get_private_post_service.get_post_detail(1)
-        self.assertIsNone(deleted_post)
-
-        post_list = self.get_public_post_service.get_post_list()
+        user = self.origin_users[0]
+        post_list = self.get_public_post_service.get_post_list(user)
         self.assertEqual(len(post_list), 2)
+
+        post = self.get_private_post_service.get_post_detail(user, 1)
+
+        self.assertIsNone(self.delete_post_service.delete(self.origin_users[0], 1))
+        deleted_post = self.get_private_post_service.get_post_detail(user, 1)
+        deleted_post = self.get_private_post_service.get_post_detail(user, 1)
+        self.assertIsInstance(deleted_post, Fail)
+
+        post_list = self.get_public_post_service.get_post_list(user)
+        self.assertEqual(len(post_list), 1)
 
     def test_(self):
         print("\t\t", sys._getframe(0).f_code.co_name)

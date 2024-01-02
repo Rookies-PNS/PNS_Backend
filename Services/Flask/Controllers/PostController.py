@@ -73,18 +73,18 @@ def private_detail(post_id):
     else:
         return redirect(url_for("post.Private_list", page=1))
     service = GetPrivatePostService(get_post_storage()[1])  # get_post_storage()
+    (PW, PR) = get_post_storage()
+    (UW, UR) = get_user_storage()
     match service.get_post_detail(user, post_id):
         case post if isinstance(post, PostVO):
             auth = post.get_uid() is None
             update_auth, delete_auth = False, False
             if not auth and "user" in session:
                 user = dict_to_user(session["user"])
-                update_auth = UpdatePostService(
-                    get_post_storage(), get_user_storage()
-                ).check_auth(post, user)
-                delete_auth = DeletePostService(
-                    get_post_storage(), get_user_storage()
-                ).check_auth(post, user)
+                update_auth = UpdatePostService(PW, UR).check_auth(post, user)
+                delete_auth = DeletePostService(PW, PR, UR).check_auth_coms(
+                    user, post.owner, post.share_flag
+                )
                 ic(user, delete_auth, update_auth)
             post = post_to_dict(post)
             return render_template(
@@ -159,26 +159,30 @@ def private_create():
     return render_template("post/private_post_form.html", form=form, form2=form2)
 
 
-@bp.route("/prdelete/<int:post_id>/", methods=["Get", "POST"])
+@bp.route("/private_delete/<int:post_id>/", methods=["Get", "POST"])
 def private_delete(post_id):
+    ic()
     if "user" in session:
         user = dict_to_user(session["user"])
     else:
         user = None
+        return redirect(url_for("post.private_detail", post_id=post_id))
 
-    match GetPrivatePostService(get_post_storage()).get_post_detail(post_id):
-        case post if isinstance(post, PostVO):
-            service = DeletePostService(get_post_storage(), get_user_storage())
-            match service.delete(post, user):
-                case id if isinstance(id, PostId):
-                    return redirect(url_for("main.index", page=1))
-                case Fail(type=type) if type == "Fail_DeletePost_UserMismatch":
-                    flash("삭제 권한이 없습니다.")
-                case Fail(type=type):
-                    ic()
-                    ic(type, "NotImplementedError")
-                case _:
-                    ic()
+    (PW, PR) = get_post_storage()
+    (UW, UR) = get_user_storage()
+    service = DeletePostService(PW, PR, UR)
+
+    if not service.check_auth(user, post_id):
+        flash("삭제할 수 없습니다.")
+    else:
+        match service.delete(user, post_id):
+            case none if none is None:
+                ic(none)
+                return redirect(url_for("post.public_list", page=1))
+            case fail:
+                ic(fail)
+                flash("삭제할 수 없습니다.")
+
     return redirect(url_for("post.private_detail", post_id=post_id))
 
 
@@ -278,23 +282,18 @@ def public_detail(post_id):
 
     service = GetPublicPostService(get_post_storage()[1])  # get_post_storage()
 
+    (PW, PR) = get_post_storage()
+    (UW, UR) = get_user_storage()
     match service.get_post_detail(user, post_id):
         case post if isinstance(post, PostVO):
             auth = post.get_uid() is None
             update_auth, delete_auth = False, False
-            # if not auth and "user" in session:
-            #     user = dict_to_user(session["user"])
-            #     update_auth = UpdatePostService(
-            #         # get_post_storage(), get_user_storage()
-            #         None,
-            #         None,
-            #     ).check_auth(post, user)
-            #     delete_auth = DeletePostService(
-            #         # get_post_storage(), get_user_storage()
-            #         None,
-            #         None,
-            #     ).check_auth(post, user)
-            #     ic(user, delete_auth, update_auth)
+            if not auth and "user" in session:
+                user = dict_to_user(session["user"])
+                update_auth = UpdatePostService(PW, UR).check_auth(post, user)
+                delete_auth = DeletePostService(PW, PR, UR).check_auth_coms(
+                    user, post.owner, post.share_flag
+                )
             post = post_to_dict(post)
             return render_template(
                 "post/public_post_detail.html",

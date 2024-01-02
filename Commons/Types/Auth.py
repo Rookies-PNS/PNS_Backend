@@ -5,8 +5,6 @@ from typing import List
 
 from Commons import Uid
 
-from icecream import ic
-
 
 class Policy(IntEnum):
     none = auto()
@@ -181,8 +179,12 @@ class IntersectionPolicy(ICheckPolicy):
         Returns:
             bool: True (Able) / False (UnAble)
         """
+        from icecream import ic
+
         for policy in self.policies:
             scopes = actor_auth_Archives.check_policy(policy)
+            ic(policy, scopes)
+
             flag = False
             for scope in scopes:
                 if self.check_scope(
