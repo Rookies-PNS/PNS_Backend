@@ -30,7 +30,7 @@
                         <td>
                             <a href="{{ url_for('post.public_detail', post_id=post["id"]) }}">{{ post["title"] }}</a>
                         </td>
-                        <td>{{ post['nickname']}}</td>
+                        <td>{{ post['owner']}}</td>
                         <td>{{ post['target_time'] }}</td>
                     </tr>
                     {% endfor %}
