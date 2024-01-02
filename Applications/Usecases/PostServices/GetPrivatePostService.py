@@ -19,7 +19,6 @@ from Applications.Results import (
     Result,
     Fail,
 )
-from icecream import ic
 
 
 class GetPrivatePostService:
@@ -99,5 +98,4 @@ class GetPrivatePostService:
                 self.cache[post_id] = post
                 return post
             case fail:
-                ic(fail)
                 return None
