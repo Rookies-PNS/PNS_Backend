@@ -54,6 +54,9 @@
         <div></div>
         <div class="col-sm-2">
             {% if delete_auth %}
+            <a href="{{ url_for('post.private_delete', post_id=post["post_id"]) }}" class="btn btn-outline-primary me-2">삭제하기</button></a>
+            {% endif %}
+            {% if delete_auth %}
             <div id="toast-container"></div>
             {% if admin_auth %}
             <div class="toggle-buttons">

@@ -188,19 +188,22 @@ VALUES (%s, %s, %s, %s, %s, %s, %s);
     def update_image_data(self, image_data: ImageData) -> Optional[Fail]:
         return NotImplementedError()
 
-    def delete(self, post: PostVO) -> Result[PostId]:
+    def delete(self, post: PostVO) -> Optional[Fail]:
         connection = self.connect()
         table_name = self.get_padding_name("post")
 
-        delete_query = f"DELETE FROM {table_name} WHERE post_id = %s;"
+        delete_query = f"""
+UPDATE {table_name}
+SET delete_flag = True
+WHERE post_id = %s;
+        """
         try:
             with connection.cursor() as cursor:
-                cursor.execute(delete_query, (post.post_id.idx,))
+                cursor.execute(delete_query, (post.get_post_id().idx,))
                 connection.commit()
-        except:
+
+        except Exception as ex:
             connection.rollback()
             return Fail(type="Fail_Mysql_DeletePost_unknown")
         finally:
             connection.close()
-
-        return post.post_id

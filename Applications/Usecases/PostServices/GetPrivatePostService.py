@@ -42,8 +42,17 @@ class GetPrivatePostService:
             taget_allow_flag=share_flag,
         )
 
+    def chece_auth(self, actor: SimpleUser, post_id: int) -> bool:
+        match self._________get_post(post_id):
+            case post if isinstance(post, PostVO):
+                flag = post.share_flag
+                target = post.owner
+            case _:
+                return False
+        return self._______chece_auth(actor, target, flag)
+
     def get_post_detail(self, actor: SimpleUser, post_id: int) -> Result[PostVO]:
-        match self._________get_simple_post(post_id):
+        match self._________get_post(post_id):
             case post if isinstance(post, PostVO):
                 ret = post
             case _:
@@ -78,16 +87,7 @@ class GetPrivatePostService:
             case _:
                 return []
 
-    def chece_auth(self, actor: SimpleUser, post_id: int) -> bool:
-        match self._________get_simple_post(post_id):
-            case post if isinstance(post, PostVO):
-                flag = post.share_flag
-                target = post.owner
-            case _:
-                return False
-        return self._______chece_auth(actor, target, flag)
-
-    def _________get_simple_post(self, post_id: int) -> Optional[PostVO]:
+    def _________get_post(self, post_id: int) -> Optional[PostVO]:
         if post_id in self.cache:
             ret = self.cache[post_id]
             del self.cache[post_id]

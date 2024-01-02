@@ -31,7 +31,7 @@ class UpdatePostService:
         self.user_repo = user_repo
 
     def check_auth(self, post: PostVO, user: SimpleUser) -> bool:
-        return True
+        return False
         if not self.post_repo.check_exist_pid(post.post_id):
             return False
 

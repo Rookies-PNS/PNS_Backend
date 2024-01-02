@@ -65,7 +65,7 @@ class IPostWriteableRepository(metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
-    def delete(self, post: PostVO) -> Result[PostId]:
+    def delete(self, post: PostVO) -> Optional[Fail]:
         """_summary_
         일기를 삭제한다.
 
@@ -73,6 +73,6 @@ class IPostWriteableRepository(metaclass=ABCMeta):
             post (PostVO): _description_
 
         Returns:
-            Result[PostId]: _description_
+            Optino[Fail]: _description_
         """
         pass

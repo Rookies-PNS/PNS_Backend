@@ -56,7 +56,9 @@ class MySqlPostReadStorage(IPostReadableRepository):
     def check_exist_pid(self, post_id: PostId) -> bool:
         connection = self.connect()
         table_name = self.get_padding_name("post")
-        select_query = f"SELECT post_id FROM {table_name} WHERE post_id = %s;"
+        select_query = (
+            f"SELECT post_id FROM {table_name} WHERE post_id = %s and delete_flag=0;"
+        )
         try:
             with connection.cursor() as cursor:
                 cursor.execute(select_query, (post_id.idx,))
@@ -101,7 +103,7 @@ class MySqlPostReadStorage(IPostReadableRepository):
 SELECT post_id, title, target_time, share_flag, img_access_key, owner_id
 FROM {table_name}
 WHERE share_flag = 1 AND delete_flag = 0 
-ORDER BY target_time ASC{ ";" if posts_per_page is None else '''
+ORDER BY target_time DESC{ ";" if posts_per_page is None else '''
 LIMIT %s OFFSET %s;''' }
             """
                 match (posts_per_page, page):
@@ -204,7 +206,7 @@ LIMIT %s OFFSET %s;''' }
 SELECT post_id, title, target_time, share_flag, img_access_key, owner_id
 FROM {table_name}
 WHERE owner_id = %s AND delete_flag = 0 
-ORDER BY target_time ASC{ ";" if posts_per_page is None else '''
+ORDER BY target_time DESC{ ";" if posts_per_page is None else '''
 LIMIT %s OFFSET %s;''' }
             """
                 match (posts_per_page, page):
