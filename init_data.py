@@ -77,11 +77,28 @@ def init_user():
             Auth(Policy.PostPrivateAblePolicy, TargetScope.Own),  # 자기 일기 비공개가능
         ],
     }
+    nomal_user3 = {
+        "id": "nomal_id3",
+        "pw": "1qaz2wsx!@QW",
+        "name": "nomal user mom",
+        "nick": "동네선배엄마",
+        "auth": [
+            Auth(Policy.UserDataReadAblePolicy, TargetScope.Own),  # 자신의 유저 정보 열람가능
+            Auth(Policy.UserDataDeleteAblePolicy, TargetScope.Own),  # 자기 계정 삭제가능
+            Auth(Policy.PostReadAblePolicy, TargetScope.Allowed),  # 공개된 일기 읽기 가능
+            Auth(Policy.PostReadAblePolicy, TargetScope.Own),  # 자기 일기 읽기 가능
+            Auth(Policy.PostDeleteAblePolicy, TargetScope.Own),  # 자기 일기 삭제가능
+            Auth(Policy.PostCreateAndUpdateAblePolicy, TargetScope.Own),  # 자기 일기 수정가능
+            Auth(Policy.PostPublicAblePolicy, TargetScope.Own),  # 자기 일기 공개가능
+            Auth(Policy.PostPrivateAblePolicy, TargetScope.Own),  # 자기 일기 비공개가능
+        ],
+    }
     users = [
         user_admin,
         post_admin,
         nomal_user,
         nomal_user2,
+        nomal_user3,
     ]
     service = CreateUserService(get_strage_factory().get_user_write_storage())
 
@@ -119,6 +136,7 @@ def init_post():
     login = LoginService(repoR, repoW)
     nomal = login.login("nomal_id", "1qaz2wsx!@QW")
     nomal2 = login.login("nomal_id2", "1qaz2wsx!@QW")
+    nomal3 = login.login("nomal_id3", "1qaz2wsx!@QW")
     create = CreatePostService(get_post_storage()[0], repoW)
 
     start = {
@@ -138,10 +156,19 @@ def init_post():
         "time": now,
         "flag": True,
     }
+    anony_post2 = {
+        "title": "'예는 또여기와서 그러네",
+        "content": f"""이상한 놈 이라도 사랑해주세요.
+이 게시판은 제가 막도록 하겠숍니다.""",
+        "user": nomal3,
+        "time": now,
+        "flag": True,
+    }
 
     posts = [
         start,
         anony_post,
+        anony_post2,
     ]
     for post in posts:
         create.create(

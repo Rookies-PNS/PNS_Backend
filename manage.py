@@ -104,8 +104,11 @@ def migrate():
     delete_storage()
     m.create_user()
     m.create_post()
-    init_user()
-    init_post()
+    try:
+        init_user()
+        init_post()
+    except:
+        print("init_data.py를 설정해주세요!")
 
 
 def set_storage(storage_type: str):
